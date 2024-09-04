@@ -1,3 +1,4 @@
+import Providers from '@/services/providers';
 import { CssBaseline } from '@mui/material';
 
 export const metadata = {
@@ -13,7 +14,10 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <CssBaseline />
-      <body>{children}</body>
+      <body>
+        {children}
+        {/* <Providers>{children}</Providers> */}
+      </body>
     </html>
   );
 }
