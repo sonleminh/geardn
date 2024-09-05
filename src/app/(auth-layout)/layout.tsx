@@ -1,5 +1,5 @@
-import Providers from '@/services/providers';
 import { CssBaseline } from '@mui/material';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 export const metadata = {
   title: 'Next.js',
@@ -12,12 +12,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang='en'>
-      <CssBaseline />
-      <body>
-        {children}
-        {/* <Providers>{children}</Providers> */}
-      </body>
-    </html>
+    <GoogleOAuthProvider clientId='74957006221-6mm4u0inm5drqgrt1hpoiagugbuhoav6.apps.googleusercontent.com'>
+      <html lang='en'>
+        <CssBaseline />
+        <body>
+          {children}
+          {/* <Providers>{children}</Providers> */}
+        </body>
+      </html>
+    </GoogleOAuthProvider>
   );
 }

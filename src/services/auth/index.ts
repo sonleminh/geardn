@@ -14,11 +14,20 @@ type TInitDataRes = {
 
 const authUrl = '/auth';
 
-export const signUpApi = async (url: string, payload: ISignUpPayload) => {
-   await postRequest(url, payload);
-  // const result = await postRequest(url, payload);
-  // return result;
+export const loginAPI = async (
+  url: string,
+  { arg }: { arg: { email: string,  password: string  } }
+) => {
+  await postRequest(url, { email: arg.email, password: arg.password });
 };
+
+export const signUpAPI = async (
+  url: string,
+  { arg }: { arg: { fullName: string,email: string,  password: string  } }
+) => {
+  await postRequest(url, { fullName: arg.fullName, email: arg.email, password: arg.password });
+};
+
 
 // export const signUpApi = async (payload: ISignInPayload) => {
 //   const result = await postRequest(`${authUrl}/signin`, payload);

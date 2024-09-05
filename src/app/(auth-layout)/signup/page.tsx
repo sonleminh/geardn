@@ -21,26 +21,25 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import useSWR from 'swr';
 import { useGetFake } from '@/services/queries';
 import { fetcher } from '@/services/fetcher';
-import { useLoginAPI, useSignUpAPI } from '@/services/mutations';
+import { useSignUpAPI } from '@/services/mutations';
 import Link from 'next/link';
-import { GoogleLogin } from '@react-oauth/google';
 
-export default function SignUp() {
+export default function Login() {
   // const { data, error, isLoading } = useSWR('/api/user/123', fetcher)
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const { trigger } = useLoginAPI();
+  const { trigger } = useSignUpAPI();
 
   const formik = useFormik({
-    initialValues: { email: '', password: '' },
+    initialValues: { fullName: '', email: '', password: '' },
     // validationSchema: schema,
     validateOnChange: false,
     onSubmit(values) {
       // signInMutation.mutate(values);
       trigger({
+        fullName: values.fullName,
         email: values.email,
         password: values.password,
       });
-      console.log(values);
     },
   });
 
@@ -99,13 +98,43 @@ export default function SignUp() {
               <Box>
                 <Typography
                   sx={{ mb: 1, textTransform: 'uppercase', fontSize: 20 }}>
-                  Welcome back!
+                  Create your account!
                 </Typography>
                 <Typography sx={{ fontSize: 12, color: '#ababab' }}>
                   Access ...
                 </Typography>
               </Box>
               <Box>
+                <FormControl
+                  fullWidth
+                  variant='standard'
+                  sx={{ maxHeight: 100 }}>
+                  <InputLabel>Họ và tên</InputLabel>
+                  <TextField
+                    variant='outlined'
+                    size='small'
+                    fullWidth
+                    name='fullName'
+                    placeholder='Your full name'
+                    autoFocus
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position='start'>
+                          <Person2OutlinedIcon />
+                        </InputAdornment>
+                      ),
+                    }}
+                    helperText={
+                      <Typography
+                        component={'span'}
+                        sx={{ fontSize: 13, color: 'red' }}>
+                        {formik.errors.fullName}
+                      </Typography>
+                    }
+                    onChange={handleChange}
+                    sx={{ mt: 6, borderRadius: 4 }}
+                  />
+                </FormControl>
                 <FormControl
                   fullWidth
                   variant='standard'
@@ -194,25 +223,20 @@ export default function SignUp() {
                   variant='contained'
                   fullWidth
                   sx={{ height: 48, mt: 3 }}
-                  disabled={!formik.values.email && !formik.values.password}
+                  disabled={
+                    !formik.values.fullName ||
+                    !formik.values.email ||
+                    !formik.values.password
+                  }
                   onClick={() => formik.handleSubmit()}>
                   Đăng nhập
                 </Button>
               </Box>
             </Box>
-            <GoogleLogin
-              onSuccess={(credentialResponse) => {
-                console.log(credentialResponse);
-              }}
-              onError={() => {
-                console.log('Login Failed');
-              }}
-            />
             <Typography sx={{ mb: 2 }}>
-              Don't you have an account ?{' '}
-              <Link href={'/signup'}>
-                {' '}
-                <Typography component={'span'}>Sign Up</Typography>
+              Already have an account?{' '}
+              <Link href={'/login'}>
+                <Typography component={'span'}>Login</Typography>
               </Link>
             </Typography>
           </Grid2>
