@@ -23,7 +23,8 @@ import { useGetFake } from '@/services/queries';
 import { fetcher } from '@/services/fetcher';
 import { useLoginAPI, useSignUpAPI } from '@/services/mutations';
 import Link from 'next/link';
-import { GoogleLogin } from '@react-oauth/google';
+import { CredentialResponse, GoogleLogin } from '@react-oauth/google';
+import { jwtDecode } from 'jwt-decode';
 
 export default function SignUp() {
   // const { data, error, isLoading } = useSWR('/api/user/123', fetcher)
@@ -201,8 +202,11 @@ export default function SignUp() {
               </Box>
             </Box>
             <GoogleLogin
-              onSuccess={(credentialResponse) => {
-                console.log(credentialResponse);
+              onSuccess={(credentialResponse: CredentialResponse) => {
+                const credentialDecoded = jwtDecode(
+                  credentialResponse.credential as string
+                );
+                console.log(credentialDecoded);
               }}
               onError={() => {
                 console.log('Login Failed');
