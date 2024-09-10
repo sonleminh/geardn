@@ -17,7 +17,7 @@ async function fetchRequest<T>(
       },
       body: data ? JSON.stringify(data) : undefined,
       ...config,
-      credentials: 'include',
+      credentials: "include",
     });
 
     const responseData: T = await response.json();

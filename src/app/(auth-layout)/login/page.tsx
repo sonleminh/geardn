@@ -21,15 +21,18 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import useSWR from 'swr';
 import { useGetFake } from '@/services/queries';
 import { fetcher } from '@/services/fetcher';
-import { useLoginAPI, useSignUpAPI } from '@/services/mutations';
+import { useCookieAPI, useLoginAPI, useSignUpAPI } from '@/services/mutations';
 import Link from 'next/link';
 import { CredentialResponse, GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
+import { BASE_API_URL } from '@/constants/env';
 
 export default function SignUp() {
   // const { data, error, isLoading } = useSWR('/api/user/123', fetcher)
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const { trigger } = useLoginAPI();
+  const { trigger: ckTrigger } = useCookieAPI();
+  const { data } = useSWR(`${BASE_API_URL}/auth/ck`, fetcher);
 
   const formik = useFormik({
     initialValues: { email: '', password: '' },
@@ -41,7 +44,6 @@ export default function SignUp() {
         email: values.email,
         password: values.password,
       });
-      console.log(values);
     },
   });
 
@@ -54,6 +56,10 @@ export default function SignUp() {
     const { value, name } = e.target;
     formik.setFieldValue(name, value);
     // const { data, error, isLoading } = useSWR('/api/user/123', fetcher);
+  };
+
+  const handleCookie = () => {
+    // ckTrigger();
   };
 
   return (
@@ -219,6 +225,7 @@ export default function SignUp() {
                 <Typography component={'span'}>Sign Up</Typography>
               </Link>
             </Typography>
+            <Button onClick={handleCookie}>Cookie</Button>
           </Grid2>
         </Grid2>
       </Box>
