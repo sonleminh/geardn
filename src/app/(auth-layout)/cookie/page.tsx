@@ -1,7 +1,8 @@
 'use client';
 
 import { BASE_API_URL } from '@/constants/env';
-import { getRequest } from '@/services/axios';
+import { getRequest } from '@/utils/fetch-client';
+// import { getRequest } from '@/services/axios';
 import { Button } from '@mui/material';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
