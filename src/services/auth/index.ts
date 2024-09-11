@@ -28,13 +28,6 @@ export const signUpAPI = async (
   await postRequest(url, { fullName: arg.fullName, email: arg.email, password: arg.password });
 };
 
-export const cookieAPI = async (
-  url: string,
-  { arg }: { arg: { cookie: string  } }
-) => {
-  await getRequest(url);
-};
-
 // export const signUpApi = async (payload: ISignInPayload) => {
 //   const result = await postRequest(`${authUrl}/signin`, payload);
 //   return result;

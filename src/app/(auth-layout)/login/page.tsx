@@ -21,18 +21,22 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import useSWR from 'swr';
 import { useGetFake } from '@/services/queries';
 import { fetcher } from '@/services/fetcher';
-import { useCookieAPI, useLoginAPI, useSignUpAPI } from '@/services/mutations';
+import { useLoginAPI, useSignUpAPI } from '@/services/mutations';
 import Link from 'next/link';
 import { CredentialResponse, GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
 import { BASE_API_URL } from '@/constants/env';
+import useSWRMutation from 'swr/mutation';
+import { loginAPI } from '@/services/auth';
 
-export default function SignUp() {
+export default function Login() {
   // const { data, error, isLoading } = useSWR('/api/user/123', fetcher)
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const { trigger } = useLoginAPI();
-  const { trigger: ckTrigger } = useCookieAPI();
-  const { data } = useSWR(`${BASE_API_URL}/auth/ck`, fetcher);
+  // const { trigger, data } = useLoginAPI();
+  const { trigger, data } = useSWRMutation(
+    `${BASE_API_URL}/auth/login`,
+    loginAPI
+  );
 
   const formik = useFormik({
     initialValues: { email: '', password: '' },
@@ -44,6 +48,7 @@ export default function SignUp() {
         email: values.email,
         password: values.password,
       });
+      console.log('data:', data);
     },
   });
 
