@@ -28,27 +28,43 @@ import { jwtDecode } from 'jwt-decode';
 import { BASE_API_URL } from '@/constants/env';
 import useSWRMutation from 'swr/mutation';
 import { loginAPI } from '@/services/auth';
+import { postRequest } from '@/utils/fetch-client';
 
 export default function Login() {
   // const { data, error, isLoading } = useSWR('/api/user/123', fetcher)
   const [showPassword, setShowPassword] = useState<boolean>(false);
   // const { trigger, data } = useLoginAPI();
-  const { trigger, data } = useSWRMutation(
-    `${BASE_API_URL}/auth/login`,
-    loginAPI
-  );
+  // const { trigger, data } = useSWRMutation(
+  //   `${BASE_API_URL}/auth/login`,
+  //   loginAPI
+  // );
+
+  const {
+    data,
+    error: swrError,
+    mutate,
+  } = useSWR(null, fetcher, {
+    shouldRetryOnError: false,
+    revalidateOnFocus: false,
+  });
 
   const formik = useFormik({
     initialValues: { email: '', password: '' },
     // validationSchema: schema,
     validateOnChange: false,
-    onSubmit(values) {
+    async onSubmit(values) {
       // signInMutation.mutate(values);
-      trigger({
-        email: values.email,
-        password: values.password,
-      });
-      console.log('data:', data);
+      // trigger({
+      //   email: values.email,
+      //   password: values.password,
+      // });
+      // console.log('data:', data);
+      const response = await mutate(
+        '/api/login', // API endpoint
+        {
+          // body: JSON.stringify({ values }),
+        }
+      );
     },
   });
 
