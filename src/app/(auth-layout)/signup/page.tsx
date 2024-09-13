@@ -23,25 +23,33 @@ import { useGetFake } from '@/services/queries';
 import { fetcher } from '@/services/fetcher';
 import { useSignUpAPI } from '@/services/mutations';
 import Link from 'next/link';
+import { BASE_API_URL } from '@/constants/env';
 
 export default function Login() {
   // const { data, error, isLoading } = useSWR('/api/user/123', fetcher)
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const { trigger } = useSignUpAPI();
+  const { trigger, data } = useSignUpAPI();
+
+  const { data: testData } = useSWR(`${BASE_API_URL}/auth/ck`, fetcher);
+
+  console.log('test:', testData);
 
   const formik = useFormik({
     initialValues: { fullName: '', email: '', password: '' },
     // validationSchema: schema,
     validateOnChange: false,
-    onSubmit(values) {
+    async onSubmit(values) {
       // signInMutation.mutate(values);
-      trigger({
+      const result = await trigger({
         fullName: values.fullName,
         email: values.email,
         password: values.password,
       });
+      console.log('res:', result);
     },
   });
+
+  console.log(2, data);
 
   // const { data, error } = useSWR(
   //   'https://jsonplaceholder.typicode.com/posts/1',

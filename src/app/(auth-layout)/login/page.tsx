@@ -1,6 +1,12 @@
 'use client';
 
+import bg from '@/../../public/setup-backgroud.jpg';
 import SkeletonImage from '@/components/common/SkeletonImage';
+import { login } from '@/services/auth';
+import { useLoginAPI } from '@/services/mutations';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+import LockIcon from '@mui/icons-material/Lock';
+import Person2OutlinedIcon from '@mui/icons-material/Person2Outlined';
 import {
   Box,
   Button,
@@ -11,76 +17,31 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import React, { ChangeEvent, useState } from 'react';
-import bg from '@/../../public/setup-backgroud.jpg';
-import Person2OutlinedIcon from '@mui/icons-material/Person2Outlined';
-import * as yup from 'yup';
-import { useFormik } from 'formik';
-import LockIcon from '@mui/icons-material/Lock';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
-import useSWR from 'swr';
-import { useGetFake } from '@/services/queries';
-import { fetcher } from '@/services/fetcher';
-import { useLoginAPI, useSignUpAPI } from '@/services/mutations';
-import Link from 'next/link';
 import { CredentialResponse, GoogleLogin } from '@react-oauth/google';
+import { useFormik } from 'formik';
 import { jwtDecode } from 'jwt-decode';
-import { BASE_API_URL } from '@/constants/env';
-import useSWRMutation from 'swr/mutation';
-import { loginAPI } from '@/services/auth';
-import { postRequest } from '@/utils/fetch-client';
+import Link from 'next/link';
+import { ChangeEvent, useState } from 'react';
 
 export default function Login() {
-  // const { data, error, isLoading } = useSWR('/api/user/123', fetcher)
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  // const { trigger, data } = useLoginAPI();
-  // const { trigger, data } = useSWRMutation(
-  //   `${BASE_API_URL}/auth/login`,
-  //   loginAPI
-  // );
-
-  const {
-    data,
-    error: swrError,
-    mutate,
-  } = useSWR(null, fetcher, {
-    shouldRetryOnError: false,
-    revalidateOnFocus: false,
-  });
+  const { mutate, data } = useLoginAPI();
 
   const formik = useFormik({
     initialValues: { email: '', password: '' },
     // validationSchema: schema,
     validateOnChange: false,
     async onSubmit(values) {
-      // signInMutation.mutate(values);
-      // trigger({
-      //   email: values.email,
-      //   password: values.password,
-      // });
-      // console.log('data:', data);
-      const response = await mutate(
-        '/api/login', // API endpoint
-        {
-          // body: JSON.stringify({ values }),
-        }
-      );
+      const userData = await login(values.email, values.password);
+      mutate(userData, false);
+      console.log('user:', userData);
+      console.log('data:', data);
     },
   });
-
-  // const { data, error } = useSWR(
-  //   'https://jsonplaceholder.typicode.com/posts/1',
-  //   fetcher
-  // );
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { value, name } = e.target;
     formik.setFieldValue(name, value);
-    // const { data, error, isLoading } = useSWR('/api/user/123', fetcher);
-  };
-
-  const handleCookie = () => {
-    // ckTrigger();
   };
 
   return (
@@ -246,7 +207,6 @@ export default function Login() {
                 <Typography component={'span'}>Sign Up</Typography>
               </Link>
             </Typography>
-            <Button onClick={handleCookie}>Cookie</Button>
           </Grid2>
         </Grid2>
       </Box>

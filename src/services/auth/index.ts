@@ -28,32 +28,21 @@ export const signUpAPI = async (
   await postRequest(url, { fullName: arg.fullName, email: arg.email, password: arg.password });
 };
 
-// export const signUpApi = async (payload: ISignInPayload) => {
-//   const result = await postRequest(`${authUrl}/signin`, payload);
-//   return result;
-// };
+export async function login(email: string, password: string) {
+  const res = await fetch(`${BASE_API_URL}/auth/login`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email, password }),
+  });
 
-// export function useLogin () {
-//   const [data, setData] = useState(null);
-//   const [error, setError] = useState(null);
-  
-//   const { mutate, isValidating } = useSWR(
-//     null,
-//     login,
-//     {
-//       onError: (err) => setError(err),
-//       onSuccess: (data) => setData(data),
-//     }
-//   );
+  if (!res.ok) {
+    const error: any = new Error('Failed to login');
+    error.info = await res.json();
+    error.status = res.status;
+    throw error;
+  }
 
-//   const login = async (username, password) => {
-//     await mutate({ username, password });
-//   };
-
-//   return {
-//     login,
-//     data,
-//     error,
-//     isLoading: isValidating,
-//   };
-// };
+  return res.json();
+}
