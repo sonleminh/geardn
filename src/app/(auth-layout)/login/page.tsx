@@ -21,21 +21,27 @@ import { CredentialResponse, GoogleLogin } from '@react-oauth/google';
 import { useFormik } from 'formik';
 import { jwtDecode } from 'jwt-decode';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ChangeEvent, useState } from 'react';
 
 export default function Login() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const { mutate, data } = useLoginAPI();
+  const { mutate } = useLoginAPI();
 
   const formik = useFormik({
     initialValues: { email: '', password: '' },
     // validationSchema: schema,
     validateOnChange: false,
     async onSubmit(values) {
-      const userData = await login(values.email, values.password);
+      const userData = await login(values);
       mutate(userData, false);
-      console.log('user:', userData);
-      console.log('data:', data);
+      console.log(userData);
+      console.log(userData?._id);
+      if (userData?._id) {
+        console.log('navigate');
+        router.push('/profile');
+      }
     },
   });
 

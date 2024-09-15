@@ -21,18 +21,16 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import useSWR from 'swr';
 import { useGetFake } from '@/services/queries';
 import { fetcher } from '@/services/fetcher';
-import { useSignUpAPI } from '@/services/mutations';
 import Link from 'next/link';
 import { BASE_API_URL } from '@/constants/env';
+import { useSignUpAPI } from '@/services/mutations';
+import { signUp } from '@/services/auth';
+import { useRouter } from 'next/navigation';
 
-export default function Login() {
-  // const { data, error, isLoading } = useSWR('/api/user/123', fetcher)
+export default function SignUp() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const { trigger, data } = useSignUpAPI();
-
-  const { data: testData } = useSWR(`${BASE_API_URL}/auth/ck`, fetcher);
-
-  console.log('test:', testData);
+  const { mutate } = useSignUpAPI();
 
   const formik = useFormik({
     initialValues: { fullName: '', email: '', password: '' },
@@ -40,26 +38,17 @@ export default function Login() {
     validateOnChange: false,
     async onSubmit(values) {
       // signInMutation.mutate(values);
-      const result = await trigger({
-        fullName: values.fullName,
-        email: values.email,
-        password: values.password,
-      });
-      console.log('res:', result);
+      const result = await signUp(values);
+      mutate(result, false);
+      if (result._id) {
+        router.push('/login');
+      }
     },
   });
-
-  console.log(2, data);
-
-  // const { data, error } = useSWR(
-  //   'https://jsonplaceholder.typicode.com/posts/1',
-  //   fetcher
-  // );
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { value, name } = e.target;
     formik.setFieldValue(name, value);
-    // const { data, error, isLoading } = useSWR('/api/user/123', fetcher);
   };
 
   return (
