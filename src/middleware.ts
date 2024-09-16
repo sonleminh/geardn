@@ -6,6 +6,12 @@ import { getRequest } from './utils/fetch-client';
 import { IWhoIAmResponse } from './interfaces/IUser';
 import { IRefreshTokenResponse } from './interfaces/IAuth';
 import { RequestCookie } from 'next/dist/compiled/@edge-runtime/cookies';
+import { JwtPayload, jwtDecode } from 'jwt-decode';
+
+interface CustomJwtPayload extends JwtPayload {
+  email?: string;
+  name?: string;
+}
 
 const protectedRoute = ['/profile'];
 const publicRoute = ['/login'];
@@ -16,7 +22,6 @@ async function whoami(accessToken: RequestCookie | undefined): Promise<IWhoIAmRe
         headers: {
           'Content-Type': 'application/json',
           Cookie: `at=${accessToken?.value}`,
-          // 'Cache-Control': 'no-cache'
         },
         cache: 'no-store'
       }) as IWhoIAmResponse;
@@ -36,7 +41,7 @@ try {
         Cookie: `rt=${refreshToken?.value}`,
     },
     }) as IRefreshTokenResponse;
-} catch (error) {
+  } catch (error) {
     console.error('Failed to refresh access token:', error);
     return null;
 }
@@ -46,23 +51,37 @@ export async function middleware(request: NextRequest) {
   const cookieStore = cookies();
   const accessToken = cookieStore.get('at');
   const refreshToken = cookieStore.get('rt');
+  const googleCredentials = cookieStore.get('GC');
+  
+  let user: IWhoIAmResponse | null = null;
 
-  let user = await whoami(accessToken)
+    if (googleCredentials) {
+      const credentialDecoded = jwtDecode(
+          googleCredentials?.value
+        ) as CustomJwtPayload;
+        if (credentialDecoded) {
+          user = { _id: credentialDecoded?.sub, email: credentialDecoded?.email, name: credentialDecoded?.name || '' }; 
+        }
+    }
+  if(!googleCredentials)
+    {
+    user = await whoami(accessToken)
 
-  if (!user?._id && refreshToken) {
-    const response = NextResponse.next();
-    const newTokenResponse = await refreshAccessToken(refreshToken);
-    if (newTokenResponse?.accessToken) {
-      response.cookies.set('at', newTokenResponse?.accessToken,  {
-        path: '/',
-      });
-      return response;
-    } else {
-      const response = NextResponse.redirect(new URL('/login', request.url));
- 
-      response.cookies.set('at', '', { maxAge: 0 });
-      response.cookies.set('rt', '', { maxAge: 0 });
-      return response;
+    if (!user?._id && refreshToken) {
+      const response = NextResponse.next();
+      const newTokenResponse = await refreshAccessToken(refreshToken);
+      if (newTokenResponse?.accessToken) {
+        response.cookies.set('at', newTokenResponse?.accessToken,  {
+          path: '/',
+        });
+        return response;
+      } else {
+        const response = NextResponse.redirect(new URL('/login', request.url));
+  
+        response.cookies.set('at', '', { maxAge: 0 });
+        response.cookies.set('rt', '', { maxAge: 0 });
+        return response;
+      }
     }
   }
 
@@ -73,6 +92,7 @@ export async function middleware(request: NextRequest) {
   if (isProtectedRoute && !user?._id) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
+
 
   if (isPublicRoute && user?._id) {
     return NextResponse.redirect(new URL('/profile', request.url));

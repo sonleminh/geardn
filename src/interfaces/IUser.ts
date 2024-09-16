@@ -3,10 +3,10 @@ export interface IUser {
     name: string;
 }
 export interface IWhoIAmResponse {
-    _id: string;
-    name: string;
-    email: string;
-    exp: number;
-    iat: number;
-    statusCode: number;
+    _id?: string;
+    name?: string;
+    email?: string;
+    exp?: number;
+    iat?: number;
+    statusCode?: number;
   }

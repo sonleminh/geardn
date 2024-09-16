@@ -24,7 +24,7 @@ import { jwtDecode } from 'jwt-decode';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, useState } from 'react';
-import useSWR from 'swr';
+import Cookies from 'js-cookie';
 
 export default function Login() {
   const router = useRouter();
@@ -38,10 +38,7 @@ export default function Login() {
     async onSubmit(values) {
       const userData = await login(values);
       mutate(userData, false);
-      console.log(userData);
-      console.log(userData?._id);
       if (userData?._id) {
-        console.log('navigate');
         router.push('/profile');
       }
     },
@@ -50,6 +47,17 @@ export default function Login() {
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { value, name } = e.target;
     formik.setFieldValue(name, value);
+  };
+
+  const handleGoogleLogin = (credentialResponse: CredentialResponse) => {
+    const credentialDecoded = jwtDecode(
+      credentialResponse?.credential as string
+    );
+    if (credentialResponse) {
+      Cookies.set('GC', credentialResponse?.credential as string, {
+        expires: credentialDecoded?.exp,
+      });
+    }
   };
 
   return (
@@ -199,17 +207,17 @@ export default function Login() {
             </Box>
             <GoogleLogin
               onSuccess={(credentialResponse: CredentialResponse) => {
-                const credentialDecoded = jwtDecode(
-                  credentialResponse.credential as string
-                );
-                console.log(credentialDecoded);
+                handleGoogleLogin(credentialResponse);
+                // const credentialDecoded = jwtDecode(
+                //   credentialResponse.credential as string
+                // );
               }}
               onError={() => {
                 console.log('Login Failed');
               }}
             />
             <Typography sx={{ mb: 2 }}>
-              Don't you have an account ?{' '}
+              Don't you have an account c?{' '}
               <Link href={'/signup'}>
                 {' '}
                 <Typography component={'span'}>Sign Up</Typography>
