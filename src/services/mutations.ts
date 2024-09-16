@@ -10,7 +10,7 @@ export function useSignUpAPI() {
     revalidateOnFocus: false, 
     shouldRetryOnError: false,
   });
-  const signUp = async (signUpData: {fullName: string, email: string, password: string}) => {
+  const signUp = async (signUpData: {name: string, email: string, password: string}) => {
     const response = await postRequest(`${BASE_API_URL}/auth/signup`, signUpData);
 
     if (response) {

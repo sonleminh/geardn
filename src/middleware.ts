@@ -16,7 +16,9 @@ async function whoami(accessToken: RequestCookie | undefined): Promise<IWhoIAmRe
         headers: {
           'Content-Type': 'application/json',
           Cookie: `at=${accessToken?.value}`,
+          // 'Cache-Control': 'no-cache'
         },
+        cache: 'no-store'
       }) as IWhoIAmResponse;
     } catch (error) {
       console.error('Failed to fetch user:', error);
@@ -44,29 +46,25 @@ export async function middleware(request: NextRequest) {
   const cookieStore = cookies();
   const accessToken = cookieStore.get('at');
   const refreshToken = cookieStore.get('rt');
+
   let user = await whoami(accessToken)
-      console.log('us:', user)
 
-  console.log('rs:', user);
-if (!user?._id && refreshToken) {
-    // const newTokenResponse = await refreshAccessToken(refreshToken);
-    const rs = await getRequest(`${BASE_API_URL}/auth/access-token`)
-    console.log(rs)
-        
-
-    // console.log('new:', newTokenResponse)
-    // if (newTokenResponse?.statusCode === 200) {
-    //   user = await whoami(newTokenResponse.accessToken);
-    // }
+  if (!user?._id && refreshToken) {
+    const response = NextResponse.next();
+    const newTokenResponse = await refreshAccessToken(refreshToken);
+    if (newTokenResponse?.accessToken) {
+      response.cookies.set('at', newTokenResponse?.accessToken,  {
+        path: '/',
+      });
+      return response;
+    } else {
+      const response = NextResponse.redirect(new URL('/login', request.url));
+ 
+      response.cookies.set('at', '', { maxAge: 0 });
+      response.cookies.set('rt', '', { maxAge: 0 });
+      return response;
+    }
   }
-    // if (user?.statusCode === 401 && refreshToken) {
-    //     const newTokenResponse = await refreshAccessToken(refreshToken);
-
-    //     if (newTokenResponse?.statusCode) {
-    //         // console.log('newAT:', accessToken)
-    //         // user = await whoami(newTokenResponse.accessToken);
-    //     }
-    // }  
 
   const path = request.nextUrl.pathname;
   const isProtectedRoute = protectedRoute.includes(path);

@@ -22,9 +22,9 @@ export const loginAPI = async (
 
 export const signUpAPI = async (
   url: string,
-  { arg }: { arg: { fullName: string,email: string,  password: string  } }
+  { arg }: { arg: { name: string,email: string,  password: string  } }
 ) => {
-  await postRequest(url, { fullName: arg.fullName, email: arg.email, password: arg.password });
+  await postRequest(url, { name: arg.name, email: arg.email, password: arg.password });
 };
 
 export async function login(payload: {email: string, password: string}) {
@@ -36,7 +36,7 @@ export async function login(payload: {email: string, password: string}) {
   }
 }
 
-export async function signUp(payload: {fullName: string ,email: string, password: string}) {
+export async function signUp(payload: {name: string ,email: string, password: string}) {
   try {
     const res: ISignUpResponse = await postRequest(`${BASE_API_URL}/auth/signup`, payload);
     return res;

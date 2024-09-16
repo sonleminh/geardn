@@ -12,7 +12,7 @@ export interface ISignUpPayload {
 
 export interface ILogInResponse {
   email: string;
-  fullName: string;
+  name: string;
   role: string;
   _id: string;
   status: number;
@@ -22,13 +22,13 @@ export interface ILogInResponse {
 export interface ISignUpResponse {
   _id: string;
   email: string;
-  fullName: string;
+  name: string;
   role: string;
   status: number;
   message: string;
 }
 
 export interface IRefreshTokenResponse {
-  message: string;
+  accessToken: string;
   statusCode: number;
 }

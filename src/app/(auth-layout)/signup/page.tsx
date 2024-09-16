@@ -33,7 +33,7 @@ export default function SignUp() {
   const { mutate } = useSignUpAPI();
 
   const formik = useFormik({
-    initialValues: { fullName: '', email: '', password: '' },
+    initialValues: { name: '', email: '', password: '' },
     // validationSchema: schema,
     validateOnChange: false,
     async onSubmit(values) {
@@ -111,7 +111,7 @@ export default function SignUp() {
                     variant='outlined'
                     size='small'
                     fullWidth
-                    name='fullName'
+                    name='name'
                     placeholder='Your full name'
                     autoFocus
                     InputProps={{
@@ -125,7 +125,7 @@ export default function SignUp() {
                       <Typography
                         component={'span'}
                         sx={{ fontSize: 13, color: 'red' }}>
-                        {formik.errors.fullName}
+                        {formik.errors.name}
                       </Typography>
                     }
                     onChange={handleChange}
@@ -221,7 +221,7 @@ export default function SignUp() {
                   fullWidth
                   sx={{ height: 48, mt: 3 }}
                   disabled={
-                    !formik.values.fullName ||
+                    !formik.values.name ||
                     !formik.values.email ||
                     !formik.values.password
                   }

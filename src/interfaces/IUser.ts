@@ -4,7 +4,7 @@ export interface IUser {
 }
 export interface IWhoIAmResponse {
     _id: string;
-    fullName: string;
+    name: string;
     email: string;
     exp: number;
     iat: number;
