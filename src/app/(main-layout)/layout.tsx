@@ -1,3 +1,5 @@
+import Layout from '@/components/common/sharing/layout';
+import { ColorModeProvider } from '@/contexts/ColorModeContext';
 import { CssBaseline } from '@mui/material';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
@@ -16,8 +18,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en'>
-      <CssBaseline />
-      <body className={inter.className}>{children}</body>
+      <ColorModeProvider>
+        <CssBaseline />
+        <body className={inter.className}>
+          <Layout>{children}</Layout>
+        </body>
+      </ColorModeProvider>
     </html>
   );
 }

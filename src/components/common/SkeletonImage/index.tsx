@@ -22,6 +22,7 @@ const SkeletonImage: React.FC<ImageProps> = (props) => {
       src={srcImg}
       alt={props.alt}
       fill={props.fill ?? true}
+      objectFit='cover'
       sizes={
         props.sizes ??
         '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
@@ -30,6 +31,7 @@ const SkeletonImage: React.FC<ImageProps> = (props) => {
         setIsError(true);
       }}
       priority
+      quality={100}
     />
   );
 };
