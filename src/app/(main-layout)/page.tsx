@@ -1,7 +1,7 @@
 import SkeletonImage from '@/components/common/SkeletonImage';
 import { Box } from '@mui/material';
 import React from 'react';
-import BANNER_BG from '@/assets/geardn-banner.png';
+import BANNER_BG from '@/assets/geardn.jpg';
 
 export default function Homepage() {
   return (
@@ -10,21 +10,25 @@ export default function Homepage() {
         sx={{
           position: 'relative',
           width: '100%',
-          height: { xs: '500px' },
+          height: { xs: '800px' },
           mb: 1,
-          borderRadius: 2,
           overflow: 'hidden',
           '& img': {
             objectFit: 'cover',
           },
+          ':before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.2)',
+            filter: 'blur(8px)',
+            zIndex: 1,
+          },
         }}>
-        <SkeletonImage
-          src={
-            'https://firebasestorage.googleapis.com/v0/b/dev-blog-7a694.appspot.com/o/geardn-banner.png?alt=media&token=c0015636-eed4-4d6d-915e-aad9fe310f9a'
-          }
-          alt='geardn'
-          fill
-        />
+        <SkeletonImage src={BANNER_BG} alt='geardn' fill unoptimized={true} />
       </Box>
       Homepage
     </>
