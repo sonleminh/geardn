@@ -3,6 +3,9 @@ import { ColorModeProvider } from '@/contexts/ColorModeContext';
 import { CssBaseline } from '@mui/material';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 
 const inter = Inter({ subsets: ['latin'] });
 
