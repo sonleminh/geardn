@@ -12,7 +12,7 @@ import ProductCard from '@/components/common/ProductCart';
 
 const Explore = () => {
   return (
-    <Box>
+    <Box sx={{ mb: 10 }}>
       <Typography sx={{ mb: 2, fontSize: 30, fontWeight: 600 }}>
         Khám phá sản phẩm
       </Typography>

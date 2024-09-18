@@ -1,13 +1,14 @@
 import BANNER_BG from '@/assets/geardn.jpg';
-import LayoutContainer from '@/components/common/sharing/layout-container';
+import ProductCard from '@/components/common/ProductCart';
 import SkeletonImage from '@/components/common/SkeletonImage';
+import LayoutContainer from '@/components/common/sharing/layout-container';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ShoppingBasketOutlinedIcon from '@mui/icons-material/ShoppingBasketOutlined';
-import StarIcon from '@mui/icons-material/Star';
 import {
   Box,
   Button,
   Grid2,
+  InputBase,
   List,
   ListItem,
   Pagination,
@@ -17,7 +18,6 @@ import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import Explore from './components/explore';
-import ProductCard from '@/components/common/ProductCart';
 
 export default function Homepage() {
   return (
@@ -155,14 +155,36 @@ export default function Homepage() {
             p: 5,
             backgroundImage: 'linear-gradient(#363636, #1E1E1E)',
             color: '#fff',
+            borderRadius: 3,
           }}>
-          <Box>
-            <Typography>Ready amksfnajk sbfjk asbfjkasb</Typography>
-            <Box>
-              <input />
+          <Box sx={{ width: '35%' }}>
+            <Typography
+              sx={{ mb: 4, fontSize: 30, fontWeight: 600, lineHeight: '38px' }}>
+              Sẵn sàng khám phá những sản phẩm mới?
+            </Typography>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                width: '260px',
+                p: '4px 4px 4px 16px',
+                bgcolor: '#fff',
+                borderRadius: 10,
+              }}>
+              <InputBase placeholder='Email ..' />
+              <Button
+                variant='contained'
+                sx={{ width: '88px', borderRadius: 10 }}>
+                Gửi
+              </Button>
             </Box>
           </Box>
-          <Box>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'end',
+            }}>
             <Typography>asf asfas fasf as</Typography>
             <Typography>asf asfas fasf as</Typography>
           </Box>
