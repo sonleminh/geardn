@@ -12,10 +12,24 @@ import ProductCard from '@/components/common/ProductCart';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import LayoutContainer from '@/components/common/sharing/layout-container';
+import { useCounterStore } from '@/providers/couter-store-provider';
 
 const Explore = () => {
+  const { count, incrementCount, decrementCount } = useCounterStore(
+    (state) => state
+  );
   return (
     <Box sx={{ mb: 10 }}>
+      <div>
+        Count: {count}
+        <hr />
+        <button type='button' onClick={() => void incrementCount()}>
+          Increment Count
+        </button>
+        <button type='button' onClick={() => void decrementCount()}>
+          Decrement Count
+        </button>
+      </div>
       <LayoutContainer>
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Typography sx={{ mb: 4, fontSize: 36, fontWeight: 700 }}>
