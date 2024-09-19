@@ -1,12 +1,10 @@
 import { SxProps, Theme } from "@mui/material";
 
 export const FooterStyle: SxProps<Theme> = {
-  padding: {xs: '30px 0 20px', sm:'50px 0 30px'},
-  bgcolor: (theme)=> theme.palette.mode === 'light' ? '#000' : '#222',
-  color: '#fff',
+  bgcolor: (theme)=> theme.palette.mode === 'light' ? '#fff' : '#222',
+  color: '#000',
   '.footer-logo': {
     p: 0,
-    mb: {xs: 1, sm:4},
     border: '1px solid #696969',
     'svg': {
       width: {xs: 100,sm: 130},

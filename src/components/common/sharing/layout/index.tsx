@@ -17,18 +17,17 @@ type LayoutType = {
 };
 
 const Layout = ({ children }: LayoutType) => {
-  // const theme = useTheme();
-  // const context = React.useContext(ColorModeContext);
+  const theme = useTheme();
+  const context = React.useContext(ColorModeContext);
 
-  // const handleScrollToTop = () => {
-  //   window.scrollTo({ top: 0, behavior: 'smooth' });
-  // };
-  // const router = useRouter();
+  const handleScrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <>
       <Header />
-      {/* <Box
+      <Box
         sx={{
           position: 'fixed',
           bottom: { xs: '11.5%', lg: '11%' },
@@ -47,8 +46,8 @@ const Layout = ({ children }: LayoutType) => {
         }}
         onClick={handleScrollToTop}>
         <KeyboardArrowUpIcon sx={{ fontSize: 24 }} />
-      </Box> */}
-      {/* <Box
+      </Box>
+      <Box
         sx={{
           position: 'fixed',
           bottom: '5%',
@@ -71,7 +70,7 @@ const Layout = ({ children }: LayoutType) => {
         ) : (
           <LightModeIcon sx={{ fontSize: 13 }} />
         )}
-      </Box> */}
+      </Box>
       {children}
       <Footer />
     </>

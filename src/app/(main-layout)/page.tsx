@@ -1,23 +1,9 @@
 import BANNER_BG from '@/assets/geardn.jpg';
-import ProductCard from '@/components/common/ProductCart';
 import SkeletonImage from '@/components/common/SkeletonImage';
 import LayoutContainer from '@/components/common/sharing/layout-container';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ShoppingBasketOutlinedIcon from '@mui/icons-material/ShoppingBasketOutlined';
-import {
-  Box,
-  Button,
-  Grid2,
-  InputBase,
-  List,
-  ListItem,
-  Pagination,
-  Typography,
-} from '@mui/material';
-import Accordion from '@mui/material/Accordion';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import AccordionSummary from '@mui/material/AccordionSummary';
+import { Box, Button, InputBase, Typography } from '@mui/material';
 import Explore from './components/explore';
+import ProductList from './components/product-list';
 
 export default function Homepage() {
   return (
@@ -45,108 +31,8 @@ export default function Homepage() {
         }}>
         <SkeletonImage src={BANNER_BG} alt='geardn' fill unoptimized={true} />
       </Box>
-      <LayoutContainer>
-        <Box sx={{ p: '32px 0 40px' }}>
-          <Grid2 container spacing={4}>
-            <Grid2 size={3}>
-              <Typography sx={{ fontSize: 22, fontWeight: 600 }}>
-                Danh mục
-              </Typography>
-              <Accordion sx={{ boxShadow: 'none' }}>
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  aria-controls='panel1-content'
-                  id='panel1-header'
-                  sx={{
-                    height: '30px',
-                    '.MuiAccordionSummary-root': {
-                      minHeight: '30px',
-                    },
-                    // '.MuiAccordionSummary-content': {
-                    //   m: 0,
-                    // },
-                  }}>
-                  <ShoppingBasketOutlinedIcon sx={{ mr: 1 }} /> Tất cả sản phẩm
-                </AccordionSummary>
-                <AccordionDetails sx={{ py: 0 }}>
-                  <List sx={{ pt: 0 }}>
-                    <ListItem>Laptop</ListItem>
-                    <ListItem>Laptop</ListItem>
-                    <ListItem>Laptop</ListItem>
-                    <ListItem>Laptop</ListItem>
-                  </List>
-                </AccordionDetails>
-              </Accordion>
-              <Accordion
-                sx={{
-                  boxShadow: 'none',
-                  ':before': {
-                    display: 'none',
-                  },
-                }}>
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  aria-controls='panel2-content'
-                  id='panel2-header'>
-                  Mới nhất
-                </AccordionSummary>
-                <AccordionDetails sx={{ py: 0 }}>
-                  <List sx={{ pt: 0 }}>
-                    <ListItem>Laptop</ListItem>
-                    <ListItem>Laptop</ListItem>
-                    <ListItem>Laptop</ListItem>
-                    <ListItem>Laptop</ListItem>
-                  </List>
-                </AccordionDetails>
-              </Accordion>
-              <Accordion
-                sx={{
-                  boxShadow: 'none',
-                  ':before': {
-                    display: 'none',
-                  },
-                }}>
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  aria-controls='panel2-content'
-                  id='panel2-header'>
-                  Khuyến mãi
-                </AccordionSummary>
-                <AccordionDetails sx={{ py: 0 }}>
-                  <List sx={{ pt: 0 }}>
-                    <ListItem>Laptop</ListItem>
-                    <ListItem>Laptop</ListItem>
-                    <ListItem>Laptop</ListItem>
-                    <ListItem>Laptop</ListItem>
-                  </List>
-                </AccordionDetails>
-              </Accordion>
-            </Grid2>
-            <Grid2 container size={9} spacing={3}>
-              {[1, 2, 3, 4, 5, 6, 7, 8].map((item, index) => (
-                <Grid2 key={index} size={4}>
-                  <ProductCard link={'c'} />
-                </Grid2>
-              ))}
-              <Pagination
-                count={10}
-                // renderItem={(item) => (
-                //   <PaginationItem
-                //     slots={{ previous: ArrowBackIcon, next: ArrowForwardIcon }}
-                //     {...item}
-                //   />
-                // )}
-              />
-            </Grid2>
-          </Grid2>
-        </Box>
-      </LayoutContainer>
-      <Box
-        sx={{
-          ml: { lg: 'calc((100% - 1070px)/2)', xl: 'calc((100% - 1200px)/2)' },
-        }}>
-        <Explore />
-      </Box>
+      <ProductList />
+      <Explore />
       <LayoutContainer>
         <Box
           sx={{
