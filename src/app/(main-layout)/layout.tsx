@@ -1,6 +1,6 @@
 import Layout from '@/components/common/sharing/layout';
 import { ColorModeProvider } from '@/contexts/ColorModeContext';
-import { CounterStoreProvider } from '@/providers/couter-store-provider';
+import { AuthStoreProvider } from '@/providers/auth-store-provider';
 import { CssBaseline } from '@mui/material';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
@@ -25,9 +25,9 @@ export default function RootLayout({
       <ColorModeProvider>
         <CssBaseline />
         <body className={inter.className}>
-          <CounterStoreProvider>
+          <AuthStoreProvider>
             <Layout>{children}</Layout>
-          </CounterStoreProvider>
+          </AuthStoreProvider>
         </body>
       </ColorModeProvider>
     </html>

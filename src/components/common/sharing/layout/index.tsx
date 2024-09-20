@@ -27,6 +27,7 @@ const Layout = ({ children }: LayoutType) => {
   return (
     <>
       <Header />
+      {/* <Box sx={{ mb: '80px' }} /> */}
       <Box
         sx={{
           position: 'fixed',

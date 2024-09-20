@@ -16,7 +16,7 @@ export function useSignUpAPI() {
     if (response) {
       mutate(response, false); // You can choose to revalidate if needed
     } else {
-      throw new Error('Sign up failed');
+      throw new Error('Sign up failed!');
     }
     return response;
   };
@@ -40,7 +40,7 @@ export function useLoginAPI() {
     if (response) {
       mutate(response, false); // You can choose to revalidate if needed
     } else {
-      throw new Error('Login failed');
+      throw new Error('Login failed!');
     }
     return response;
   };
@@ -48,6 +48,30 @@ export function useLoginAPI() {
     data,
     mutate,
     login,
+    isLoading: !error && !data,
+    isError: error,
+  };
+}
+
+export function useLogoutAPI() {
+  const { data, error, mutate } = useSWR(null, fetcher, {
+      revalidateOnFocus: false, 
+      shouldRetryOnError: false,
+    });
+  const logout = async () => {
+    const response = await postRequest(`${BASE_API_URL}/auth/logout`, {});
+
+    if (response) {
+      mutate(response, false); // You can choose to revalidate if needed
+    } else {
+      throw new Error('Logout failed!');
+    }
+    return response;
+  };
+  return {
+    data,
+    mutate,
+    logout,
     isLoading: !error && !data,
     isError: error,
   };

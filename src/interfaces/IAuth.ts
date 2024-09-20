@@ -1,3 +1,5 @@
+import { JwtPayload } from "jwt-decode";
+
 export interface ILoginInPayload {
   username: string;
   password: string;
@@ -15,8 +17,13 @@ export interface ILogInResponse {
   name: string;
   role: string;
   _id: string;
-  status: number;
+  statusCode: number;
   message: string;
+}
+
+export interface ILogoutResponse {
+  message: string;
+  statusCode: number;
 }
 
 export interface ISignUpResponse {
@@ -31,4 +38,10 @@ export interface ISignUpResponse {
 export interface IRefreshTokenResponse {
   accessToken: string;
   statusCode: number;
+}
+
+export interface ICustomJwtPayload extends JwtPayload {
+  email?: string;
+  name?: string;
+  picture?: string
 }

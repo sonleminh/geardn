@@ -1,6 +1,7 @@
 // src/stores/counter-store.ts
 import { IUser } from '@/interfaces/IUser'
 import { createStore } from 'zustand/vanilla'
+import { devtools, persist } from 'zustand/middleware';
 
 export type AuthState = {
   user?: IUser | null;
@@ -17,12 +18,12 @@ export const defaultInitState: AuthState = {
   user: null
 }
 
-export const useAuthStore = (
+export const authStore = (
   initState: AuthState = defaultInitState,
 ) => {
-  return createStore<AuthStore>()((set) => ({
+  return createStore<AuthStore>()((devtools(persist((set) => ({
     ...initState,
-    login: (user) => set(({ user })),
+    login: (user) => set(({ user }), false, "login"),
     logout: () => set(() => ({ user: null })),
-  }))
+  }), {name: 'store'}))))
 }

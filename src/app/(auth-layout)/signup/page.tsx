@@ -24,7 +24,7 @@ import { fetcher } from '@/services/fetcher';
 import Link from 'next/link';
 import { BASE_API_URL } from '@/constants/env';
 import { useSignUpAPI } from '@/services/mutations';
-import { signUp } from '@/services/auth';
+import { signUp, signUpAPI } from '@/services/auth';
 import { useRouter } from 'next/navigation';
 
 export default function SignUp() {
@@ -38,7 +38,7 @@ export default function SignUp() {
     validateOnChange: false,
     async onSubmit(values) {
       // signInMutation.mutate(values);
-      const result = await signUp(values);
+      const result = await signUpAPI(values);
       mutate(result, false);
       if (result._id) {
         router.push('/login');

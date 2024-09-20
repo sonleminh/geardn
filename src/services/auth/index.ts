@@ -2,7 +2,7 @@
 // import { useQuery } from '@tanstack/react-query';
 
 import { BASE_API_URL } from '@/constants/env';
-import { ILogInResponse, ISignUpPayload, ISignUpResponse } from '@/interfaces/IAuth';
+import { ILogInResponse, ILogoutResponse, ISignUpPayload, ISignUpResponse } from '@/interfaces/IAuth';
 import { getRequest, postRequest } from '@/utils/fetch-client';
 
 const articleUrl = 'article';
@@ -13,21 +13,27 @@ type TInitDataRes = {
 
 const authUrl = '/auth';
 
-export const loginAPI = async (
+export const login = async (
   url: string,
   { arg }: { arg: { email: string,  password: string  } }
 ) => {
   await postRequest(url, { email: arg.email, password: arg.password });
 };
 
-export const signUpAPI = async (
+export const signUp = async (
   url: string,
   { arg }: { arg: { name: string,email: string,  password: string  } }
 ) => {
   await postRequest(url, { name: arg.name, email: arg.email, password: arg.password });
 };
 
-export async function login(payload: {email: string, password: string}) {
+export const logout = async (
+  url: string,
+) => {
+  await postRequest(url, {});
+};
+
+export async function loginAPI(payload: {email: string, password: string}) {
   try {
     const res: ILogInResponse = await postRequest(`${BASE_API_URL}/auth/login`, payload);
     return res;
@@ -36,9 +42,18 @@ export async function login(payload: {email: string, password: string}) {
   }
 }
 
-export async function signUp(payload: {name: string ,email: string, password: string}) {
+export async function signUpAPI(payload: {name: string ,email: string, password: string}) {
   try {
     const res: ISignUpResponse = await postRequest(`${BASE_API_URL}/auth/signup`, payload);
+    return res;
+  } catch (error) {
+    throw error
+  }
+}
+
+export async function logoutAPI() {
+  try {
+    const res: ILogoutResponse = await postRequest(`${BASE_API_URL}/auth/logout`, {});
     return res;
   } catch (error) {
     throw error

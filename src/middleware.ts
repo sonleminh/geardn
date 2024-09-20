@@ -4,14 +4,9 @@ import React from 'react'
 import { BASE_API_URL } from './constants/env';
 import { getRequest } from './utils/fetch-client';
 import { IWhoIAmResponse } from './interfaces/IUser';
-import { IRefreshTokenResponse } from './interfaces/IAuth';
+import { ICustomJwtPayload, IRefreshTokenResponse } from './interfaces/IAuth';
 import { RequestCookie } from 'next/dist/compiled/@edge-runtime/cookies';
 import { JwtPayload, jwtDecode } from 'jwt-decode';
-
-interface CustomJwtPayload extends JwtPayload {
-  email?: string;
-  name?: string;
-}
 
 const protectedRoute = ['/profile'];
 const publicRoute = ['/login'];
@@ -58,7 +53,7 @@ export async function middleware(request: NextRequest) {
     if (googleCredentials) {
       const credentialDecoded = jwtDecode(
           googleCredentials?.value
-        ) as CustomJwtPayload;
+        ) as ICustomJwtPayload;
         if (credentialDecoded) {
           user = { _id: credentialDecoded?.sub, email: credentialDecoded?.email, name: credentialDecoded?.name || '' }; 
         }

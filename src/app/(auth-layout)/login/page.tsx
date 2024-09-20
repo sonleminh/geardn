@@ -3,7 +3,7 @@
 import bg from '@/../../public/setup-backgroud.jpg';
 import SkeletonImage from '@/components/common/SkeletonImage';
 import { BASE_API_URL } from '@/constants/env';
-import { login } from '@/services/auth';
+import { loginAPI } from '@/services/auth';
 import { useLoginAPI } from '@/services/mutations';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import LockIcon from '@mui/icons-material/Lock';
@@ -25,9 +25,14 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, useState } from 'react';
 import Cookies from 'js-cookie';
+import { useAuthStore } from '@/providers/auth-store-provider';
+import { ICustomJwtPayload } from '@/interfaces/IAuth';
 
 export default function Login() {
   const router = useRouter();
+  const { user, login } = useAuthStore((state) => state);
+
+  console.log('user:', user);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const { mutate } = useLoginAPI();
 
@@ -36,8 +41,15 @@ export default function Login() {
     // validationSchema: schema,
     validateOnChange: false,
     async onSubmit(values) {
-      const userData = await login(values);
+      const userData = await loginAPI(values);
       mutate(userData, false);
+
+      login({
+        _id: userData?._id,
+        email: userData?.email,
+        name: userData?.name,
+      });
+
       if (userData?._id) {
         router.push('/profile');
       }
@@ -50,13 +62,23 @@ export default function Login() {
   };
 
   const handleGoogleLogin = (credentialResponse: CredentialResponse) => {
-    const credentialDecoded = jwtDecode(
+    const credentialDecoded: ICustomJwtPayload = jwtDecode(
       credentialResponse?.credential as string
     );
+
     if (credentialResponse) {
       Cookies.set('GC', credentialResponse?.credential as string, {
         expires: credentialDecoded?.exp,
       });
+
+      login({
+        _id: credentialDecoded?.sub,
+        email: credentialDecoded?.email as string,
+        name: credentialDecoded?.name as string,
+        picture: credentialDecoded?.picture,
+      });
+
+      router.push('/login');
     }
   };
 

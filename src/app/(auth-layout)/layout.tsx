@@ -1,6 +1,7 @@
 import { CssBaseline } from '@mui/material';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import Providers from './providers';
+import { AuthStoreProvider } from '@/providers/auth-store-provider';
 
 export const metadata = {
   title: 'Next.js',
@@ -17,7 +18,9 @@ export default function RootLayout({
       <html lang='en'>
         <CssBaseline />
         <body>
-          <Providers>{children}</Providers>
+          <AuthStoreProvider>
+            <Providers>{children}</Providers>
+          </AuthStoreProvider>
         </body>
       </html>
     </GoogleOAuthProvider>
