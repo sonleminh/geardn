@@ -9,7 +9,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import Brightness3Icon from '@mui/icons-material/Brightness3';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import { Box, useTheme } from '@mui/material';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { ColorModeContext } from '@/contexts/ColorModeContext';
 
 type LayoutType = {
@@ -18,6 +18,7 @@ type LayoutType = {
 
 const Layout = ({ children }: LayoutType) => {
   const theme = useTheme();
+  const pathname = usePathname();
   const context = React.useContext(ColorModeContext);
 
   const handleScrollToTop = () => {
@@ -27,7 +28,7 @@ const Layout = ({ children }: LayoutType) => {
   return (
     <>
       <Header />
-      {/* <Box sx={{ mb: '80px' }} /> */}
+      {pathname !== '/' && <Box sx={{ mb: '80px' }} />}
       <Box
         sx={{
           position: 'fixed',
@@ -72,7 +73,7 @@ const Layout = ({ children }: LayoutType) => {
           <LightModeIcon sx={{ fontSize: 13 }} />
         )}
       </Box>
-      {children}
+      <Box sx={{ minHeight: 'calc(100vh - 80px - 241.23px)' }}>{children}</Box>
       <Footer />
     </>
   );

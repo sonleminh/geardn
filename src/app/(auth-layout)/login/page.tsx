@@ -78,7 +78,8 @@ export default function Login() {
         picture: credentialDecoded?.picture,
       });
 
-      router.push('/login');
+      router.push('/profile');
+      console.log('cc');
     }
   };
 
@@ -111,7 +112,7 @@ export default function Login() {
                   objectFit: 'cover',
                 },
               }}>
-              <SkeletonImage src={bg} alt='cc' />
+              <SkeletonImage src={bg} alt='geardn' />
             </Box>
           </Grid2>
           <Grid2
