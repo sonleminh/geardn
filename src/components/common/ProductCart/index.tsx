@@ -4,14 +4,11 @@ import SkeletonImage from '../SkeletonImage';
 import BANNER_BG from '@/assets/geardn.jpg';
 import StarRateIcon from '@mui/icons-material/StarRate';
 import AppLink from '../AppLink';
+import { IProduct } from '@/interfaces/IProduct';
 
-interface IProductCard {
-  link: string;
-}
-
-const ProductCard = (props: IProductCard) => {
+const ProductCard = ({ data }: { data: IProduct }) => {
   return (
-    <AppLink href={props.link}>
+    <AppLink href={data?._id ?? ''}>
       <Box
         sx={{
           position: 'relative',
@@ -25,10 +22,10 @@ const ProductCard = (props: IProductCard) => {
           },
         }}
         className='product-img'>
-        <SkeletonImage src={BANNER_BG} alt='geardn' fill />
+        <SkeletonImage src={data?.thumbnail_image} alt='geardn' fill />
       </Box>
       <Typography sx={{ mb: 1, fontSize: 18, fontWeight: 600 }}>
-        Logitech G102
+        {data?.name}
       </Typography>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>

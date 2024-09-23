@@ -4,6 +4,7 @@ import LayoutContainer from '@/components/common/sharing/layout-container';
 import { Box, Button, InputBase, Typography } from '@mui/material';
 import Explore from './components/explore';
 import ProductList from './components/product-list';
+import { useGetProducts } from '@/services/product/api';
 
 export default function Homepage() {
   return (

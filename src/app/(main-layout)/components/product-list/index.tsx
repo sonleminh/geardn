@@ -1,3 +1,5 @@
+'use client';
+
 import ProductCard from '@/components/common/ProductCart';
 import LayoutContainer from '@/components/common/sharing/layout-container';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -14,8 +16,11 @@ import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import { ProductListStyle } from './style';
+import { useGetProducts } from '@/services/product/api';
+import { IProduct } from '@/interfaces/IProduct';
 
 const ProductList = () => {
+  const { products, isLoading, isError } = useGetProducts();
   return (
     <LayoutContainer>
       <Box sx={ProductListStyle}>
@@ -86,9 +91,9 @@ const ProductList = () => {
             </Accordion>
           </Grid2>
           <Grid2 container size={9} spacing={4}>
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((item, index) => (
+            {products?.productList.map((item, index) => (
               <Grid2 key={index} size={4}>
-                <ProductCard link={'c'} />
+                <ProductCard data={item} />
               </Grid2>
             ))}
             <Pagination

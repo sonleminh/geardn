@@ -15,24 +15,8 @@ import LayoutContainer from '@/components/common/sharing/layout-container';
 import { useAuthStore } from '@/providers/auth-store-provider';
 
 const Explore = () => {
-  const { user, login } = useAuthStore((state) => state);
-  console.log('user:', user);
   return (
     <Box sx={{ mb: 10 }}>
-      <div>
-        <hr />
-        <button
-          type='button'
-          onClick={() =>
-            void login({
-              _id: 'ccc',
-              email: 'ccc',
-              name: 'ccc',
-            })
-          }>
-          Increment Count
-        </button>
-      </div>
       <LayoutContainer>
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Typography sx={{ mb: 4, fontSize: 36, fontWeight: 700 }}>

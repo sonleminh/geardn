@@ -17,11 +17,11 @@ import SkeletonImage from '../../SkeletonImage';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import { useAuthStore } from '@/providers/auth-store-provider';
 import { useState } from 'react';
-import { logoutAPI } from '@/services/auth';
 import { usePathname, useRouter } from 'next/navigation';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AppLink from '../../AppLink';
 import { HeaderStyle } from './style';
+import { logoutAPI } from '@/services/auth/api';
 
 const Header = () => {
   const router = useRouter();

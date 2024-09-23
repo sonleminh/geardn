@@ -1,8 +1,7 @@
 import { BASE_API_URL } from '@/constants/env';
 import useSWR from 'swr';
 import useSWRMutation from 'swr/mutation';
-import { signUpAPI } from './auth';
-import { fetcher } from './fetcher';
+import { fetcher } from '../fetcher';
 import { postRequest } from '@/utils/fetch-client';
 
 export function useSignUpAPI() {
