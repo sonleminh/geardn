@@ -93,7 +93,7 @@ const Header = () => {
                   <SkeletonImage src={user?.picture} alt='geardn' fill />
                 </Button>
               ) : (
-                <Button onClick={handleUserClick} className='user-icon'>
+                <Button onClick={handleUserClick} className='usernname-icon'>
                   <AccountCircleIcon sx={{ fontSize: 36 }} /> {user?.name}
                 </Button>
               )

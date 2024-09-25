@@ -3,7 +3,6 @@
 import bg from '@/../../public/setup-backgroud.jpg';
 import SkeletonImage from '@/components/common/SkeletonImage';
 import { BASE_API_URL } from '@/constants/env';
-import { loginAPI } from '@/services/auth';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import LockIcon from '@mui/icons-material/Lock';
 import Person2OutlinedIcon from '@mui/icons-material/Person2Outlined';
@@ -27,6 +26,7 @@ import Cookies from 'js-cookie';
 import { useAuthStore } from '@/providers/auth-store-provider';
 import { ICustomJwtPayload } from '@/interfaces/IAuth';
 import { useLoginAPI } from '@/services/auth/mutations';
+import { loginAPI } from '@/services/auth/api';
 
 export default function Login() {
   const router = useRouter();

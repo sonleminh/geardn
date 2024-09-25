@@ -56,5 +56,9 @@ export const HeaderStyle: (pathname: string) => SxProps<Theme> = (pathname: stri
     minWidth: '30px',
     height: { xs: '30px' },
     ml: 2.5,
+  },
+  '.username-icon': {
+    height: { xs: '30px' },
+    ml: 2.5,
   }
 });
