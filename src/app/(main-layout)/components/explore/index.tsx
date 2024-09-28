@@ -1,20 +1,17 @@
 'use client';
 
-import AppLink from '@/components/common/AppLink';
-import SkeletonImage from '@/components/common/SkeletonImage';
-import { Box, Typography } from '@mui/material';
-import React from 'react';
-import { Navigation } from 'swiper/modules';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import BANNER_BG from '@/assets/geardn.jpg';
-import { truncateTextByLine } from '@/utils/css-helper.util';
-import ProductCard from '@/components/common/ProductCart';
+import ProductCard from '@/components/common/ProductCard';
+import LayoutContainer from '@/components/common/sharing/layout-container';
+import { IProduct } from '@/interfaces/IProduct';
+import { useGetProducts } from '@/services/product/api';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import LayoutContainer from '@/components/common/sharing/layout-container';
-import { useAuthStore } from '@/providers/auth-store-provider';
+import { Box, Typography } from '@mui/material';
+import { Navigation } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
 
 const Explore = () => {
+  const { products } = useGetProducts();
   return (
     <Box sx={{ mb: 10 }}>
       <LayoutContainer>
@@ -66,7 +63,7 @@ const Explore = () => {
             },
           }}
           className='mySwiper'>
-          {[1, 2, 3, 4, 5]?.map((item, index) => (
+          {products?.productList.map((item, index) => (
             <SwiperSlide key={index}>
               <Box
                 sx={{
@@ -76,7 +73,7 @@ const Explore = () => {
                     },
                   },
                 }}>
-                <ProductCard link={'c'} />
+                <ProductCard data={item} />
               </Box>
             </SwiperSlide>
           ))}

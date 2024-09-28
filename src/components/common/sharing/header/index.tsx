@@ -94,12 +94,15 @@ const Header = () => {
                 </Button>
               ) : (
                 <Button onClick={handleUserClick} className='usernname-icon'>
-                  <AccountCircleIcon sx={{ fontSize: 36 }} /> {user?.name}
+                  <AccountCircleIcon sx={{ mr: 0.5, ml: 1.5, fontSize: 32 }} />
+                  <Typography sx={{ fontSize: 14, textTransform: 'none' }}>
+                    {user?.name}
+                  </Typography>
                 </Button>
               )
             ) : (
               <Button onClick={handleUserClick} className='user-icon'>
-                <AccountCircleIcon sx={{ fontSize: 36 }} />
+                <AccountCircleIcon sx={{ fontSize: 32 }} />
               </Button>
             )}
             <Menu

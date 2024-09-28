@@ -28,7 +28,7 @@ const Layout = ({ children }: LayoutType) => {
   return (
     <>
       <Header />
-      {pathname !== '/' && <Box sx={{ mb: '80px' }} />}
+      {/* {pathname !== '/' && <Box sx={{ mb: '80px' }} />} */}
       <Box
         sx={{
           position: 'fixed',
@@ -73,7 +73,7 @@ const Layout = ({ children }: LayoutType) => {
           <LightModeIcon sx={{ fontSize: 13 }} />
         )}
       </Box>
-      <Box sx={{ minHeight: 'calc(100vh - 80px - 241.23px)' }}>{children}</Box>
+      <Box sx={{ minHeight: 'calc(100vh - 241.23px)' }}>{children}</Box>
       <Footer />
     </>
   );

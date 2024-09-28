@@ -1,7 +1,8 @@
 'use client';
 
-import ProductCard from '@/components/common/ProductCart';
+import { useGetProducts } from '@/services/product/api';
 import LayoutContainer from '@/components/common/sharing/layout-container';
+import ProductCard from '@/components/common/ProductCard';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ShoppingBasketOutlinedIcon from '@mui/icons-material/ShoppingBasketOutlined';
 import {
@@ -16,11 +17,10 @@ import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import { ProductListStyle } from './style';
-import { useGetProducts } from '@/services/product/api';
 import { IProduct } from '@/interfaces/IProduct';
 
 const ProductList = () => {
-  const { products, isLoading, isError } = useGetProducts();
+  const { products } = useGetProducts();
   return (
     <LayoutContainer>
       <Box sx={ProductListStyle}>

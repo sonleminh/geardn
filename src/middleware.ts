@@ -27,19 +27,18 @@ async function whoami(accessToken: RequestCookie | undefined): Promise<IWhoIAmRe
   }
 
 async function refreshAccessToken(refreshToken: RequestCookie | undefined): Promise<IRefreshTokenResponse | null> {
-if (!refreshToken) return null;
-
-try {
-    return await getRequest(`${BASE_API_URL}/auth/refresh-token`, {
-    headers: {
-        'Content-Type': 'application/json',
-        Cookie: `rt=${refreshToken?.value}`,
-    },
-    }) as IRefreshTokenResponse;
-  } catch (error) {
-    console.error('Failed to refresh access token:', error);
-    return null;
-}
+  if (!refreshToken) return null;
+  try {
+      return await getRequest(`${BASE_API_URL}/auth/refresh-token`, {
+      headers: {
+          'Content-Type': 'application/json',
+          Cookie: `rt=${refreshToken?.value}`,
+      },
+      }) as IRefreshTokenResponse;
+    } catch (error) {
+      console.error('Failed to refresh access token:', error);
+      return null;
+  }
 }
 
 export async function middleware(request: NextRequest) {
