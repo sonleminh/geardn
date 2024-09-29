@@ -25,3 +25,12 @@ export const useGetProducts = () => {
     isError: error,
   };
 };
+
+export const useGetProductById = (id: string) => {
+  const { data, error, isLoading } = useSWR(`${BASE_API_URL}/product/${id}`, fetcher);
+  return {
+    product: data as IProduct,
+    isLoading,
+    isError: error,
+  };
+};

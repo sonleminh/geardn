@@ -23,8 +23,6 @@ import { useGetFake } from '@/services/queries';
 import { fetcher } from '@/services/fetcher';
 import Link from 'next/link';
 import { BASE_API_URL } from '@/constants/env';
-import { useSignUpAPI } from '@/services/mutations';
-import { signUp, signUpAPI } from '@/services/auth';
 import { useRouter } from 'next/navigation';
 
 export default function SignUp() {

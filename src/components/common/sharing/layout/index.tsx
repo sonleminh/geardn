@@ -73,7 +73,14 @@ const Layout = ({ children }: LayoutType) => {
           <LightModeIcon sx={{ fontSize: 13 }} />
         )}
       </Box>
-      <Box sx={{ minHeight: 'calc(100vh - 241.23px)' }}>{children}</Box>
+      <Box
+        sx={{
+          minHeight: 'calc(100vh - 241.23px)',
+          pt: pathname !== '/' ? '100px' : '0',
+          bgcolor: '#eee',
+        }}>
+        {children}
+      </Box>
       <Footer />
     </>
   );

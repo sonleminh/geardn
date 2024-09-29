@@ -4,9 +4,14 @@ import { AuthStoreProvider } from '@/providers/auth-store-provider';
 import { CssBaseline } from '@mui/material';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+
 import 'swiper/css';
+import 'swiper/css/effect-fade';
+import 'swiper/css/free-mode';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
+import 'swiper/css/scrollbar';
+import 'swiper/css/thumbs';
 
 const inter = Inter({ subsets: ['latin'] });
 

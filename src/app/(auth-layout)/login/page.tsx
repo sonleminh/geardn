@@ -30,9 +30,8 @@ import { loginAPI } from '@/services/auth/api';
 
 export default function Login() {
   const router = useRouter();
-  const { user, login } = useAuthStore((state) => state);
+  const { login } = useAuthStore((state) => state);
 
-  console.log('user:', user);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const { mutate } = useLoginAPI();
 
@@ -70,16 +69,13 @@ export default function Login() {
       Cookies.set('GC', credentialResponse?.credential as string, {
         expires: credentialDecoded?.exp,
       });
-
       login({
         _id: credentialDecoded?.sub,
         email: credentialDecoded?.email as string,
         name: credentialDecoded?.name as string,
         picture: credentialDecoded?.picture,
       });
-
       router.push('/profile');
-      console.log('cc');
     }
   };
 
