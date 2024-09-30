@@ -24,6 +24,8 @@ import { fetcher } from '@/services/fetcher';
 import Link from 'next/link';
 import { BASE_API_URL } from '@/constants/env';
 import { useRouter } from 'next/navigation';
+import { useSignUpAPI } from '@/services/auth/mutations';
+import { signUpAPI } from '@/services/auth/api';
 
 export default function SignUp() {
   const router = useRouter();
