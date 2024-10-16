@@ -12,11 +12,12 @@ export interface IDiscount {
 export interface IProduct {
     _id: string;
     name: string;
-    original_price: number;
-    discount: IDiscount;
     category_id: string;
-    tags: ITagOptions[];
-    content: string;
     images: string[];
+    tags: ITagOptions[];
+    original_price: number;
+    attributes: string[];
+    discount: IDiscount;
+    content: string;
     createdAt: string;
 }

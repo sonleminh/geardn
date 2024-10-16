@@ -61,6 +61,10 @@ const ProductDetail = () => {
     setOption(newOption);
   };
 
+  function removeDuplicates(arr: (string | undefined)[]) {
+    return arr?.filter((item, index) => arr.indexOf(item) === index);
+  }
+
   return (
     <Box>
       <LayoutContainer>
@@ -91,7 +95,7 @@ const ProductDetail = () => {
                     Xem đánh giá
                   </AppLink>
                 </Box>
-                <Box sx={{ mb: 3 }}>
+                {/* <Box sx={{ mb: 3 }}>
                   <Typography sx={{ fontSize: 26, fontWeight: 600 }}>
                     {formatPrice(product?.price)}
                   </Typography>
@@ -100,32 +104,50 @@ const ProductDetail = () => {
                       {formatPrice(product?.discount?.discountPrice)}
                     </Typography>
                   )}
-                </Box>
-                <ToggleButtonGroup
-                  value={option}
-                  exclusive
-                  size='small'
-                  onChange={handleOption}
-                  sx={{
-                    '.MuiButtonBase-root': {
-                      width: 80,
-                      height: 36,
-                      mr: 2,
-                      mb: 4,
-                      border: '1px solid rgba(0,0,0,0.09)',
-                      borderRadius: 1,
-                    },
-                  }}>
-                  <ToggleButton value='left' aria-label='left aligned'>
-                    <StarRateIcon />
-                  </ToggleButton>
-                  <ToggleButton value='center' aria-label='centered'>
-                    <StarRateIcon />
-                  </ToggleButton>
-                  <ToggleButton value='right' aria-label='right aligned'>
-                    <StarRateIcon />
-                  </ToggleButton>
-                </ToggleButtonGroup>
+                </Box> */}
+                {product?.attributes?.map((att) => (
+                  <Box display={'flex'} key={att}>
+                    <Box>{att}:</Box>
+                    <Box>
+                      <ToggleButtonGroup
+                        value={option}
+                        exclusive
+                        size='small'
+                        onChange={handleOption}
+                        sx={{
+                          '.MuiButtonBase-root': {
+                            width: 80,
+                            height: 36,
+                            mr: 2,
+                            mb: 4,
+                            border: '1px solid rgba(0,0,0,0.09)',
+                            borderRadius: 1,
+                          },
+                        }}>
+                        {removeDuplicates(
+                          skuList
+                            ?.map((sku) =>
+                              sku?.attributes?.find(
+                                (item) => item?.name === att
+                              )
+                            )
+                            ?.map((item) => item?.value)
+                        )?.map((item) => (
+                          <ToggleButton
+                            key={item}
+                            value={item ?? ''}
+                            aria-label='left aligned'>
+                            {item}
+                          </ToggleButton>
+                        ))}
+                      </ToggleButtonGroup>
+                    </Box>
+                  </Box>
+                ))}
+                {/* {product?.attributes?.map((item) => {
+                  <Box key={item}>item</Box>;
+                })} */}
+
                 <Box sx={{ display: 'flex', alightItems: 'center', mb: 3 }}>
                   <ButtonGroup
                     variant='outlined'
