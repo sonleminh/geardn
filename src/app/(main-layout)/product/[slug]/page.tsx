@@ -3,7 +3,7 @@
 import AppLink from '@/components/common/AppLink';
 import Breadcrumbs from '@/components/common/Breadcrumbs';
 import LayoutContainer from '@/components/common/sharing/layout-container';
-import { useGetProductById } from '@/services/product/api';
+import { useGetProductById, useGetSKUByPrdId } from '@/services/product/api';
 import { formatPrice } from '@/utils/format-price';
 import StarRateIcon from '@mui/icons-material/StarRate';
 import {
@@ -32,6 +32,8 @@ const ProductDetail = () => {
   const [option, setOption] = useState<string | null>('');
 
   const { product } = useGetProductById(params?.slug as string);
+  const { skuList } = useGetSKUByPrdId(params?.slug as string);
+  console.log(skuList);
   const breadcrumbsOptions = [
     { link: '/', label: 'Home' },
     { link: `/product/${product?._id}`, label: product?.name as string },

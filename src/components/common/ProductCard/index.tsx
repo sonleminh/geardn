@@ -33,7 +33,7 @@ const ProductCard = ({ data }: { data: IProduct }) => {
           <Typography sx={{ fontSize: 14 }}>5.0 (2 reviews)</Typography>
         </Box>
         <Typography sx={{ fontSize: 18, fontWeight: 600 }}>
-          {formatPrice(data?.price)}
+          {formatPrice(data?.original_price)}
         </Typography>
       </Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>

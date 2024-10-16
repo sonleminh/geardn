@@ -7,6 +7,7 @@ import { getRequest, postRequest } from '@/utils/fetch-client';
 import useSWR from 'swr';
 import { fetcher } from '../fetcher';
 import { IProduct } from '@/interfaces/IProduct';
+import { ISku } from '@/interfaces/ISku';
 
 type TProductsRes = {
   productList: IProduct[];
@@ -30,6 +31,15 @@ export const useGetProductById = (id: string) => {
   const { data, error, isLoading } = useSWR(`${BASE_API_URL}/product/${id}`, fetcher);
   return {
     product: data as IProduct,
+    isLoading,
+    isError: error,
+  };
+};
+
+export const useGetSKUByPrdId = (id: string) => {
+  const { data, error, isLoading } = useSWR(`${BASE_API_URL}/product-sku/product/${id}`, fetcher);
+  return {
+    skuList: data as ISku[],
     isLoading,
     isError: error,
   };
