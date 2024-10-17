@@ -81,19 +81,47 @@ const Header = () => {
               width: '100%',
             }}>
             <SearchIcon />
-            <ShoppingCartOutlinedIcon sx={{ ml: 2.5 }} />
+            <Button sx={{ minWidth: 40, height: 40, ml: 2 }}>
+              <ShoppingCartOutlinedIcon
+                sx={
+                  {
+                    // p: 1,
+                    // ml: 2.5,
+                    // fontSize: 40,
+                    // borderRadius: 2,
+                    // ':hover': {
+                    //   bgcolor: '#eee',
+                    //   cursor: 'pointer',
+                    // },
+                  }
+                }
+                onClick={() => {
+                  user !== null ? router.push('/cart') : router.push('/login');
+                }}
+              />
+            </Button>
             {user !== null ? (
               user?.picture ? (
                 <Button
+                  sx={{
+                    width: 40,
+                    minWidth: 40,
+                    height: 40,
+                    ml: 1,
+                    textAlign: 'center',
+                  }}
                   onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
                     handleUserClick(e)
-                  }
-                  className='user-avatar'
-                  sx={{}}>
-                  <SkeletonImage src={user?.picture} alt='geardn' fill />
+                  }>
+                  <Box className='user-avatar'>
+                    <SkeletonImage src={user?.picture} alt='geardn' fill />
+                  </Box>
                 </Button>
               ) : (
-                <Button onClick={handleUserClick} className='usernname-icon'>
+                <Button
+                  sx={{ minWidth: 40, height: 40 }}
+                  className='usernname-icon'
+                  onClick={handleUserClick}>
                   <AccountCircleIcon sx={{ mr: 0.5, ml: 1.5, fontSize: 32 }} />
                   <Typography sx={{ fontSize: 14, textTransform: 'none' }}>
                     {user?.name}
@@ -101,8 +129,11 @@ const Header = () => {
                 </Button>
               )
             ) : (
-              <Button onClick={handleUserClick} className='user-icon'>
-                <AccountCircleIcon sx={{ fontSize: 32 }} />
+              <Button
+                sx={{ width: 40, minWidth: 40, height: 40, ml: 1 }}
+                className='user-icon'
+                onClick={handleUserClick}>
+                <AccountCircleIcon sx={{ fontSize: 30 }} />
               </Button>
             )}
             <Menu

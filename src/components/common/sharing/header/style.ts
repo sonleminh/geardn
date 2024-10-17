@@ -29,37 +29,36 @@ export const HeaderStyle: (pathname: string) => SxProps<Theme> = (pathname: stri
     position: 'relative',
     minWidth: '30px',
     height: { xs: '30px' },
-    ml: 2.5,
     borderRadius: '50%',
     overflow: 'hidden',
     '& img': {
       objectFit: 'cover',
     },
-    ':hover': {
-      ':before': {
-        display: 'block',
-      },
-    },
-    ':before': {
-      content: '""',
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      display: 'none',
-      width: '100%',
-      height: '100%',
-      bgcolor: 'rgba(255,255,255, 0.4)',
-      zIndex: 69,
-    },
+    // ':hover': {
+    //   ':before': {
+    //     display: 'block',
+    //   },
+    // },
+    // ':before': {
+    //   content: '""',
+    //   position: 'absolute',
+    //   top: 0,
+    //   left: 0,
+    //   display: 'none',
+    //   width: '100%',
+    //   height: '100%',
+    //   bgcolor: 'rgba(255,255,255, 0.4)',
+    //   zIndex: 69,
+    // },
   },
   '.user-icon': {
-    width: '30px',
-    minWidth: '30px',
-    height: { xs: '30px' },
-    ml: 2.5,
+    // width: '30px',
+    // minWidth: '30px',
+    // height: { xs: '30px' },
+    // ml: 2.5,
   },
   '.username-icon': {
-    height: { xs: '30px' },
-    ml: 2.5,
+    // height: { xs: '30px' },
+    // ml: 2.5,
   }
 });

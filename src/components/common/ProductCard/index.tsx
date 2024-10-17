@@ -8,7 +8,7 @@ import { formatPrice } from '@/utils/format-price';
 
 const ProductCard = ({ data }: { data: IProduct }) => {
   return (
-    <AppLink href={`product/${data._id}`}>
+    <AppLink href={`${data._id}`}>
       <Box
         sx={{
           position: 'relative',

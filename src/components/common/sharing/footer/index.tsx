@@ -26,7 +26,7 @@ const Footer = () => {
   return (
     <Box sx={FooterStyle}>
       <LayoutContainer>
-        <Grid2 container sx={{ mb: 4 }}>
+        <Grid2 container sx={{ mt: 3, mb: 4 }}>
           <Grid2 size={2}>
             <Box
               sx={{
