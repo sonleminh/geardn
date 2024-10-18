@@ -18,45 +18,54 @@ import {
   ToggleButtonGroup,
   Typography,
 } from '@mui/material';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Swiper as SwiperClass } from 'swiper';
 import MainSwiper from './components/main-swiper';
 import ThumbSwiper from './components/thumb-swiper';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import HtmlRenderBox from '@/components/common/HtmlRenderBox';
+import { useUpsertCart } from '@/services/cart/mutations';
+import { useAuthStore } from '@/providers/auth-store-provider';
+import { addCartAPI } from '@/services/cart/api';
+import { ISku } from '@/interfaces/ISku';
 
 const ProductDetail = () => {
   const params = useParams();
+  const router = useRouter();
+  const { user, logout } = useAuthStore((state) => state);
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperClass | null>(null);
   const [count, setCount] = useState<number | null>(1);
   const [selectedAttributes, setSelectedAttributes] = useState<
     Record<string, string | null>
   >({});
-  const [matchedPrice, setMatchedPrice] = useState<number | null>(null);
+  const [matchedSKU, setMatchedSKU] = useState<ISku | null>(null);
 
   const { product } = useGetProductById(params?.slug as string);
   const { skuList } = useGetSKUByPrdId(params?.slug as string);
+  const { mutate } = useUpsertCart();
 
   const breadcrumbsOptions = [
     { link: '/', label: 'Home' },
     { link: `/product/${product?._id}`, label: product?.name as string },
   ];
 
-  console.log(matchedPrice);
+  console.log('count:', count);
 
   useEffect(() => {
-    const price = findMatchingPrice();
-    setMatchedPrice(price);
+    const matchedSKU = findMatchingSKU();
+    if (matchedSKU) {
+      setMatchedSKU(matchedSKU);
+    }
   }, [selectedAttributes]);
 
-  const findMatchingPrice = () => {
+  const findMatchingSKU = () => {
     const matchedSKU = skuList?.find((sku) =>
       sku.attributes?.every(
         (attr) => selectedAttributes[attr.name] === attr.value
       )
     );
-    return matchedSKU?.price ?? null;
+    return matchedSKU ?? null;
   };
 
   // Step 2: Handle ToggleButtonGroup change
@@ -71,13 +80,6 @@ const ProductDetail = () => {
     }));
   };
 
-  // const handleInputChange = (e) => {
-  //   // Convert input value to number and set count
-  //   const newValue = parseInt(e.target.value, 10);
-  //   if (!isNaN(newValue)) {
-  //     setCount(newValue);
-  //   }
-  // };
   const handleCountChange = (value: number | null) => {
     // Ensure count is non-negative
     if (value && value >= 0) {
@@ -88,6 +90,21 @@ const ProductDetail = () => {
   function removeDuplicates(arr: (string | undefined)[]) {
     return arr?.filter((item, index) => arr.indexOf(item) === index);
   }
+
+  const handleAddCart = async () => {
+    if (!user) {
+      router.push('/login');
+    }
+    if (matchedSKU) {
+      const cartData = await addCartAPI({
+        sku: matchedSKU?._id,
+        quantity: count ?? 1,
+      });
+      mutate(cartData, false);
+    }
+  };
+
+  console.log(selectedAttributes);
 
   return (
     <Box pb={4}>
@@ -130,7 +147,7 @@ const ProductDetail = () => {
                   )}
                 </Box> */}
                 <Typography sx={{ mb: 2, fontSize: 24, fontWeight: 600 }}>
-                  {formatPrice(matchedPrice || product?.original_price) ??
+                  {formatPrice(matchedSKU?.price || product?.original_price) ??
                     formatPrice(product?.original_price)}
                 </Typography>
                 {product?.attributes?.map((att, index) => (
@@ -243,9 +260,10 @@ const ProductDetail = () => {
                 </Grid2>
                 <Box>
                   <Button
+                    sx={{ mr: 2, bgcolor: '#f0f0f0' }}
                     variant='outlined'
                     size='large'
-                    sx={{ mr: 2, bgcolor: '#f0f0f0' }}>
+                    onClick={handleAddCart}>
                     <ShoppingCartOutlinedIcon />
                   </Button>
                   <Button variant='contained' size='large' sx={{ width: 200 }}>
