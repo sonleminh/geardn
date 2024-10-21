@@ -30,6 +30,7 @@ import { useAuthStore } from '@/providers/auth-store-provider';
 import { addCartAPI } from '@/services/cart/api';
 import { ISku } from '@/interfaces/ISku';
 import SkeletonImage from '@/components/common/SkeletonImage';
+import { IVariant } from '@/interfaces/IProduct';
 
 const ProductDetail = () => {
   const params = useParams();
@@ -37,13 +38,12 @@ const ProductDetail = () => {
   const { user, logout } = useAuthStore((state) => state);
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperClass | null>(null);
   const [count, setCount] = useState<number | null>(1);
-  const [selectedAttributes, setSelectedAttributes] = useState<
-    Record<string, string | null>
-  >({});
+
+  const [selectedModel, setSelectedModel] = useState<number[]>([]);
+  const [selectedOptionIndex, setSelectedOptionIndex] = useState<number>(0);
   const [matchedSKU, setMatchedSKU] = useState<ISku | null>(null);
 
   const { product } = useGetProductById(params?.slug as string);
-  const { skuList } = useGetSKUByPrdId(params?.slug as string);
   const { mutate } = useUpsertCart();
 
   const breadcrumbsOptions = [
@@ -51,34 +51,35 @@ const ProductDetail = () => {
     { link: `/product/${product?._id}`, label: product?.name as string },
   ];
 
-  console.log('count:', count);
-
-  useEffect(() => {
-    const matchedSKU = findMatchingSKU();
-    if (matchedSKU) {
-      setMatchedSKU(matchedSKU);
-    }
-  }, [selectedAttributes]);
+  // useEffect(() => {
+  //   const matchedSKU = findMatchingSKU();
+  //   if (matchedSKU) {
+  //     setMatchedSKU(matchedSKU);
+  //   }
+  // }, [selectedAttributes]);
 
   const findMatchingSKU = () => {
-    const matchedSKU = skuList?.find((sku) =>
-      sku.attributes?.every(
-        (attr) => selectedAttributes[attr.name] === attr.value
-      )
+    const matchedModel = product?.models?.find(
+      (model) =>
+        JSON.stringify(model?.extinfo?.tier_index) ==
+        JSON.stringify(selectedModel)
     );
-    return matchedSKU ?? null;
-  };
 
+    return matchedModel?.price;
+  };
   // Step 2: Handle ToggleButtonGroup change
   const handleToggleChange = (
-    attributeName: string,
-    newValue: string | null
+    variantName: string,
+    newValue: string,
+    vIndex: number
   ) => {
-    console.log(newValue);
-    setSelectedAttributes((prevState) => ({
-      ...prevState,
-      [attributeName]: newValue, // Update specific attribute value
-    }));
+    const optionIndex =
+      product?.tier_variations[vIndex]?.options?.indexOf(newValue);
+
+    const updatedSelectedModel = [...selectedModel];
+    updatedSelectedModel[vIndex] = optionIndex ?? 0;
+    setSelectedModel(updatedSelectedModel);
+    setSelectedOptionIndex(vIndex);
   };
 
   const handleCountChange = (value: number | null) => {
@@ -87,6 +88,8 @@ const ProductDetail = () => {
       setCount(value);
     }
   };
+
+  // console.log('slt:', selectedModel);
 
   function removeDuplicates(arr: (string | undefined)[]) {
     return arr?.filter((item, index) => arr.indexOf(item) === index);
@@ -105,7 +108,65 @@ const ProductDetail = () => {
     }
   };
 
-  console.log(selectedAttributes);
+  const handleDisableOption = (vIndex: number, index: number) => {
+    // Ensure count is non-negative
+    // const updatedSelectedModel = selectedModel; // = [2]
+    // updatedSelectedModel[vIndex] = index; // =
+    // // console.log('up', { vIndex, index, updatedSelectedModel });
+    // console.log('up', updatedSelectedModel);
+    // const a = product?.models?.find(
+    //   (model) =>
+    //     JSON.stringify(model?.extinfo?.tier_index) ===
+    //     JSON.stringify(updatedSelectedModel)
+    // );
+    // console.log(
+    //   product?.models?.find(
+    //     (model) =>
+    //       JSON.stringify(model?.extinfo?.tier_index) ===
+    //       JSON.stringify(updatedSelectedModel)
+    //   )
+    // );
+    // const a = product?.models?.find(
+    //   (model) =>
+    //     JSON.stringify(model?.extinfo?.tier_index) ===
+    //     JSON.stringify(updatedSelectedModel)
+    // );
+    // return a ? false : true;
+    // console.log(
+    //   1,
+    //   product?.models?.find(
+    //     (model) => model?.extinfo.tier_index[vIndex] === index
+    //   )
+    // );
+    // return false;
+
+    if (selectedModel?.length > 0) {
+      const updatedSelectedModel = [...selectedModel]; // = [2]
+      updatedSelectedModel[vIndex] = index; // =
+      console.log('upd:', updatedSelectedModel);
+      // console.log('upd:', updatedSelectedModel);
+      const a = product?.models?.find(
+        (model) =>
+          JSON.stringify(model?.extinfo?.tier_index) ===
+          JSON.stringify(updatedSelectedModel)
+      );
+      console.log('a:', a);
+      // const a = selectedModel?.length
+      console.log('check:', updatedSelectedModel[vIndex]);
+      const disableCheck = product?.models?.find(
+        (model) => model?.extinfo.tier_index[vIndex] === index
+      );
+      return a || (disableCheck && selectedOptionIndex === vIndex)
+        ? false
+        : true;
+    }
+    const disableCheck = product?.models?.find(
+      (model) => model?.extinfo.tier_index[vIndex] === index
+    );
+    return disableCheck ? false : true;
+  };
+
+  console.log('slt:', selectedModel);
 
   return (
     <Box pb={4}>
@@ -148,10 +209,12 @@ const ProductDetail = () => {
                   )}
                 </Box> */}
                 <Typography sx={{ mb: 2, fontSize: 24, fontWeight: 600 }}>
-                  {formatPrice(matchedSKU?.price || product?.original_price) ??
+                  {formatPrice(findMatchingSKU() || product?.original_price) ??
                     formatPrice(product?.original_price)}
+                  {/* {formatPrice(matchedSKU?.price || product?.original_price) ??
+                    formatPrice(product?.original_price)} */}
                 </Typography>
-                {product?.tier_variations?.map((variant, index) => (
+                {product?.tier_variations?.map((variant: IVariant, vIndex) => (
                   <Grid2
                     container
                     display={'flex'}
@@ -166,44 +229,74 @@ const ProductDetail = () => {
                       size={10}
                       sx={{ display: 'flex', alignItems: 'center' }}>
                       <ToggleButtonGroup
-                        // value={selectedAttributes[att] || ''}
-                        // Step 3: Use state for value
-                        exclusive
-                        size='small'
-                        // onChange={(event, newValue) =>
-                        //   handleToggleChange(att, newValue)
-                        // }
+                        // value={selectedModel[variant?.name] || ''}
                         sx={{
                           '.MuiButtonBase-root': {
-                            width: 120,
-                            height: 36,
+                            // width: 140,
+                            height: 40,
                             mr: 2,
                             border: '1px solid rgba(0,0,0,0.09)',
                             color: '#000',
-                            borderRadius: 1,
+                            borderRadius: '2px',
                             textTransform: 'initial',
+                            ':hover': {
+                              border: '1px solid #000',
+                            },
                           },
-                        }}>
-                        {variant?.options?.map((item) => (
+                          '.Mui-selected': {
+                            border: '1px solid #000',
+                          },
+                          '.Mui-disabled': {
+                            bgcolor: '#fafafa',
+                            color: 'rgba(0,0,0,.26)',
+                            border: '1px solid rgba(0,0,0,0.09) !important',
+                            cursor: 'not-allowed',
+                          },
+                        }}
+                        value={
+                          product?.tier_variations[vIndex]?.options[
+                            selectedModel[vIndex]
+                          ]
+                        }
+                        exclusive
+                        size='small'
+                        onChange={(event, newValue) =>
+                          handleToggleChange(variant?.name, newValue, vIndex)
+                        }>
+                        {variant?.options?.map((item, index) => (
                           <ToggleButton
+                            sx={{
+                              '.Mui-disabled': {
+                                bgcolor: 'red',
+                              },
+                            }}
                             key={item}
                             value={item ?? ''}
-                            aria-label='left aligned'>
-                            <Box
-                              sx={{
-                                position: 'relative',
-                                width: '100%',
-                                height: { xs: '400px' },
-                                overflow: 'hidden',
-                                '& img': {
-                                  objectFit: 'contain !important',
-                                },
-                              }}>
-                              <SkeletonImage
-                                src={variant?.images[item]}
-                                alt='geardn'
-                              />
-                            </Box>
+                            aria-label='left aligned'
+                            disabled={
+                              handleDisableOption(vIndex, index)
+                              // selectedModel?.length !== 0
+                              //   ? handleDisableOption(vIndex, index)
+                              //   : false
+                            }>
+                            {variant?.images && (
+                              <Box
+                                sx={{
+                                  position: 'relative',
+                                  width: 24,
+                                  height: 24,
+                                  mr: 1,
+                                  overflow: 'hidden',
+                                  '& img': {
+                                    objectFit: 'contain !important',
+                                  },
+                                }}>
+                                <SkeletonImage
+                                  src={variant?.images[index]}
+                                  alt='geardn'
+                                />
+                              </Box>
+                            )}
                             {item}
                           </ToggleButton>
                         ))}
@@ -255,7 +348,6 @@ const ProductDetail = () => {
                             count === null &&
                             (e.key === '0' || e.key === 'Enter')
                           ) {
-                            console.log('prv');
                             e.preventDefault();
                           }
                         }}

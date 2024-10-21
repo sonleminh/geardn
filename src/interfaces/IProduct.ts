@@ -20,7 +20,18 @@ interface IDetails {
 export interface IVariant {
     name: string;
     options: string[];
-    image?: string[];
+    images?: string[];
+}
+
+export interface IModel {
+    _id: string;
+    name: string;
+    price: number;
+    stock: number;
+    extinfo: {
+        tier_index: number[];
+        is_pre_order: boolean;
+    };
 }
 
 export interface IProduct {
@@ -37,4 +48,5 @@ export interface IProduct {
     details: IDetails;
     description: string;
     createdAt: string;
+    models: IModel[]
 }
