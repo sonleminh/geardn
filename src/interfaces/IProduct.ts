@@ -17,6 +17,12 @@ interface IDetails {
     material?: string;
 }
 
+export interface IVariant {
+    name: string;
+    options: string[];
+    image?: string[];
+}
+
 export interface IProduct {
     _id: string;
     name: string;
@@ -25,8 +31,8 @@ export interface IProduct {
     original_price: number;
     tags: ITagOptions[];
     images: string[];
-    attributes: string[];
-    sku_name: string;
+    // sku_name: string;
+    tier_variations: IVariant[];
     brand: string;
     details: IDetails;
     description: string;

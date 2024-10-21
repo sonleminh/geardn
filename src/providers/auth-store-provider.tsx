@@ -13,7 +13,7 @@ export const AuthStoreContext = createContext<AuthStoreApi | undefined>(
 );
 
 export interface AuthStoreProviderProps {
-  children: ReactNode;
+  children?: ReactNode;
 }
 
 export const AuthStoreProvider = ({ children }: AuthStoreProviderProps) => {

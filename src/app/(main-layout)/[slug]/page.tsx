@@ -29,6 +29,7 @@ import { useUpsertCart } from '@/services/cart/mutations';
 import { useAuthStore } from '@/providers/auth-store-provider';
 import { addCartAPI } from '@/services/cart/api';
 import { ISku } from '@/interfaces/ISku';
+import SkeletonImage from '@/components/common/SkeletonImage';
 
 const ProductDetail = () => {
   const params = useParams();
@@ -150,23 +151,28 @@ const ProductDetail = () => {
                   {formatPrice(matchedSKU?.price || product?.original_price) ??
                     formatPrice(product?.original_price)}
                 </Typography>
-                {product?.attributes?.map((att, index) => (
-                  <Grid2 container display={'flex'} key={att} my={2.5}>
+                {product?.tier_variations?.map((variant, index) => (
+                  <Grid2
+                    container
+                    display={'flex'}
+                    key={variant?.name}
+                    my={2.5}>
                     <Grid2
                       size={2}
                       sx={{ display: 'flex', alignItems: 'center' }}>
-                      {att}:
+                      {variant?.name}:
                     </Grid2>
                     <Grid2
                       size={10}
                       sx={{ display: 'flex', alignItems: 'center' }}>
                       <ToggleButtonGroup
-                        value={selectedAttributes[att] || ''} // Step 3: Use state for value
+                        // value={selectedAttributes[att] || ''}
+                        // Step 3: Use state for value
                         exclusive
                         size='small'
-                        onChange={(event, newValue) =>
-                          handleToggleChange(att, newValue)
-                        }
+                        // onChange={(event, newValue) =>
+                        //   handleToggleChange(att, newValue)
+                        // }
                         sx={{
                           '.MuiButtonBase-root': {
                             width: 120,
@@ -178,7 +184,30 @@ const ProductDetail = () => {
                             textTransform: 'initial',
                           },
                         }}>
-                        {removeDuplicates(
+                        {variant?.options?.map((item) => (
+                          <ToggleButton
+                            key={item}
+                            value={item ?? ''}
+                            aria-label='left aligned'>
+                            <Box
+                              sx={{
+                                position: 'relative',
+                                width: '100%',
+                                height: { xs: '400px' },
+                                overflow: 'hidden',
+                                '& img': {
+                                  objectFit: 'contain !important',
+                                },
+                              }}>
+                              <SkeletonImage
+                                src={variant?.images[item]}
+                                alt='geardn'
+                              />
+                            </Box>
+                            {item}
+                          </ToggleButton>
+                        ))}
+                        {/* {removeDuplicates(
                           Array.isArray(skuList)
                             ? skuList
                                 ?.map((sku) =>
@@ -195,7 +224,7 @@ const ProductDetail = () => {
                             aria-label='left aligned'>
                             {item}
                           </ToggleButton>
-                        ))}
+                        ))} */}
                       </ToggleButtonGroup>
                     </Grid2>
                   </Grid2>
@@ -243,7 +272,6 @@ const ProductDetail = () => {
                                 {
                                   display: 'none',
                                 },
-                              '-moz-appearance': 'textfield',
                             },
                           },
                         }}
