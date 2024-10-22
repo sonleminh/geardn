@@ -7,6 +7,7 @@ import { Skeleton } from '@mui/material';
 const SkeletonImage: React.FC<ImageProps> = (props) => {
   const [isError, setIsError] = useState(false);
   let srcImg = props.src;
+
   return isError ? (
     <Skeleton
       variant='rectangular'
@@ -22,7 +23,6 @@ const SkeletonImage: React.FC<ImageProps> = (props) => {
       src={srcImg}
       alt={props.alt}
       fill={props.fill ?? true}
-      objectFit='cover'
       sizes={
         props.sizes ??
         '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
