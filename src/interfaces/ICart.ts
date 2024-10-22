@@ -4,12 +4,12 @@ export interface ICart {
 }
 
 export interface ICartPayload {
-    sku: string;
+    model: string;
     quantity: number;
 }
 
 export interface ICartItem {
-    sku: {
+    model: {
         product_name: string;
         price: number;
     };
