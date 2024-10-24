@@ -17,10 +17,11 @@ export const addCartAPI = (payload: ICartPayload) => {
 };
 
 export const useGetCart = () => {
-  const { data, error, isLoading } = useSWR(`${BASE_API_URL}/cart`, fetcher);
+  const { data, error, isLoading, mutate } = useSWR(`${BASE_API_URL}/cart`, fetcher);
   return {
    cart: data as ICart,
     isLoading,
     isError: error,
+    mutate
   };
 };
