@@ -1,3 +1,5 @@
+import { IModel } from "./IProduct";
+
 export interface ICart {
     user_id: string;
     items: ICartItem[]
@@ -10,8 +12,22 @@ export interface ICartPayload {
 
 export interface ICartItem {
     model: {
-        product_name: string;
+        _id: string;
+        name: string;
+        image: string;
         price: number;
+        extinfo: {
+            tier_index: number[];
+            is_pre_order: boolean;
+        };
+        product_id: string;
+        product_name: string;
     };
     quantity: number;
+}
+
+export interface ICartResponse {
+    _id: string;
+    user_id: string;
+    items: IModel[]
 }

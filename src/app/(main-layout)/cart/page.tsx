@@ -2,12 +2,14 @@
 
 import Breadcrumbs from '@/components/common/Breadcrumbs';
 import LayoutContainer from '@/components/common/sharing/layout-container';
+import SkeletonImage from '@/components/common/SkeletonImage';
 import { useGetCart } from '@/services/cart/api';
 import { formatPrice } from '@/utils/format-price';
 import {
   Box,
   Button,
   ButtonGroup,
+  Checkbox,
   Grid2,
   Paper,
   Table,
@@ -19,7 +21,7 @@ import {
   Typography,
 } from '@mui/material';
 import Link from 'next/link';
-import React from 'react';
+import React, { useState } from 'react';
 
 const Cart = () => {
   const breadcrumbsOptions = [
@@ -27,6 +29,38 @@ const Cart = () => {
     { link: '/cart', label: 'Giỏ hàng' },
   ];
   const { cart } = useGetCart();
+  const [selected, setSelected] = useState<string[]>([]);
+
+  const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) {
+      const newSelected = cart?.items?.map((n) => n?.model?._id);
+      if (newSelected) {
+        setSelected(newSelected);
+      }
+      return;
+    }
+    setSelected([]);
+  };
+
+  const handleItemClick = (event: React.MouseEvent<unknown>, id: string) => {
+    const selectedIndex = selected.indexOf(id);
+    let newSelected: string[] = [];
+
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(selected, id);
+    } else if (selectedIndex === 0) {
+      newSelected = newSelected.concat(selected.slice(1));
+    } else if (selectedIndex === selected.length - 1) {
+      newSelected = newSelected.concat(selected.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelected = newSelected.concat(
+        selected.slice(0, selectedIndex),
+        selected.slice(selectedIndex + 1)
+      );
+    }
+    setSelected(newSelected);
+  };
+
   console.log(cart);
   return (
     <>
@@ -41,23 +75,66 @@ const Cart = () => {
                 <Table sx={{ minWidth: 650 }} aria-label='simple table'>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Dessert (100g serving)</TableCell>
-                      <TableCell align='right'>Calories</TableCell>
-                      <TableCell align='right'>Fat&nbsp;(g)</TableCell>
+                      <TableCell>
+                        <Checkbox
+                          color='primary'
+                          checked={
+                            cart?.items?.length > 0 &&
+                            selected?.length === cart?.items?.length
+                          }
+                          onChange={handleSelectAllClick}
+                          inputProps={{
+                            'aria-label': 'select all desserts',
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell>Sản phẩm</TableCell>
+                      <TableCell align='right'>Giá</TableCell>
+                      <TableCell align='right'>Số lượng</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {cart?.items?.map((row) => (
-                      <TableRow
-                        key={row.model?.product_name}
-                        sx={{
-                          '&:last-child td, &:last-child th': { border: 0 },
-                        }}>
-                        <TableCell component='th' scope='row'>
-                          {row.model?.price}
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    {cart?.items?.map((row) => {
+                      const isItemSelected = selected.includes(row.model._id);
+
+                      return (
+                        <TableRow
+                          key={row.model?._id}
+                          sx={{
+                            '&:last-child td, &:last-child th': { border: 0 },
+                          }}
+                          onClick={(event) =>
+                            handleItemClick(event, row.model._id)
+                          }>
+                          <TableCell component='th' scope='row'>
+                            <Checkbox
+                              color='primary'
+                              checked={isItemSelected}
+                            />
+                          </TableCell>
+                          <TableCell component='th' scope='row'>
+                            <Box
+                              sx={{
+                                position: 'relative',
+                                width: 100,
+                                height: 100,
+                              }}>
+                              <SkeletonImage
+                                src={row?.model?.image}
+                                alt='Gear DN'
+                                fill
+                              />
+                            </Box>
+                          </TableCell>
+                          <TableCell component='th' scope='row'>
+                            {row.model?.product_name}
+                          </TableCell>
+                          <TableCell component='th' scope='row'>
+                            {row.model?.price}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
                   </TableBody>
                 </Table>
               </TableContainer>
