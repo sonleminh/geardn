@@ -3,13 +3,31 @@
 
 import { BASE_API_URL } from '@/constants/env';
 import { ICart, ICartPayload } from '@/interfaces/ICart';
-import { postRequest } from '@/utils/fetch-client';
+import { patchRequest, postRequest } from '@/utils/fetch-client';
 import useSWR from 'swr';
 import { fetcher } from '../fetcher';
 
 export const addCartAPI = (payload: ICartPayload) => {
   try {
     const res = postRequest(`${BASE_API_URL}/cart/add`, payload);
+    return res;
+  } catch (error) {
+    throw error
+  }
+};
+
+export const subtractCartAPI = (payload: ICartPayload) => {
+  try {
+    const res = postRequest(`${BASE_API_URL}/cart/subtract`, payload);
+    return res;
+  } catch (error) {
+    throw error
+  }
+};
+
+export const updateCartQuantityAPI = (payload: ICartPayload) => {
+  try {
+    const res = patchRequest(`${BASE_API_URL}/cart`, payload);
     return res;
   } catch (error) {
     throw error

@@ -3,7 +3,12 @@
 import Breadcrumbs from '@/components/common/Breadcrumbs';
 import LayoutContainer from '@/components/common/sharing/layout-container';
 import SkeletonImage from '@/components/common/SkeletonImage';
-import { addCartAPI, useGetCart } from '@/services/cart/api';
+import {
+  addCartAPI,
+  subtractCartAPI,
+  updateCartQuantityAPI,
+  useGetCart,
+} from '@/services/cart/api';
 import { useUpsertCart } from '@/services/cart/mutations';
 import { formatPrice } from '@/utils/format-price';
 import {
@@ -23,7 +28,7 @@ import {
   Typography,
 } from '@mui/material';
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 import { useSWRConfig } from 'swr';
 
 const Cart = () => {
@@ -36,6 +41,9 @@ const Cart = () => {
   const { mutate: globalMutate } = useSWRConfig();
   console.log('cart:', cart);
   const [selected, setSelected] = useState<string[]>([]);
+  const [quantityInputs, setQuantityInputs] = useState<{
+    [key: string]: string;
+  }>({});
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
@@ -84,6 +92,8 @@ const Cart = () => {
       (item) => item.model._id === item_id
     );
 
+    console.log('itemToUpdate:', itemToUpdate);
+
     if (!itemToUpdate) return;
 
     // Create an optimistic cart update
@@ -94,15 +104,18 @@ const Cart = () => {
         item.model._id === item_id ? { ...item, quantity: newQuantity } : item
       ),
     };
+    console.log('optimisticCart:', optimisticCart);
 
     // Optimistically update the UI
     mutate(optimisticCart, false);
 
     try {
       // Perform the API call to update the cart on the server
+      console.log('newQuantity:', newQuantity);
+      console.log('itemToUpdate2:', itemToUpdate);
       const updatedCartData = await addCartAPI({
         model: item_id,
-        quantity: newQuantity,
+        quantity: 1,
       });
 
       // Mutate the cart with the new data from the server
@@ -117,7 +130,119 @@ const Cart = () => {
     }
   };
 
-  console.log(cart);
+  const handleSubtractItem = async (item_id: string) => {
+    // Find the item in the cart
+    const itemToUpdate = cart?.items?.find(
+      (item) => item.model._id === item_id
+    );
+
+    console.log('itemToUpdate:', itemToUpdate);
+
+    if (!itemToUpdate) return;
+
+    // Create an optimistic cart update
+    const newQuantity = itemToUpdate.quantity - 1; // Increment quantity
+    const optimisticCart = {
+      ...cart,
+      items: cart?.items?.map((item) =>
+        item.model._id === item_id ? { ...item, quantity: newQuantity } : item
+      ),
+    };
+    console.log('optimisticCart:', optimisticCart);
+
+    // Optimistically update the UI
+    mutate(optimisticCart, false);
+
+    try {
+      // Perform the API call to update the cart on the server
+      console.log('newQuantity:', newQuantity);
+      console.log('itemToUpdate2:', itemToUpdate);
+      const updatedCartData = await subtractCartAPI({
+        model: item_id,
+        quantity: 1,
+      });
+
+      // Mutate the cart with the new data from the server
+      mutateCart(updatedCartData, false);
+
+      // Revalidate the cart data (ensure consistency)
+      globalMutate('/api/cart');
+    } catch (error) {
+      // If the API call fails, revert the cart to its previous state
+      mutate(cart, false);
+      console.error('Failed to update cart:', error);
+    }
+  };
+
+  const handleQuantityInputChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    item_id: string
+  ) => {
+    const newQuantity = e.target.value;
+    // if (isNaN(newQuantity) || newQuantity < 1) return;
+
+    // Update the local input state
+    setQuantityInputs((prev) => ({
+      ...prev,
+      [item_id]: newQuantity,
+    }));
+  };
+
+  console.log('quantityInputs:', quantityInputs);
+
+  const handleQuantityInputBlur = async (item_id: string) => {
+    const inputQuantity = quantityInputs[item_id];
+    const newQuantity = parseInt(inputQuantity, 10);
+
+    // If the input is not a valid number or is empty, reset it to the current cart quantity
+    if (isNaN(newQuantity) || newQuantity < 1) {
+      const originalQuantity = cart?.items?.find(
+        (item) => item.model._id === item_id
+      )?.quantity;
+      setQuantityInputs((prev) => ({
+        ...prev,
+        [item_id]: originalQuantity?.toString() ?? '1',
+      }));
+      return;
+    }
+
+    // Find the item in the cart
+    const itemToUpdate = cart?.items?.find(
+      (item) => item.model._id === item_id
+    );
+
+    if (!itemToUpdate || newQuantity === itemToUpdate.quantity) return;
+
+    // Optimistically update the UI
+    const optimisticCart = {
+      ...cart,
+      items: cart?.items?.map((item) =>
+        item.model._id === item_id ? { ...item, quantity: newQuantity } : item
+      ),
+    };
+
+    console.log('optimisticCart:', optimisticCart);
+
+    mutate(optimisticCart, false); // Optimistic UI update
+
+    try {
+      // Update the quantity on the server
+      console.log('newQuantity:', newQuantity);
+      const updatedCartData = await updateCartQuantityAPI({
+        model: item_id,
+        quantity: newQuantity,
+      });
+      mutateCart(updatedCartData, false);
+
+      // Revalidate the cart data
+      globalMutate('/api/cart');
+    } catch (error) {
+      console.error('Failed to update cart:', error);
+      mutate(cart, false); // Revert on failure
+    }
+  };
+
+  // console.log(cart);
   return (
     <>
       <LayoutContainer>
@@ -197,19 +322,22 @@ const Cart = () => {
                               size='small'
                               sx={{ mr: 2, height: 32 }}>
                               <Button
-                              // onClick={() =>
-                              //   handleCountChange((count ?? 0) - 1)
-                              // }
-                              >
+                                onClick={() =>
+                                  handleSubtractItem(row?.model?._id)
+                                }>
                                 -
                               </Button>
                               <TextField
                                 type='number'
-                                value={row.quantity ?? ''}
-                                // onChange={(e) => {
-                                //   const value = e.target.value;
-                                //   setCount(value ? parseInt(value, 10) : null);
-                                // }}
+                                value={
+                                  quantityInputs[row.model._id] ?? row.quantity
+                                }
+                                onChange={(e) =>
+                                  handleQuantityInputChange(e, row?.model?._id)
+                                }
+                                onBlur={() =>
+                                  handleQuantityInputBlur(row?.model?._id)
+                                }
                                 // onKeyDown={(e) => {
                                 //   if (e.key === '-') {
                                 //     e.preventDefault();
