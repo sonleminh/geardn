@@ -91,7 +91,7 @@ const ProductList = () => {
             </Accordion>
           </Grid2>
           <Grid2 container size={9} spacing={4}>
-            {products?.productList.map((item, index) => (
+            {products?.productList?.map((item, index) => (
               <Grid2 key={index} size={4}>
                 <ProductCard data={item} />
               </Grid2>

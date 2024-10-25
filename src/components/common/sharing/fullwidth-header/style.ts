@@ -1,13 +1,13 @@
 import { keyframes, SxProps, Theme } from "@mui/material";
 
-export const HeaderStyle: (pathname: string) => SxProps<Theme> = (pathname: string) => ({
+export const FullWidthHeaderStyle: (pathname: string) => SxProps<Theme> = (pathname: string) => ({
   position: 'fixed',
   top: 0,
   left: '50%',
   transform: 'translateX(-50%)',
   zIndex: 69,
   // width: { lg: pathname === '/' ?  1070 :1070, xl: pathname === '/' ?  '100%' : 1200 },
-  width:  {lg: 1070, xl: 1200 },
+  width:  '100%',
   height: { xs: 80 },
   px: 3,
   bgcolor: 'white',

@@ -28,7 +28,7 @@ import {
   Typography,
 } from '@mui/material';
 import Link from 'next/link';
-import React, { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent, useRef, useState } from 'react';
 import { useSWRConfig } from 'swr';
 
 const Cart = () => {
@@ -44,6 +44,8 @@ const Cart = () => {
   const [quantityInputs, setQuantityInputs] = useState<{
     [key: string]: string;
   }>({});
+
+  const inputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
@@ -243,6 +245,19 @@ const Cart = () => {
   };
 
   // console.log(cart);
+  const handleKeyDown = (e: React.KeyboardEvent, itemId: string) => {
+    const target = e.currentTarget as HTMLInputElement;
+
+    if (e.key === '0' && target.value === '') {
+      e.preventDefault(); // Prevent '0' as the first character if input is empty
+    }
+    if (e.key === 'Enter') {
+      handleQuantityInputBlur(itemId);
+      if (inputRefs.current[itemId]) {
+        inputRefs.current[itemId]?.blur(); // Use ref to blur the input
+      }
+    }
+  };
   return (
     <>
       <LayoutContainer>
@@ -250,8 +265,8 @@ const Cart = () => {
           <Breadcrumbs options={breadcrumbsOptions} />
         </Box>
         <Box sx={{ bgcolor: '#fff', borderRadius: '4px' }}>
-          <Grid2 container>
-            <Grid2 size={8}>
+          <Grid2 container spacing={4}>
+            <Grid2 size={8.5}>
               <TableContainer component={Paper}>
                 <Table sx={{ minWidth: 650 }} aria-label='simple table'>
                   <TableHead>
@@ -272,6 +287,7 @@ const Cart = () => {
                       <TableCell>Sản phẩm</TableCell>
                       <TableCell align='center'>Giá</TableCell>
                       <TableCell align='center'>Số lượng</TableCell>
+                      <TableCell align='center'>Số tiền</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -301,13 +317,13 @@ const Cart = () => {
                             <Box
                               sx={{
                                 position: 'relative',
-                                width: 100,
-                                height: 100,
+                                width: 68,
+                                height: 68,
                                 mr: 2,
                               }}>
                               <SkeletonImage
                                 src={row?.model?.image}
-                                alt='Gear DN'
+                                alt={row.model?.product_name}
                                 fill
                               />
                             </Box>
@@ -317,18 +333,99 @@ const Cart = () => {
                             {formatPrice(row.model?.price)}
                           </TableCell>
                           <TableCell component='th' scope='row' align='center'>
-                            <ButtonGroup
-                              variant='outlined'
-                              size='small'
-                              sx={{ mr: 2, height: 32 }}>
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+
+                                '& .MuiButtonBase-root': {
+                                  minWidth: 32,
+                                  height: 32,
+                                  border: '1px solid #eee',
+                                  // ':first-child': {
+                                  //   ':hover': {
+                                  //     borderRightColor: 'unset !important',
+                                  //   },
+                                  // },
+                                },
+                              }}>
+                              {/* <ButtonGroup
+                                variant='outlined'
+                                size='small'
+                                sx={{
+                                  // width: 104,
+                                  height: 32,
+                                  '.MuiButtonGroup-firstButton': {
+                                    ':hover': {
+                                      borderRightColor: 'transparent',
+                                    },
+                                  },
+                                  '& .MuiButtonBase-root': {
+                                    minWidth: 32,
+                                    // border: '1px solid #eee',
+                                    // ':first-child': {
+                                    //   ':hover': {
+                                    //     borderRightColor: 'unset !important',
+                                    //   },
+                                    // },
+                                  },
+                                }}> */}
                               <Button
+                                sx={{
+                                  borderTopRightRadius: 0,
+                                  borderBottomRightRadius: 0,
+                                }}
                                 onClick={() =>
                                   handleSubtractItem(row?.model?._id)
                                 }>
                                 -
                               </Button>
                               <TextField
+                                sx={{
+                                  width: '40px',
+                                  height: 32,
+                                  borderTop: '1px solid rgba(0,0,0,.09)',
+                                  borderBottom: '1px solid rgba(0,0,0,.09)',
+                                  '& .MuiOutlinedInput-root': {
+                                    height: 32,
+                                    '& fieldset': {
+                                      // borderTop: '#E0E3E7',
+                                      // borderBottom: '#E0E3E7',
+                                      display: 'none',
+                                    },
+                                    // '&:hover fieldset': {
+                                    //   borderColor: '#B2BAC2',
+                                    // },
+                                    // '&.Mui-focused fieldset': {
+                                    //   borderColor: '#6F7E8C',
+                                    // },
+                                  },
+                                  '.MuiInputBase-root': {
+                                    height: 32,
+                                    borderRadius: 0,
+                                    // // border: '1px solid rgb(255, 255, 255)',
+                                    // // ':before': {
+                                    // //   border: 'none',
+                                    // // },
+                                    fontSize: 14,
+                                    '.MuiInputBase-input': {
+                                      height: 28,
+                                      p: 0,
+                                      textAlign: 'center',
+                                      ':focus': {
+                                        border: '1px solid #000',
+                                      },
+                                      // border: 'none',
+                                      '&::-webkit-outer-spin-button, &::-webkit-inner-spin-button':
+                                        {
+                                          display: 'none',
+                                        },
+                                    },
+                                  },
+                                }}
+                                variant='outlined'
                                 type='number'
+                                size='small'
                                 value={
                                   quantityInputs[row.model._id] ?? row.quantity
                                 }
@@ -338,39 +435,26 @@ const Cart = () => {
                                 onBlur={() =>
                                   handleQuantityInputBlur(row?.model?._id)
                                 }
-                                // onKeyDown={(e) => {
-                                //   if (e.key === '-') {
-                                //     e.preventDefault();
-                                //   }
-                                //   if (
-                                //     count === null &&
-                                //     (e.key === '0' || e.key === 'Enter')
-                                //   ) {
-                                //     e.preventDefault();
-                                //   }
-                                // }}
-                                size='small'
-                                sx={{
-                                  width: '48px',
-                                  '.MuiInputBase-root': {
-                                    height: 32,
-                                    borderRadius: 0,
-                                    '.MuiInputBase-input': {
-                                      p: 0,
-                                      textAlign: 'center',
-                                      '&::-webkit-outer-spin-button, &::-webkit-inner-spin-button':
-                                        {
-                                          display: 'none',
-                                        },
-                                    },
-                                  },
-                                }}
+                                onKeyDown={(e) =>
+                                  handleKeyDown(e, row?.model?._id)
+                                }
+                                inputRef={(ref) =>
+                                  (inputRefs.current[row.model._id] = ref)
+                                }
                               />
                               <Button
+                                sx={{
+                                  borderTopLeftRadius: 0,
+                                  borderBottomLeftRadius: 0,
+                                }}
                                 onClick={() => handleAddItem(row?.model?._id)}>
                                 +
                               </Button>
-                            </ButtonGroup>
+                            </Box>
+                            {/* </ButtonGroup> */}
+                          </TableCell>
+                          <TableCell component='th' scope='row' align='center'>
+                            {formatPrice(row.model?.price * row.quantity)}
                           </TableCell>
                         </TableRow>
                       );
@@ -388,7 +472,7 @@ const Cart = () => {
                     </Button>
                   </div> */}
             </Grid2>
-            <Grid2 size={4}>
+            <Grid2 size={3.5}>
               <Box className='pay'>
                 <Typography className='total-title'>CỘNG GIỎ HÀNG</Typography>
                 <Grid2 className='total'>
