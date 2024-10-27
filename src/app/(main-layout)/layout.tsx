@@ -13,7 +13,10 @@ import 'swiper/css/pagination';
 import 'swiper/css/scrollbar';
 import 'swiper/css/thumbs';
 
-const inter = Inter({ weight: '400', subsets: ['latin'] });
+const inter = Inter({
+  weight: ['400', '600', '700', '800', '900'],
+  subsets: ['latin'],
+});
 
 export const metadata: Metadata = {
   title: 'Create Next App',

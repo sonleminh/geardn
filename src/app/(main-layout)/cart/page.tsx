@@ -1,20 +1,24 @@
 'use client';
 
-import Breadcrumbs from '@/components/common/Breadcrumbs';
+import React, { ChangeEvent, useRef, useState } from 'react';
+import { useSWRConfig } from 'swr';
+
 import LayoutContainer from '@/components/common/sharing/layout-container';
 import SkeletonImage from '@/components/common/SkeletonImage';
+import Breadcrumbs from '@/components/common/Breadcrumbs';
 import {
   addCartAPI,
+  deleteCartItem,
   subtractCartAPI,
   updateCartQuantityAPI,
   useGetCart,
 } from '@/services/cart/api';
 import { useUpsertCart } from '@/services/cart/mutations';
 import { formatPrice } from '@/utils/format-price';
+
 import {
   Box,
   Button,
-  ButtonGroup,
   Checkbox,
   Grid2,
   Paper,
@@ -27,9 +31,6 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import Link from 'next/link';
-import React, { ChangeEvent, useRef, useState } from 'react';
-import { useSWRConfig } from 'swr';
 
 const Cart = () => {
   const breadcrumbsOptions = [
@@ -39,7 +40,6 @@ const Cart = () => {
   const { cart, mutate } = useGetCart();
   const { mutate: mutateCart } = useUpsertCart();
   const { mutate: globalMutate } = useSWRConfig();
-  console.log('cart:', cart);
   const [selected, setSelected] = useState<string[]>([]);
   const [quantityInputs, setQuantityInputs] = useState<{
     [key: string]: string;
@@ -58,119 +58,62 @@ const Cart = () => {
     setSelected([]);
   };
 
-  const handleItemClick = (event: React.MouseEvent<unknown>, id: string) => {
-    const selectedIndex = selected.indexOf(id);
-    let newSelected: string[] = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
-    }
-    setSelected(newSelected);
-  };
-
-  // const handleAddItem = async (item_id: string) => {
-  //   const cartData = await addCartAPI({
-  //     model: item_id,
-  //     quantity: 1,
-  //     // quantity: count ?? 1,
-  //   });
-  //   mutateCart(cartData, false);
-
-  //   mutate('/api/cart');
-  // };
-
   const handleAddItem = async (item_id: string) => {
-    // Find the item in the cart
     const itemToUpdate = cart?.items?.find(
       (item) => item.model._id === item_id
     );
 
-    console.log('itemToUpdate:', itemToUpdate);
-
     if (!itemToUpdate) return;
 
-    // Create an optimistic cart update
-    const newQuantity = itemToUpdate.quantity + 1; // Increment quantity
+    const newQuantity = itemToUpdate.quantity + 1;
     const optimisticCart = {
       ...cart,
       items: cart?.items?.map((item) =>
         item.model._id === item_id ? { ...item, quantity: newQuantity } : item
       ),
     };
-    console.log('optimisticCart:', optimisticCart);
 
-    // Optimistically update the UI
     mutate(optimisticCart, false);
 
     try {
-      // Perform the API call to update the cart on the server
-      console.log('newQuantity:', newQuantity);
-      console.log('itemToUpdate2:', itemToUpdate);
       const updatedCartData = await addCartAPI({
         model: item_id,
         quantity: 1,
       });
 
-      // Mutate the cart with the new data from the server
       mutateCart(updatedCartData, false);
 
-      // Revalidate the cart data (ensure consistency)
       globalMutate('/api/cart');
     } catch (error) {
-      // If the API call fails, revert the cart to its previous state
       mutate(cart, false);
       console.error('Failed to update cart:', error);
     }
   };
 
   const handleSubtractItem = async (item_id: string) => {
-    // Find the item in the cart
     const itemToUpdate = cart?.items?.find(
       (item) => item.model._id === item_id
     );
-
-    console.log('itemToUpdate:', itemToUpdate);
-
     if (!itemToUpdate) return;
 
-    // Create an optimistic cart update
-    const newQuantity = itemToUpdate.quantity - 1; // Increment quantity
+    const newQuantity = itemToUpdate.quantity - 1;
     const optimisticCart = {
       ...cart,
       items: cart?.items?.map((item) =>
         item.model._id === item_id ? { ...item, quantity: newQuantity } : item
       ),
     };
-    console.log('optimisticCart:', optimisticCart);
-
-    // Optimistically update the UI
     mutate(optimisticCart, false);
 
     try {
-      // Perform the API call to update the cart on the server
-      console.log('newQuantity:', newQuantity);
-      console.log('itemToUpdate2:', itemToUpdate);
       const updatedCartData = await subtractCartAPI({
         model: item_id,
         quantity: 1,
       });
 
-      // Mutate the cart with the new data from the server
       mutateCart(updatedCartData, false);
-
-      // Revalidate the cart data (ensure consistency)
       globalMutate('/api/cart');
     } catch (error) {
-      // If the API call fails, revert the cart to its previous state
       mutate(cart, false);
       console.error('Failed to update cart:', error);
     }
@@ -181,16 +124,12 @@ const Cart = () => {
     item_id: string
   ) => {
     const newQuantity = e.target.value;
-    // if (isNaN(newQuantity) || newQuantity < 1) return;
 
-    // Update the local input state
     setQuantityInputs((prev) => ({
       ...prev,
       [item_id]: newQuantity,
     }));
   };
-
-  console.log('quantityInputs:', quantityInputs);
 
   const handleQuantityInputBlur = async (item_id: string) => {
     const inputQuantity = quantityInputs[item_id];
@@ -208,14 +147,12 @@ const Cart = () => {
       return;
     }
 
-    // Find the item in the cart
     const itemToUpdate = cart?.items?.find(
       (item) => item.model._id === item_id
     );
 
     if (!itemToUpdate || newQuantity === itemToUpdate.quantity) return;
 
-    // Optimistically update the UI
     const optimisticCart = {
       ...cart,
       items: cart?.items?.map((item) =>
@@ -223,49 +160,61 @@ const Cart = () => {
       ),
     };
 
-    console.log('optimisticCart:', optimisticCart);
-
-    mutate(optimisticCart, false); // Optimistic UI update
+    mutate(optimisticCart, false);
 
     try {
-      // Update the quantity on the server
-      console.log('newQuantity:', newQuantity);
       const updatedCartData = await updateCartQuantityAPI({
         model: item_id,
         quantity: newQuantity,
       });
       mutateCart(updatedCartData, false);
 
-      // Revalidate the cart data
       globalMutate('/api/cart');
     } catch (error) {
       console.error('Failed to update cart:', error);
-      mutate(cart, false); // Revert on failure
+      mutate(cart, false);
     }
+    setQuantityInputs({});
   };
 
-  // console.log(cart);
   const handleKeyDown = (e: React.KeyboardEvent, itemId: string) => {
     const target = e.currentTarget as HTMLInputElement;
 
     if (e.key === '0' && target.value === '') {
-      e.preventDefault(); // Prevent '0' as the first character if input is empty
+      e.preventDefault();
     }
     if (e.key === 'Enter') {
       handleQuantityInputBlur(itemId);
       if (inputRefs.current[itemId]) {
-        inputRefs.current[itemId]?.blur(); // Use ref to blur the input
+        inputRefs.current[itemId]?.blur();
       }
     }
   };
+
+  const handleDeleteItem = async (item_id: string) => {
+    const optimisticCart = {
+      ...cart,
+      items: cart?.items.filter((item) => item.model._id !== item_id),
+    };
+    mutate(optimisticCart, false);
+    try {
+      const updatedCartData = await deleteCartItem(item_id);
+
+      mutateCart(updatedCartData, false);
+      globalMutate('/api/cart');
+    } catch (error) {
+      mutate(cart, false);
+      console.error('Failed to update cart:', error);
+    }
+  };
   return (
-    <>
+    <Box pt={2} pb={4} bgcolor={'#eee'}>
       <LayoutContainer>
         <Box sx={{ mb: 2 }}>
           <Breadcrumbs options={breadcrumbsOptions} />
         </Box>
         <Box sx={{ bgcolor: '#fff', borderRadius: '4px' }}>
-          <Grid2 container spacing={4}>
+          <Grid2 container>
             <Grid2 size={8.5}>
               <TableContainer component={Paper}>
                 <Table sx={{ minWidth: 650 }} aria-label='simple table'>
@@ -287,7 +236,9 @@ const Cart = () => {
                       <TableCell>Sản phẩm</TableCell>
                       <TableCell align='center'>Giá</TableCell>
                       <TableCell align='center'>Số lượng</TableCell>
-                      <TableCell align='center'>Số tiền</TableCell>
+                      <TableCell align='center' width={'13%'}>
+                        Tuỳ chọn
+                      </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -299,11 +250,7 @@ const Cart = () => {
                           key={row.model?._id}
                           sx={{
                             '&:last-child td, &:last-child th': { border: 0 },
-                          }}
-                          // onClick={(event) =>
-                          //   handleItemClick(event, row.model._id)
-                          // }
-                        >
+                          }}>
                           <TableCell component='th' scope='row'>
                             <Checkbox
                               color='primary'
@@ -329,47 +276,25 @@ const Cart = () => {
                             </Box>
                             {row.model?.product_name}
                           </TableCell>
-                          <TableCell component='th' scope='row' align='center'>
+                          <TableCell
+                            sx={{}}
+                            component='th'
+                            scope='row'
+                            align='center'>
                             {formatPrice(row.model?.price)}
                           </TableCell>
                           <TableCell component='th' scope='row' align='center'>
                             <Box
                               sx={{
                                 display: 'flex',
+                                justifyContent: 'center',
                                 alignItems: 'center',
-
                                 '& .MuiButtonBase-root': {
-                                  minWidth: 32,
-                                  height: 32,
+                                  minWidth: 28,
+                                  height: 28,
                                   border: '1px solid #eee',
-                                  // ':first-child': {
-                                  //   ':hover': {
-                                  //     borderRightColor: 'unset !important',
-                                  //   },
-                                  // },
                                 },
                               }}>
-                              {/* <ButtonGroup
-                                variant='outlined'
-                                size='small'
-                                sx={{
-                                  // width: 104,
-                                  height: 32,
-                                  '.MuiButtonGroup-firstButton': {
-                                    ':hover': {
-                                      borderRightColor: 'transparent',
-                                    },
-                                  },
-                                  '& .MuiButtonBase-root': {
-                                    minWidth: 32,
-                                    // border: '1px solid #eee',
-                                    // ':first-child': {
-                                    //   ':hover': {
-                                    //     borderRightColor: 'unset !important',
-                                    //   },
-                                    // },
-                                  },
-                                }}> */}
                               <Button
                                 sx={{
                                   borderTopRightRadius: 0,
@@ -382,40 +307,27 @@ const Cart = () => {
                               </Button>
                               <TextField
                                 sx={{
-                                  width: '40px',
-                                  height: 32,
+                                  width: '36px',
+                                  height: 28,
                                   borderTop: '1px solid rgba(0,0,0,.09)',
                                   borderBottom: '1px solid rgba(0,0,0,.09)',
                                   '& .MuiOutlinedInput-root': {
-                                    height: 32,
+                                    height: 28,
                                     '& fieldset': {
-                                      // borderTop: '#E0E3E7',
-                                      // borderBottom: '#E0E3E7',
                                       display: 'none',
                                     },
-                                    // '&:hover fieldset': {
-                                    //   borderColor: '#B2BAC2',
-                                    // },
-                                    // '&.Mui-focused fieldset': {
-                                    //   borderColor: '#6F7E8C',
-                                    // },
                                   },
                                   '.MuiInputBase-root': {
-                                    height: 32,
+                                    height: 28,
                                     borderRadius: 0,
-                                    // // border: '1px solid rgb(255, 255, 255)',
-                                    // // ':before': {
-                                    // //   border: 'none',
-                                    // // },
                                     fontSize: 14,
                                     '.MuiInputBase-input': {
-                                      height: 28,
+                                      height: 24,
                                       p: 0,
                                       textAlign: 'center',
                                       ':focus': {
                                         border: '1px solid #000',
                                       },
-                                      // border: 'none',
                                       '&::-webkit-outer-spin-button, &::-webkit-inner-spin-button':
                                         {
                                           display: 'none',
@@ -451,10 +363,18 @@ const Cart = () => {
                                 +
                               </Button>
                             </Box>
-                            {/* </ButtonGroup> */}
                           </TableCell>
+
                           <TableCell component='th' scope='row' align='center'>
-                            {formatPrice(row.model?.price * row.quantity)}
+                            <Typography
+                              sx={{
+                                ':hover': {
+                                  color: 'red',
+                                },
+                              }}
+                              onClick={() => handleDeleteItem(row?.model?._id)}>
+                              Xoá
+                            </Typography>
                           </TableCell>
                         </TableRow>
                       );
@@ -462,54 +382,41 @@ const Cart = () => {
                   </TableBody>
                 </Table>
               </TableContainer>
-              {/* <div className='w-full text-right'>
-                    <Button
-                    // onClick={() => {
-                    //   cart?.updateCartData?.();
-                    // }}
-                    >
-                      Cập nhật giỏ hàng
-                    </Button>
-                  </div> */}
             </Grid2>
-            <Grid2 size={3.5}>
-              <Box className='pay'>
-                <Typography className='total-title'>CỘNG GIỎ HÀNG</Typography>
-                <Grid2 className='total'>
-                  <Grid2 size={6} className='total-price-label'>
-                    Tổng thanh toán:
-                  </Grid2>
-                  <Grid2 size={6} className='total-price-cost'>
-                    {/* {formatPrice(cart?.totalPrice)} */}
-                  </Grid2>
-                  <Button className='pay-btn'>
-                    <Link href={'/'}>Tiến hành thanh toán</Link>
-                  </Button>
-                  <ButtonGroup className='total-btns'>
-                    <Button
-                    // onClick={
-                    // () =>
-                    // showConfirmModal({
-                    //   title: 'Bạn có muốn xoá hết sản phẩm trong giỏ hàng?',
-                    //   onOk: () => {
-                    //     cart?.removeAllProductInCart?.();
-                    //   },
-                    // })
-                    // }
-                    >
-                      Xóa tất cả
-                    </Button>
-                    <Button>
-                      <Link href='/'>Về trang chủ</Link>
-                    </Button>
-                  </ButtonGroup>
+            <Grid2 size={3.5} p={3}>
+              <Grid2 className='total'>
+                <Grid2 size={6} mb={2} className='total-price-label'>
+                  Tổng thanh toán (100 sản phẩm):
                 </Grid2>
-              </Box>
+                <Grid2
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    mb: 2,
+                  }}
+                  size={6}
+                  className='total-price-cost'>
+                  <Typography sx={{ fontSize: 15, fontWeight: 600 }}>
+                    Thành tiền:
+                  </Typography>
+                  <Typography sx={{ fontSize: 20, fontWeight: 800 }}>
+                    {formatPrice(10000000)}
+                  </Typography>
+                </Grid2>
+                <Button
+                  sx={{ fontWeight: 600 }}
+                  variant='contained'
+                  size='large'
+                  fullWidth>
+                  Thanh toán
+                </Button>
+              </Grid2>
             </Grid2>
           </Grid2>
         </Box>
       </LayoutContainer>
-    </>
+    </Box>
   );
 };
 

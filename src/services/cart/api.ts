@@ -3,7 +3,7 @@
 
 import { BASE_API_URL } from '@/constants/env';
 import { ICart, ICartPayload } from '@/interfaces/ICart';
-import { patchRequest, postRequest } from '@/utils/fetch-client';
+import { deleteRequest, patchRequest, postRequest } from '@/utils/fetch-client';
 import useSWR from 'swr';
 import { fetcher } from '../fetcher';
 
@@ -42,4 +42,13 @@ export const useGetCart = () => {
     isError: error,
     mutate
   };
+};
+
+export const deleteCartItem = (item_id:string) => {
+  try {
+    const res = deleteRequest(`${BASE_API_URL}/cart/${item_id}`);
+    return res;
+  } catch (error) {
+    throw error
+  }
 };
