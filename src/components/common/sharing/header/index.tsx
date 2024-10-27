@@ -1,5 +1,17 @@
 'use client';
 
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+
+import AppLink from '../../AppLink';
+import SkeletonImage from '../../SkeletonImage';
+
+import { useAuthStore } from '@/providers/auth-store-provider';
+import { logoutAPI } from '@/services/auth/api';
+
+import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import SearchIcon from '@mui/icons-material/Search';
 import {
   Box,
   Button,
@@ -10,22 +22,12 @@ import {
   MenuItem,
   Typography,
 } from '@mui/material';
-import LayoutContainer from '../layout-container';
-import LOGO from '@/assets/geardn-logo.png';
-import SearchIcon from '@mui/icons-material/Search';
-import SkeletonImage from '../../SkeletonImage';
-import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
-import { useAuthStore } from '@/providers/auth-store-provider';
-import { useState } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import AppLink from '../../AppLink';
-import { HeaderStyle } from './style';
-import { logoutAPI } from '@/services/auth/api';
 
-const Header = () => {
+import LOGO from '@/assets/geardn-logo.png';
+import { HeaderStyle } from './style';
+
+const Header = ({ showHeader }: { showHeader: boolean }) => {
   const router = useRouter();
-  const pathname = usePathname();
   const { user, logout } = useAuthStore((state) => state);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -51,7 +53,7 @@ const Header = () => {
     }
   };
   return (
-    <Box sx={HeaderStyle(pathname)}>
+    <Box sx={HeaderStyle(showHeader)}>
       <Grid2 container height={80}>
         <Grid2 size={4.5} sx={{ display: 'flex', alignItems: 'center' }}>
           <Box component={AppLink} href={'/'} className='header-logo'>
@@ -83,18 +85,6 @@ const Header = () => {
             <SearchIcon />
             <Button sx={{ minWidth: 40, height: 40, ml: 2 }}>
               <ShoppingCartOutlinedIcon
-                sx={
-                  {
-                    // p: 1,
-                    // ml: 2.5,
-                    // fontSize: 40,
-                    // borderRadius: 2,
-                    // ':hover': {
-                    //   bgcolor: '#eee',
-                    //   cursor: 'pointer',
-                    // },
-                  }
-                }
                 onClick={() => {
                   user !== null ? router.push('/cart') : router.push('/login');
                 }}

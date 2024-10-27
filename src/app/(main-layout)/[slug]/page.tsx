@@ -128,7 +128,7 @@ const ProductDetail = () => {
   };
 
   return (
-    <Box pb={4}>
+    <Box pt={2} pb={4} bgcolor={'#eee'}>
       <LayoutContainer>
         <Box sx={{ mb: 2 }}>
           <Breadcrumbs options={breadcrumbsOptions} />

@@ -30,7 +30,13 @@ export default function Homepage() {
             zIndex: 1,
           },
         }}>
-        <SkeletonImage src={BANNER_BG} alt='geardn' fill unoptimized={true} />
+        <SkeletonImage
+          src={BANNER_BG}
+          alt='geardn'
+          fill
+          quality={90}
+          priority
+        />
       </Box>
       <ProductList />
       <Explore />
