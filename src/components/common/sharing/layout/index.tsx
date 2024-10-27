@@ -31,9 +31,10 @@ const Layout = ({ children }: LayoutType) => {
   };
 
   const handleScroll = () => {
-    if (window.scrollY > 200) {
+    if (window.scrollY > 0) {
       setShowScrollTop(true);
     } else {
+      setShowScrollTop(false);
     }
     if (window.scrollY > 720) {
       setShowHeader(false);

@@ -25,9 +25,11 @@ import {
 
 import LOGO from '@/assets/geardn-logo.png';
 import { HeaderStyle } from './style';
+import { useGetCart } from '@/services/cart/api';
 
 const Header = ({ showHeader }: { showHeader: boolean }) => {
   const router = useRouter();
+  const { cart } = useGetCart();
   const { user, logout } = useAuthStore((state) => state);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -83,12 +85,31 @@ const Header = ({ showHeader }: { showHeader: boolean }) => {
               width: '100%',
             }}>
             <SearchIcon />
-            <Button sx={{ minWidth: 40, height: 40, ml: 2 }}>
+            <Button
+              sx={{ position: 'relative', minWidth: 40, height: 40, ml: 2 }}>
               <ShoppingCartOutlinedIcon
                 onClick={() => {
                   user !== null ? router.push('/cart') : router.push('/login');
                 }}
               />
+              <Typography
+                sx={{
+                  position: 'absolute',
+                  top: -2,
+                  right: -2,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  width: '20px',
+                  height: '20px',
+                  borderRadius: 10,
+                  fontSize: 11,
+                  fontWeight: 600,
+                  bgcolor: '#000',
+                  color: '#fff',
+                }}>
+                0
+              </Typography>
             </Button>
             {user !== null ? (
               user?.picture ? (
