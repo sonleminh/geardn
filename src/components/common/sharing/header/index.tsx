@@ -29,7 +29,7 @@ import { useGetCart } from '@/services/cart/api';
 
 const Header = ({ showHeader }: { showHeader: boolean }) => {
   const router = useRouter();
-  const { cart } = useGetCart();
+  const { cart, isLoading } = useGetCart();
   const { user, logout } = useAuthStore((state) => state);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -38,6 +38,7 @@ const Header = ({ showHeader }: { showHeader: boolean }) => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+  console.log('header');
 
   const handleLogout = async () => {
     const result = await logoutAPI();
@@ -105,10 +106,10 @@ const Header = ({ showHeader }: { showHeader: boolean }) => {
                   borderRadius: 10,
                   fontSize: 11,
                   fontWeight: 600,
-                  bgcolor: '#000',
+                  bgcolor: isLoading ? 'rgba(0, 0 ,0, 0.3)' : '#000',
                   color: '#fff',
                 }}>
-                0
+                {cart?.items ? cart.items.length : isLoading ? '' : 0}
               </Typography>
             </Button>
             {user !== null ? (

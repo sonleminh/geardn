@@ -34,7 +34,7 @@ import {
 import EMPTY_CART from '@/assets/empty-cart.png';
 import Link from 'next/link';
 
-const Cart = () => {
+const Checkout = () => {
   const breadcrumbsOptions = [
     { link: '/', label: 'Home' },
     { link: '/cart', label: 'Giỏ hàng' },
@@ -525,4 +525,4 @@ const Cart = () => {
   );
 };
 
-export default Cart;
+export default Checkout;

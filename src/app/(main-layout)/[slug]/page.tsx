@@ -28,10 +28,13 @@ import { Swiper as SwiperClass } from 'swiper';
 import MainSwiper from './components/main-swiper';
 import ThumbSwiper from './components/thumb-swiper';
 import { addCartAPI } from '@/services/cart/api';
+import { useSWRConfig } from 'swr';
+import { BASE_API_URL } from '@/constants/env';
 
 const ProductDetail = () => {
   const params = useParams();
   const router = useRouter();
+  const { mutate: globalMutate } = useSWRConfig();
   const { user, logout } = useAuthStore((state) => state);
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperClass | null>(null);
   const [count, setCount] = useState<number | null>(1);
@@ -52,7 +55,6 @@ const ProductDetail = () => {
   ];
 
   useEffect(() => {
-    // Match the selectedModel with a valid product model
     const matchedModel = product?.models?.find(
       (model) =>
         JSON.stringify(model?.extinfo?.tier_index) ===
@@ -107,7 +109,6 @@ const ProductDetail = () => {
     if (!user) {
       router.push('/login');
     }
-
     if (
       matchedModel &&
       selectedModel?.length === product?.tier_variations?.length
@@ -116,15 +117,8 @@ const ProductDetail = () => {
         model: matchedModel?._id,
         quantity: count ?? 1,
       });
-      mutate(cartData, false);
+      globalMutate(`${BASE_API_URL}/cart`, undefined, { revalidate: true });
     }
-    // if (matchedSKU) {
-    //   const cartData = await addCartAPI({
-    //     sku: matchedSKU?._id,
-    //     quantity: count ?? 1,
-    //   });
-    //   mutate(cartData, false);
-    // }
   };
 
   return (

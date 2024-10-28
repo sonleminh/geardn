@@ -1,5 +1,12 @@
 'use client';
 
+import LOGO from '@/assets/geardn-logo.png';
+import { useAuthStore } from '@/providers/auth-store-provider';
+import { logoutAPI } from '@/services/auth/api';
+import { useGetCart } from '@/services/cart/api';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import SearchIcon from '@mui/icons-material/Search';
+import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import {
   Box,
   Button,
@@ -10,18 +17,12 @@ import {
   MenuItem,
   Typography,
 } from '@mui/material';
-import LayoutContainer from '../layout-container';
-import LOGO from '@/assets/geardn-logo.png';
-import SearchIcon from '@mui/icons-material/Search';
-import SkeletonImage from '../../SkeletonImage';
-import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
-import { useAuthStore } from '@/providers/auth-store-provider';
-import { useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { useState } from 'react';
 import AppLink from '../../AppLink';
+import SkeletonImage from '../../SkeletonImage';
+import LayoutContainer from '../layout-container';
 import { FullWidthHeaderStyle } from './style';
-import { logoutAPI } from '@/services/auth/api';
 
 const FullWidthHeader = ({
   showFullWidthHeader,
@@ -29,6 +30,7 @@ const FullWidthHeader = ({
   showFullWidthHeader: boolean;
 }) => {
   const router = useRouter();
+  const { cart, isLoading } = useGetCart();
   const pathname = usePathname();
   const { user, logout } = useAuthStore((state) => state);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -86,26 +88,33 @@ const FullWidthHeader = ({
                 width: '100%',
               }}>
               <SearchIcon />
-              <Button sx={{ minWidth: 40, height: 40, ml: 2 }}>
+              <Button
+                sx={{ position: 'relative', minWidth: 40, height: 40, ml: 2 }}>
                 <ShoppingCartOutlinedIcon
-                  sx={
-                    {
-                      // p: 1,
-                      // ml: 2.5,
-                      // fontSize: 40,
-                      // borderRadius: 2,
-                      // ':hover': {
-                      //   bgcolor: '#eee',
-                      //   cursor: 'pointer',
-                      // },
-                    }
-                  }
                   onClick={() => {
                     user !== null
                       ? router.push('/cart')
                       : router.push('/login');
                   }}
                 />
+                <Typography
+                  sx={{
+                    position: 'absolute',
+                    top: -2,
+                    right: -2,
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    width: '20px',
+                    height: '20px',
+                    borderRadius: 10,
+                    fontSize: 11,
+                    fontWeight: 600,
+                    bgcolor: isLoading ? 'rgba(0, 0 ,0, 0.3)' : '#000',
+                    color: '#fff',
+                  }}>
+                  {cart?.items ? cart.items.length : isLoading ? '' : 0}
+                </Typography>
               </Button>
               {user !== null ? (
                 user?.picture ? (
