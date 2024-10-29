@@ -20,8 +20,14 @@ import {
   Box,
   Button,
   Checkbox,
+  Divider,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
   Grid2,
   Paper,
+  Radio,
+  RadioGroup,
   Table,
   TableBody,
   TableCell,
@@ -29,15 +35,21 @@ import {
   TableHead,
   TableRow,
   TextField,
+  TextareaAutosize,
   Typography,
+  styled,
 } from '@mui/material';
 import EMPTY_CART from '@/assets/empty-cart.png';
 import Link from 'next/link';
+import ChevronLeftOutlinedIcon from '@mui/icons-material/ChevronLeftOutlined';
+import { Label } from '@mui/icons-material';
+import MinHeightTextarea from '@/components/common/Textarea';
+import Textarea from '@/components/common/Textarea';
 
 const Checkout = () => {
   const breadcrumbsOptions = [
     { link: '/', label: 'Home' },
-    { link: '/cart', label: 'Giỏ hàng' },
+    { link: '/cart', label: 'Thanh toán' },
   ];
   const { cart, mutate } = useGetCart();
   const { mutate: mutateCart } = useUpsertCart();
@@ -251,216 +263,183 @@ const Checkout = () => {
   return (
     <Box pt={2} pb={4} bgcolor={'#eee'}>
       <LayoutContainer>
-        <Box sx={{ mb: 2 }}>
+        <Box sx={{}}>
           <Breadcrumbs options={breadcrumbsOptions} />
         </Box>
-        <Box sx={{ bgcolor: '#fff', borderRadius: '4px' }}>
+        <Button>
+          <ChevronLeftOutlinedIcon />
+          Quay lại giỏ hàng
+        </Button>
+
+        <Box sx={{}}>
           {cart?.items?.length > 0 ? (
-            <Grid2 container>
-              <Grid2 size={8.5}>
-                <TableContainer component={Paper}>
-                  <Table sx={{ minWidth: 650 }} aria-label='simple table'>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>
-                          <Checkbox
-                            color='primary'
-                            checked={
-                              cart?.items?.length > 0 &&
-                              selected?.length === cart?.items?.length
-                            }
-                            onChange={handleSelectAllClick}
-                            inputProps={{
-                              'aria-label': 'select all desserts',
-                            }}
-                          />
-                        </TableCell>
-                        <TableCell>Sản phẩm</TableCell>
-                        <TableCell align='center'>Giá</TableCell>
-                        <TableCell align='center'>Số lượng</TableCell>
-                        <TableCell align='center' width={'13%'}>
-                          Tuỳ chọn
-                        </TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {cart?.items?.map((row) => {
-                        const isItemSelected = selected.includes(row.model._id);
-
-                        return (
-                          <TableRow
-                            key={row.model?._id}
-                            sx={{
-                              '&:last-child td, &:last-child th': { border: 0 },
-                            }}>
-                            <TableCell component='th' scope='row'>
-                              <Checkbox
-                                color='primary'
-                                checked={isItemSelected}
-                                onClick={(e) => handleClick(e, row.model._id)}
-                              />
-                            </TableCell>
-                            <TableCell
-                              sx={{ display: 'flex', alignItems: 'center' }}
-                              component='th'
-                              scope='row'>
-                              <Box
-                                sx={{
-                                  position: 'relative',
-                                  width: 68,
-                                  height: 68,
-                                  mr: 2,
-                                }}>
-                                <SkeletonImage
-                                  src={row?.model?.image}
-                                  alt={row.model?.product_name}
-                                  fill
-                                />
-                              </Box>
-                              {row.model?.product_name}
-                            </TableCell>
-                            <TableCell
-                              sx={{}}
-                              component='th'
-                              scope='row'
-                              align='center'>
-                              {formatPrice(row.model?.price)}
-                            </TableCell>
-                            <TableCell
-                              component='th'
-                              scope='row'
-                              align='center'>
-                              <Box
-                                sx={{
-                                  display: 'flex',
-                                  justifyContent: 'center',
-                                  alignItems: 'center',
-                                  '& .MuiButtonBase-root': {
-                                    minWidth: 28,
-                                    height: 28,
-                                    border: '1px solid #eee',
-                                  },
-                                }}>
-                                <Button
-                                  sx={{
-                                    borderTopRightRadius: 0,
-                                    borderBottomRightRadius: 0,
-                                  }}
-                                  onClick={() =>
-                                    handleSubtractItem(row?.model?._id)
-                                  }>
-                                  -
-                                </Button>
-                                <TextField
-                                  sx={{
-                                    width: '36px',
-                                    height: 28,
-                                    borderTop: '1px solid rgba(0,0,0,.09)',
-                                    borderBottom: '1px solid rgba(0,0,0,.09)',
-                                    '& .MuiOutlinedInput-root': {
-                                      height: 28,
-                                      '& fieldset': {
-                                        display: 'none',
-                                      },
-                                    },
-                                    '.MuiInputBase-root': {
-                                      height: 28,
-                                      borderRadius: 0,
-                                      fontSize: 14,
-                                      '.MuiInputBase-input': {
-                                        height: 24,
-                                        p: 0,
-                                        textAlign: 'center',
-                                        ':focus': {
-                                          border: '1px solid #000',
-                                        },
-                                        '&::-webkit-outer-spin-button, &::-webkit-inner-spin-button':
-                                          {
-                                            display: 'none',
-                                          },
-                                      },
-                                    },
-                                  }}
-                                  variant='outlined'
-                                  type='number'
-                                  size='small'
-                                  value={
-                                    quantityInputs[row.model._id] ??
-                                    row.quantity
-                                  }
-                                  onChange={(e) =>
-                                    handleQuantityInputChange(
-                                      e,
-                                      row?.model?._id
-                                    )
-                                  }
-                                  onBlur={() =>
-                                    handleQuantityInputBlur(row?.model?._id)
-                                  }
-                                  onKeyDown={(e) =>
-                                    handleKeyDown(e, row?.model?._id)
-                                  }
-                                  inputRef={(ref) =>
-                                    (inputRefs.current[row.model._id] = ref)
-                                  }
-                                />
-                                <Button
-                                  sx={{
-                                    borderTopLeftRadius: 0,
-                                    borderBottomLeftRadius: 0,
-                                  }}
-                                  onClick={() =>
-                                    handleAddItem(row?.model?._id)
-                                  }>
-                                  +
-                                </Button>
-                              </Box>
-                            </TableCell>
-
-                            <TableCell
-                              component='th'
-                              scope='row'
-                              align='center'>
-                              <Typography
-                                sx={{
-                                  ':hover': {
-                                    color: 'red',
-                                  },
-                                }}
-                                onClick={() =>
-                                  handleDeleteItem(row?.model?._id)
-                                }>
-                                Xoá
-                              </Typography>
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
+            <Grid2 container spacing={2}>
+              <Grid2 sx={{}} size={8.5}>
+                <Box sx={{ p: 3, mb: 2, bgcolor: '#fff', borderRadius: '4px' }}>
+                  <Typography sx={{ mb: 2, fontSize: 18, fontWeight: 700 }}>
+                    Sản phẩm trong đơn
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      <Box
+                        sx={{
+                          position: 'relative',
+                          width: 68,
+                          height: 68,
+                          mr: 2,
+                        }}>
+                        <SkeletonImage
+                          src={
+                            'https://storage.googleapis.com/geardn-a6c28.appspot.com/1729417250050-Aula-F75-Glacier-Blue.webp'
+                          }
+                          alt={''}
+                          fill
+                        />
+                      </Box>
+                      <Typography>iPhone 16 512GB Hồng MYEQ3VN/A</Typography>
+                    </Box>
+                    <Typography>29.900.000 đ</Typography>
+                  </Box>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      <Box
+                        sx={{
+                          position: 'relative',
+                          width: 68,
+                          height: 68,
+                          mr: 2,
+                        }}>
+                        <SkeletonImage
+                          src={
+                            'https://storage.googleapis.com/geardn-a6c28.appspot.com/1729417250050-Aula-F75-Glacier-Blue.webp'
+                          }
+                          alt={''}
+                          fill
+                        />
+                      </Box>
+                      <Typography>iPhone 16 512GB Hồng MYEQ3VN/A</Typography>
+                    </Box>
+                    <Typography>29.900.000 đ</Typography>
+                  </Box>
+                </Box>
+                <Box sx={{ p: 3, mb: 2, bgcolor: '#fff', borderRadius: '4px' }}>
+                  <Typography mb={2}>Thông tin đặt hàng</Typography>
+                  <TextField
+                    sx={{ mb: 1 }}
+                    fullWidth
+                    placeholder='Họ và tên'
+                    size='small'
+                  />
+                  <TextField
+                    sx={{ mb: 1 }}
+                    fullWidth
+                    placeholder='Số điện thoại'
+                    size='small'
+                  />
+                  <TextField
+                    sx={{ mb: 1 }}
+                    fullWidth
+                    placeholder='Email (Không bắt buộc)'
+                    size='small'
+                  />
+                </Box>
+                <Box sx={{ p: 3, mb: 2, bgcolor: '#fff', borderRadius: '4px' }}>
+                  <FormControl>
+                    <FormLabel id='demo-row-radio-buttons-group-label'>
+                      Hình thức nhận hàng
+                    </FormLabel>
+                    <RadioGroup
+                      row
+                      aria-labelledby='demo-row-radio-buttons-group-label'
+                      name='row-radio-buttons-group'>
+                      <FormControlLabel
+                        value='female'
+                        control={<Radio size='small' />}
+                        label='Giao hàng tận nơi'
+                      />
+                      <FormControlLabel
+                        value='male'
+                        control={<Radio size='small' />}
+                        label='Nhận tại cửa hàng'
+                      />
+                    </RadioGroup>
+                  </FormControl>
+                  <Typography mb={1}>Ghi chú yêu cầu</Typography>
+                  <Textarea placeholder='Số điện thoại' minRows={3} />
+                </Box>
+                <Box sx={{ p: 3, bgcolor: '#fff', borderRadius: '4px' }}>
+                  <FormControl>
+                    <FormLabel id='demo-row-radio-buttons-group-label'>
+                      Phương thức thanh toán
+                    </FormLabel>
+                    <RadioGroup
+                      row
+                      aria-labelledby='demo-row-radio-buttons-group-label'
+                      name='row-radio-buttons-group'>
+                      <FormControlLabel
+                        value='female'
+                        control={<Radio size='small' />}
+                        label='COD'
+                      />
+                    </RadioGroup>
+                  </FormControl>
+                </Box>
               </Grid2>
-              <Grid2 size={3.5} p={3}>
-                <Grid2 className='total'>
-                  <Grid2 size={6} mb={2} className='total-price-label'>
-                    Tổng thanh toán ({selected?.length} sản phẩm):
-                  </Grid2>
-                  <Grid2
+              <Grid2
+                sx={{
+                  position: 'sticky',
+                  top: 0,
+                  right: 0,
+                  height: '100%',
+                  bgcolor: '#fff',
+                  borderRadius: '4px',
+                }}
+                size={3.5}
+                p={3}>
+                <Typography
+                  sx={{ mb: 2, fontSize: 18, fontWeight: 700 }}
+                  className='total-price-label'>
+                  Thông tin đơn hàng
+                </Typography>
+                <Box className='total'>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                    className='total-price-cost'>
+                    <Typography sx={{ fontSize: 13 }}>Tổng tiền:</Typography>
+                    <Typography sx={{ fontSize: 16, fontWeight: 700 }}>
+                      {/* {formatPrice(totalAmount())} */}
+                      2.000.000 đ
+                    </Typography>
+                  </Box>
+                  <Divider sx={{ mt: 2, mb: 1 }} />
+                  <Box
                     sx={{
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
                       mb: 2,
-                    }}
-                    size={6}
-                    className='total-price-cost'>
-                    <Typography sx={{ fontSize: 15, fontWeight: 600 }}>
-                      Thành tiền:
+                    }}>
+                    <Typography sx={{ fontSize: 13 }}>
+                      Phí vận chuyển:
                     </Typography>
-                    <Typography sx={{ fontSize: 20, fontWeight: 800 }}>
-                      {formatPrice(totalAmount())}
+                    <Typography sx={{ fontSize: 13 }}>
+                      Miễn phí (5km)
                     </Typography>
-                  </Grid2>
+                  </Box>
                   <Button
                     sx={{ mb: 1.5, fontWeight: 600 }}
                     variant='contained'
@@ -475,7 +454,7 @@ const Checkout = () => {
                     fullWidth>
                     Tiếp tục mua hàng
                   </Button>
-                </Grid2>
+                </Box>
               </Grid2>
             </Grid2>
           ) : (

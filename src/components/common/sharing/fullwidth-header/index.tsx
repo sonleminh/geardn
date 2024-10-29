@@ -89,14 +89,11 @@ const FullWidthHeader = ({
               }}>
               <SearchIcon />
               <Button
-                sx={{ position: 'relative', minWidth: 40, height: 40, ml: 2 }}>
-                <ShoppingCartOutlinedIcon
-                  onClick={() => {
-                    user !== null
-                      ? router.push('/cart')
-                      : router.push('/login');
-                  }}
-                />
+                sx={{ position: 'relative', minWidth: 40, height: 40, ml: 2 }}
+                onClick={() => {
+                  user !== null ? router.push('/cart') : router.push('/login');
+                }}>
+                <ShoppingCartOutlinedIcon />
                 <Typography
                   sx={{
                     position: 'absolute',

@@ -38,7 +38,6 @@ const Header = ({ showHeader }: { showHeader: boolean }) => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-  console.log('header');
 
   const handleLogout = async () => {
     const result = await logoutAPI();

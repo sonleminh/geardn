@@ -47,6 +47,8 @@ const Cart = () => {
     [key: string]: string;
   }>({});
 
+  console.log(selected);
+
   const inputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -317,7 +319,24 @@ const Cart = () => {
                                   fill
                                 />
                               </Box>
-                              {row.model?.product_name}
+                              <Box>
+                                <Typography fontSize={15}>
+                                  {row.model?.product_name}
+                                </Typography>
+                                {row.model?.name && (
+                                  <Typography
+                                    sx={{
+                                      display: 'inline-block',
+                                      px: '6px',
+                                      py: '2px',
+                                      bgcolor: '#f3f4f6',
+                                      fontSize: 11,
+                                      borderRadius: 0.5,
+                                    }}>
+                                    {row.model?.name}
+                                  </Typography>
+                                )}
+                              </Box>
                             </TableCell>
                             <TableCell
                               sx={{}}
@@ -423,6 +442,7 @@ const Cart = () => {
                               align='center'>
                               <Typography
                                 sx={{
+                                  fontSize: 14,
                                   ':hover': {
                                     color: 'red',
                                   },
