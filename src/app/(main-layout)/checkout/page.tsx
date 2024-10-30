@@ -45,7 +45,7 @@ import ChevronLeftOutlinedIcon from '@mui/icons-material/ChevronLeftOutlined';
 import { Label } from '@mui/icons-material';
 import MinHeightTextarea from '@/components/common/Textarea';
 import Textarea from '@/components/common/Textarea';
-import { useAppStore, useBearStore } from '@/stores/app-store';
+import { useAuthStore } from '@/providers/auth-store-provider';
 
 const Checkout = () => {
   const breadcrumbsOptions = [
@@ -60,9 +60,11 @@ const Checkout = () => {
     [key: string]: string;
   }>({});
 
-  const addABear = useBearStore((state) => state.addABear);
-
   const inputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
+
+  const { checkoutData } = useAuthStore((state) => state);
+
+  console.log(checkoutData);
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
@@ -269,7 +271,7 @@ const Checkout = () => {
         <Box sx={{}}>
           <Breadcrumbs options={breadcrumbsOptions} />
         </Box>
-        <Button onClick={() => addABear()}>
+        <Button component={Link} href='/cart'>
           <ChevronLeftOutlinedIcon />
           Quay lại giỏ hàng
         </Button>
@@ -282,58 +284,30 @@ const Checkout = () => {
                   <Typography sx={{ mb: 2, fontSize: 18, fontWeight: 700 }}>
                     Sản phẩm trong đơn
                   </Typography>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                    }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      <Box
-                        sx={{
-                          position: 'relative',
-                          width: 68,
-                          height: 68,
-                          mr: 2,
-                        }}>
-                        <SkeletonImage
-                          src={
-                            'https://storage.googleapis.com/geardn-a6c28.appspot.com/1729417250050-Aula-F75-Glacier-Blue.webp'
-                          }
-                          alt={''}
-                          fill
-                        />
+
+                  {checkoutData?.map((item) => (
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                      }}
+                      key={item.model._id}>
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <Box
+                          sx={{
+                            position: 'relative',
+                            width: 68,
+                            height: 68,
+                            mr: 2,
+                          }}>
+                          <SkeletonImage src={item.model.image} alt={''} fill />
+                        </Box>
+                        <Typography>{item.model.product_name}</Typography>
                       </Box>
-                      <Typography>iPhone 16 512GB Hồng MYEQ3VN/A</Typography>
+                      <Typography>{formatPrice(item.model.price)}</Typography>
                     </Box>
-                    <Typography>29.900.000 đ</Typography>
-                  </Box>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                    }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      <Box
-                        sx={{
-                          position: 'relative',
-                          width: 68,
-                          height: 68,
-                          mr: 2,
-                        }}>
-                        <SkeletonImage
-                          src={
-                            'https://storage.googleapis.com/geardn-a6c28.appspot.com/1729417250050-Aula-F75-Glacier-Blue.webp'
-                          }
-                          alt={''}
-                          fill
-                        />
-                      </Box>
-                      <Typography>iPhone 16 512GB Hồng MYEQ3VN/A</Typography>
-                    </Box>
-                    <Typography>29.900.000 đ</Typography>
-                  </Box>
+                  ))}
                 </Box>
                 <Box sx={{ p: 3, mb: 2, bgcolor: '#fff', borderRadius: '4px' }}>
                   <Typography mb={2}>Thông tin đặt hàng</Typography>

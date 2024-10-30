@@ -33,6 +33,9 @@ import {
 } from '@mui/material';
 import EMPTY_CART from '@/assets/empty-cart.png';
 import Link from 'next/link';
+import { useAuthStore } from '@/providers/auth-store-provider';
+import { ICartItem } from '@/interfaces/ICart';
+import { useRouter } from 'next/navigation';
 
 const Cart = () => {
   const breadcrumbsOptions = [
@@ -40,12 +43,14 @@ const Cart = () => {
     { link: '/cart', label: 'Giỏ hàng' },
   ];
   const { cart, mutate } = useGetCart();
+  const router = useRouter();
   const { mutate: mutateCart } = useUpsertCart();
   const { mutate: globalMutate } = useSWRConfig();
   const [selected, setSelected] = useState<string[]>([]);
   const [quantityInputs, setQuantityInputs] = useState<{
     [key: string]: string;
   }>({});
+  const { setCheckoutData } = useAuthStore((state) => state);
 
   console.log(selected);
 
@@ -253,9 +258,10 @@ const Cart = () => {
   const checkoutItems = () => {
     const selectedItems = selected
       .map((item_id) => cart?.items?.find((item) => item.model._id === item_id))
-      .filter((item) => item !== undefined);
+      .filter((item): item is ICartItem => item !== undefined);
 
-    console.log(selectedItems);
+    setCheckoutData(selectedItems);
+    router.push('/checkout');
   };
 
   return (
