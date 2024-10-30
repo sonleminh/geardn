@@ -250,6 +250,14 @@ const Cart = () => {
     );
   };
 
+  const checkoutItems = () => {
+    const selectedItems = selected
+      .map((item_id) => cart?.items?.find((item) => item.model._id === item_id))
+      .filter((item) => item !== undefined);
+
+    console.log(selectedItems);
+  };
+
   return (
     <Box pt={2} pb={4} bgcolor={'#eee'}>
       <LayoutContainer>
@@ -485,7 +493,11 @@ const Cart = () => {
                     sx={{ mb: 1.5, fontWeight: 600 }}
                     variant='contained'
                     size='large'
-                    fullWidth>
+                    fullWidth
+                    onClick={() => {
+                      checkoutItems();
+                      console.log(2);
+                    }}>
                     Thanh toán
                   </Button>
                   <Button

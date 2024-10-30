@@ -1,4 +1,4 @@
-// src/stores/counter-store.ts
+  // src/stores/counter-store.ts
 import { createStore } from 'zustand/vanilla'
 
 export type CounterState = {

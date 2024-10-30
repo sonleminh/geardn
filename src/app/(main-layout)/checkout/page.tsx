@@ -45,6 +45,7 @@ import ChevronLeftOutlinedIcon from '@mui/icons-material/ChevronLeftOutlined';
 import { Label } from '@mui/icons-material';
 import MinHeightTextarea from '@/components/common/Textarea';
 import Textarea from '@/components/common/Textarea';
+import { useAppStore, useBearStore } from '@/stores/app-store';
 
 const Checkout = () => {
   const breadcrumbsOptions = [
@@ -58,6 +59,8 @@ const Checkout = () => {
   const [quantityInputs, setQuantityInputs] = useState<{
     [key: string]: string;
   }>({});
+
+  const addABear = useBearStore((state) => state.addABear);
 
   const inputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
 
@@ -266,7 +269,7 @@ const Checkout = () => {
         <Box sx={{}}>
           <Breadcrumbs options={breadcrumbsOptions} />
         </Box>
-        <Button>
+        <Button onClick={() => addABear()}>
           <ChevronLeftOutlinedIcon />
           Quay lại giỏ hàng
         </Button>
@@ -398,7 +401,7 @@ const Checkout = () => {
               <Grid2
                 sx={{
                   position: 'sticky',
-                  top: 0,
+                  top: 100,
                   right: 0,
                   height: '100%',
                   bgcolor: '#fff',
