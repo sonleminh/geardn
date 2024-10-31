@@ -77,13 +77,15 @@ const Checkout = () => {
       name: '',
       phone: '',
       email: '',
-      items: [],
       address: {
         street: '',
         city: '',
         state: '',
         country: '',
       },
+      receiveOption: 'DELIVERY',
+      note: '',
+      payment_method: 'COD',
     },
     // validationSchema: schema,
     validateOnChange: false,
@@ -303,7 +305,9 @@ const Checkout = () => {
     changeCustomer(customerData);
   }, [customerData, changeCustomer]);
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>
+  ) => {
     const { value, name } = e.target;
     formik.setFieldValue(name, value);
   };
@@ -413,39 +417,57 @@ const Checkout = () => {
                 </Box>
                 <Box sx={{ p: 2, mb: 2, bgcolor: '#fff', borderRadius: '4px' }}>
                   <FormControl>
-                    <FormLabel id='demo-row-radio-buttons-group-label'>
+                    <FormLabel id='receiveOption'>
                       Hình thức nhận hàng
                     </FormLabel>
                     <RadioGroup
                       row
-                      aria-labelledby='demo-row-radio-buttons-group-label'
-                      name='row-radio-buttons-group'>
+                      name='receiveOption'
+                      onChange={handleChange}
+                      value={formik?.values?.receiveOption}>
                       <FormControlLabel
-                        value='female'
+                        value='DELIVERY'
                         control={<Radio size='small' />}
                         label='Giao hàng tận nơi'
                       />
                       <FormControlLabel
-                        value='male'
+                        value='STORE'
                         control={<Radio size='small' />}
                         label='Nhận tại cửa hàng'
                       />
                     </RadioGroup>
                   </FormControl>
                   <Typography mb={1}>Ghi chú yêu cầu</Typography>
-                  <Textarea placeholder='Số điện thoại' minRows={3} />
+                  <textarea
+                    placeholder='Nội dung'
+                    name='note'
+                    rows={3}
+                    onChange={handleChange}
+                    value={formik?.values?.note}
+                    style={{
+                      width: '100%',
+                      padding: '8.5px 14px',
+                      border: '1px solid rgba(0, 0, 0, 0.23)',
+                      borderRadius: '4px',
+                      fontSize: 16,
+                    }}
+                    onFocus={(e) => (e.target.style.outline = '1px solid #000')}
+                    onBlur={(e) => (e.target.style.outline = 'none')}
+                  />
                 </Box>
                 <Box sx={{ p: 3, bgcolor: '#fff', borderRadius: '4px' }}>
                   <FormControl>
-                    <FormLabel id='demo-row-radio-buttons-group-label'>
+                    <FormLabel id='payment_method'>
                       Phương thức thanh toán
                     </FormLabel>
                     <RadioGroup
                       row
-                      aria-labelledby='demo-row-radio-buttons-group-label'
-                      name='row-radio-buttons-group'>
+                      aria-labelledby='payment_method'
+                      name='payment_method'
+                      onChange={handleChange}
+                      value={formik?.values?.payment_method}>
                       <FormControlLabel
-                        value='female'
+                        value='COD'
                         control={<Radio size='small' />}
                         label='COD'
                       />

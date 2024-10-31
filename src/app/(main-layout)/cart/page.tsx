@@ -58,7 +58,7 @@ const Cart = () => {
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      const newSelected = cart?.items?.map((n) => n?.model?._id);
+      const newSelected = cart?.items?.map((n) => n?.model_id);
       if (newSelected) {
         setSelected(newSelected);
       }
@@ -87,9 +87,7 @@ const Cart = () => {
   };
 
   const handleAddItem = async (item_id: string) => {
-    const itemToUpdate = cart?.items?.find(
-      (item) => item.model._id === item_id
-    );
+    const itemToUpdate = cart?.items?.find((item) => item.model_id === item_id);
 
     if (!itemToUpdate) return;
 
@@ -97,7 +95,7 @@ const Cart = () => {
     const optimisticCart = {
       ...cart,
       items: cart?.items?.map((item) =>
-        item.model._id === item_id ? { ...item, quantity: newQuantity } : item
+        item.model_id === item_id ? { ...item, quantity: newQuantity } : item
       ),
     };
 
@@ -119,9 +117,7 @@ const Cart = () => {
   };
 
   const handleSubtractItem = async (item_id: string) => {
-    const itemToUpdate = cart?.items?.find(
-      (item) => item.model._id === item_id
-    );
+    const itemToUpdate = cart?.items?.find((item) => item.model_id === item_id);
     if (!itemToUpdate) return;
 
     const newQuantity = itemToUpdate.quantity - 1;
@@ -131,7 +127,7 @@ const Cart = () => {
       items:
         newQuantity > 0
           ? cart?.items?.map((item) =>
-              item.model._id === item_id
+              item.model_id === item_id
                 ? { ...item, quantity: newQuantity }
                 : item
             )
@@ -174,7 +170,7 @@ const Cart = () => {
     // If the input is not a valid number or is empty, reset it to the current cart quantity
     if (isNaN(newQuantity) || newQuantity < 1) {
       const originalQuantity = cart?.items?.find(
-        (item) => item.model._id === item_id
+        (item) => item.model_id === item_id
       )?.quantity;
       setQuantityInputs((prev) => ({
         ...prev,
@@ -183,16 +179,14 @@ const Cart = () => {
       return;
     }
 
-    const itemToUpdate = cart?.items?.find(
-      (item) => item.model._id === item_id
-    );
+    const itemToUpdate = cart?.items?.find((item) => item.model_id === item_id);
 
     if (!itemToUpdate || newQuantity === itemToUpdate.quantity) return;
 
     const optimisticCart = {
       ...cart,
       items: cart?.items?.map((item) =>
-        item.model._id === item_id ? { ...item, quantity: newQuantity } : item
+        item.model_id === item_id ? { ...item, quantity: newQuantity } : item
       ),
     };
 
@@ -230,7 +224,7 @@ const Cart = () => {
   const handleDeleteItem = async (item_id: string) => {
     const optimisticCart = {
       ...cart,
-      items: cart?.items.filter((item) => item.model._id !== item_id),
+      items: cart?.items.filter((item) => item.model_id !== item_id),
     };
     mutate(optimisticCart, false);
     try {
@@ -246,18 +240,18 @@ const Cart = () => {
 
   const totalAmount = () => {
     const selectedItems = selected
-      .map((item_id) => cart?.items?.find((item) => item.model._id === item_id))
+      .map((item_id) => cart?.items?.find((item) => item.model_id === item_id))
       .filter((item) => item !== undefined);
 
     return selectedItems?.reduce(
-      (acc, item) => acc + (item?.model?.price ?? 0) * (item?.quantity ?? 0),
+      (acc, item) => acc + (item?.price ?? 0) * (item?.quantity ?? 0),
       0
     );
   };
 
   const checkoutItems = () => {
     const selectedItems = selected
-      .map((item_id) => cart?.items?.find((item) => item.model._id === item_id))
+      .map((item_id) => cart?.items?.find((item) => item.model_id === item_id))
       .filter((item): item is ICartItem => item !== undefined);
 
     addProducts(selectedItems);
@@ -301,11 +295,11 @@ const Cart = () => {
                     </TableHead>
                     <TableBody>
                       {cart?.items?.map((row) => {
-                        const isItemSelected = selected.includes(row.model._id);
+                        const isItemSelected = selected.includes(row.model_id);
 
                         return (
                           <TableRow
-                            key={row.model?._id}
+                            key={row.model_id}
                             sx={{
                               '&:last-child td, &:last-child th': { border: 0 },
                             }}>
@@ -313,7 +307,7 @@ const Cart = () => {
                               <Checkbox
                                 color='primary'
                                 checked={isItemSelected}
-                                onClick={(e) => handleClick(e, row.model._id)}
+                                onClick={(e) => handleClick(e, row.model_id)}
                               />
                             </TableCell>
                             <TableCell

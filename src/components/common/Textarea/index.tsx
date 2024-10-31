@@ -3,7 +3,22 @@ import * as React from 'react';
 import { styled } from '@mui/system';
 import { TextareaAutosize, TextareaAutosizeProps } from '@mui/material';
 
-export default function Textarea(props: TextareaAutosizeProps) {
+// interface ITextareaProps {
+//   props: TextareaAutosizeProps;
+//   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+//   value: string;
+// }
+
+interface ITextareaProps extends TextareaAutosizeProps {
+  onChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  value: string;
+}
+
+export default function Textarea({
+  onChange,
+  value,
+  ...props
+}: ITextareaProps) {
   const blue = {
     100: '#DAECFF',
     200: '#b6daff',
@@ -58,5 +73,5 @@ export default function Textarea(props: TextareaAutosizeProps) {
   `
   );
 
-  return <Textarea {...props} />;
+  return <Textarea {...props} onChange={onChange} value={value} />;
 }
