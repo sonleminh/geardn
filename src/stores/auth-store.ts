@@ -69,12 +69,17 @@ export const authStore = (
         products: products, // Merges existing products with new list
       }
     }), false, "addProducts"),
-    changeCustomer: (customerData) => set((state) => ({
-      orderFormData: {
-        customer: customerData || { email: '', name: '', phone: '' },
-        products: state.orderFormData?.products || [], // Merges existing products with new list
-      }
-    }), false, "addProducts"),
+    changeCustomer: (customerData) =>
+      set(
+        (state) => ({
+          orderFormData: {
+            customer: customerData,
+            products: state.orderFormData?.products || [], // Ensure products field is included
+          },
+        }),
+        false,
+        'changeCustomer'
+      ),
   }), {
     name: 'store',
     storage: sessionStorageAdapter,

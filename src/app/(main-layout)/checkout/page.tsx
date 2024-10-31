@@ -1,6 +1,6 @@
 'use client';
 
-import React, { ChangeEvent, useRef, useState } from 'react';
+import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useSWRConfig } from 'swr';
 
 import LayoutContainer from '@/components/common/sharing/layout-container';
@@ -46,6 +46,7 @@ import { Label } from '@mui/icons-material';
 import MinHeightTextarea from '@/components/common/Textarea';
 import Textarea from '@/components/common/Textarea';
 import { useAuthStore } from '@/providers/auth-store-provider';
+import { useFormik } from 'formik';
 
 const Checkout = () => {
   const breadcrumbsOptions = [
@@ -67,9 +68,29 @@ const Checkout = () => {
 
   const inputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
 
-  const { orderFormData } = useAuthStore((state) => state);
+  const { orderFormData, changeCustomer } = useAuthStore((state) => state);
 
   console.log(orderFormData);
+
+  const formik = useFormik({
+    initialValues: {
+      name: '',
+      phone: '',
+      email: '',
+      items: [],
+      address: {
+        street: '',
+        city: '',
+        state: '',
+        country: '',
+      },
+    },
+    // validationSchema: schema,
+    validateOnChange: false,
+    async onSubmit(values) {
+      console.log(2, values);
+    },
+  });
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
@@ -277,6 +298,16 @@ const Checkout = () => {
       [name]: value,
     }));
   };
+
+  useEffect(() => {
+    changeCustomer(customerData);
+  }, [customerData, changeCustomer]);
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { value, name } = e.target;
+    formik.setFieldValue(name, value);
+  };
+
   console.log('customerData:', customerData);
   return (
     <Box pt={2} pb={4} bgcolor={'#eee'}>
@@ -351,8 +382,9 @@ const Checkout = () => {
                     placeholder='Họ và tên'
                     size='small'
                     name='name'
-                    onChange={handleCustomerChange}
-                    value={customerData?.name ?? ''}
+                    onChange={handleChange}
+                    value={formik?.values?.name}
+                    // value={customerData?.name ?? ''}
                   />
                   <TextField
                     sx={{ mb: 1 }}
@@ -360,8 +392,11 @@ const Checkout = () => {
                     placeholder='Số điện thoại'
                     size='small'
                     name='phone'
-                    onChange={handleCustomerChange}
-                    value={customerData?.phone ?? ''}
+                    onChange={handleChange}
+                    value={formik?.values?.phone}
+
+                    // onChange={handleCustomerChange}
+                    // value={customerData?.phone ?? ''}
                   />
                   <TextField
                     sx={{ mb: 1 }}
@@ -369,8 +404,11 @@ const Checkout = () => {
                     placeholder='Email (Không bắt buộc)'
                     size='small'
                     name='email'
-                    onChange={handleCustomerChange}
-                    value={customerData?.email ?? ''}
+                    onChange={handleChange}
+                    value={formik?.values?.email}
+
+                    // onChange={handleCustomerChange}
+                    // value={customerData?.email ?? ''}
                   />
                 </Box>
                 <Box sx={{ p: 2, mb: 2, bgcolor: '#fff', borderRadius: '4px' }}>
@@ -464,7 +502,8 @@ const Checkout = () => {
                     sx={{ mb: 1.5, fontWeight: 600 }}
                     variant='contained'
                     size='large'
-                    fullWidth>
+                    fullWidth
+                    onClick={() => formik.handleSubmit()}>
                     Thanh toán
                   </Button>
                   <Button
