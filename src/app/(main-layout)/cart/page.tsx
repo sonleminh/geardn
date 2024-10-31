@@ -50,7 +50,7 @@ const Cart = () => {
   const [quantityInputs, setQuantityInputs] = useState<{
     [key: string]: string;
   }>({});
-  const { setCheckoutData } = useAuthStore((state) => state);
+  const { addProducts } = useAuthStore((state) => state);
 
   console.log(selected);
 
@@ -260,7 +260,7 @@ const Cart = () => {
       .map((item_id) => cart?.items?.find((item) => item.model._id === item_id))
       .filter((item): item is ICartItem => item !== undefined);
 
-    setCheckoutData(selectedItems);
+    addProducts(selectedItems);
     router.push('/checkout');
   };
 

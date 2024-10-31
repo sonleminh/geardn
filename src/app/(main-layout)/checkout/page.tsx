@@ -59,12 +59,17 @@ const Checkout = () => {
   const [quantityInputs, setQuantityInputs] = useState<{
     [key: string]: string;
   }>({});
+  const [customerData, setCustomerData] = useState<{
+    name: string;
+    phone: string;
+    email: string;
+  }>({ name: '', phone: '', email: '' });
 
   const inputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
 
-  const { checkoutData } = useAuthStore((state) => state);
+  const { orderFormData } = useAuthStore((state) => state);
 
-  console.log(checkoutData);
+  console.log(orderFormData);
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
@@ -265,6 +270,14 @@ const Checkout = () => {
     );
   };
 
+  const handleCustomerChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setCustomerData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+    }));
+  };
+  console.log('customerData:', customerData);
   return (
     <Box pt={2} pb={4} bgcolor={'#eee'}>
       <LayoutContainer>
@@ -280,57 +293,87 @@ const Checkout = () => {
           {cart?.items?.length > 0 ? (
             <Grid2 container spacing={2}>
               <Grid2 sx={{}} size={8.5}>
-                <Box sx={{ p: 3, mb: 2, bgcolor: '#fff', borderRadius: '4px' }}>
-                  <Typography sx={{ mb: 2, fontSize: 18, fontWeight: 700 }}>
+                <Box sx={{ p: 2, mb: 2, bgcolor: '#fff', borderRadius: '4px' }}>
+                  <Typography sx={{ fontSize: 18, fontWeight: 700 }}>
                     Sản phẩm trong đơn
                   </Typography>
 
-                  {checkoutData?.map((item) => (
+                  {orderFormData?.products?.map((item, index) => (
                     <Box
                       sx={{
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
+                        pt: 2,
+                        pb: 3,
+                        borderTop: index !== 0 ? '1px solid #f3f4f6' : 'none',
                       }}
                       key={item.model._id}>
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <Box
                           sx={{
                             position: 'relative',
-                            width: 68,
-                            height: 68,
+                            width: 60,
+                            height: 60,
                             mr: 2,
+                            borderRadius: '4px',
+                            border: '1px solid #d1d5db',
+                            overflow: 'hidden',
                           }}>
                           <SkeletonImage src={item.model.image} alt={''} fill />
                         </Box>
-                        <Typography>{item.model.product_name}</Typography>
+                        <Box>
+                          <Typography>{item.model.product_name}</Typography>
+                          {item?.model?.name && (
+                            <Typography
+                              sx={{
+                                display: 'inline-block',
+                                px: '6px',
+                                py: '2px',
+                                bgcolor: '#f3f4f6',
+                                fontSize: 11,
+                                borderRadius: 0.5,
+                              }}>
+                              {item?.model?.name}
+                            </Typography>
+                          )}
+                        </Box>
                       </Box>
                       <Typography>{formatPrice(item.model.price)}</Typography>
                     </Box>
                   ))}
                 </Box>
-                <Box sx={{ p: 3, mb: 2, bgcolor: '#fff', borderRadius: '4px' }}>
+                <Box sx={{ p: 2, mb: 2, bgcolor: '#fff', borderRadius: '4px' }}>
                   <Typography mb={2}>Thông tin đặt hàng</Typography>
                   <TextField
                     sx={{ mb: 1 }}
                     fullWidth
                     placeholder='Họ và tên'
                     size='small'
+                    name='name'
+                    onChange={handleCustomerChange}
+                    value={customerData?.name ?? ''}
                   />
                   <TextField
                     sx={{ mb: 1 }}
                     fullWidth
                     placeholder='Số điện thoại'
                     size='small'
+                    name='phone'
+                    onChange={handleCustomerChange}
+                    value={customerData?.phone ?? ''}
                   />
                   <TextField
                     sx={{ mb: 1 }}
                     fullWidth
                     placeholder='Email (Không bắt buộc)'
                     size='small'
+                    name='email'
+                    onChange={handleCustomerChange}
+                    value={customerData?.email ?? ''}
                   />
                 </Box>
-                <Box sx={{ p: 3, mb: 2, bgcolor: '#fff', borderRadius: '4px' }}>
+                <Box sx={{ p: 2, mb: 2, bgcolor: '#fff', borderRadius: '4px' }}>
                   <FormControl>
                     <FormLabel id='demo-row-radio-buttons-group-label'>
                       Hình thức nhận hàng
@@ -382,7 +425,7 @@ const Checkout = () => {
                   borderRadius: '4px',
                 }}
                 size={3.5}
-                p={3}>
+                p={2}>
                 <Typography
                   sx={{ mb: 2, fontSize: 18, fontWeight: 700 }}
                   className='total-price-label'>

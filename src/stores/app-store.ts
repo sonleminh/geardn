@@ -16,7 +16,7 @@ export const defaultInitState: AppState = {
   data: null
 }
 
-export const apppStore = (
+export const appStore = (
   initState: AppState = defaultInitState,
 ) => {
   return createStore<AppStore>()((devtools(persist((set) => ({
