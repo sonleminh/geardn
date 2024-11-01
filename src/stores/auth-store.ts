@@ -82,7 +82,7 @@ export const authStore = (
       ),
   }), {
     name: 'store',
-    storage: sessionStorageAdapter,
+    // storage: sessionStorageAdapter,
     // storage: sessionStorage,  // Use sessionStorage to persist checkoutData
   }))))
 }

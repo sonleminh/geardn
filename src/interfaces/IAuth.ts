@@ -37,6 +37,7 @@ export interface ISignUpResponse {
 
 export interface IRefreshTokenResponse {
   accessToken: string;
+  expires: number;
   statusCode: number;
 }
 

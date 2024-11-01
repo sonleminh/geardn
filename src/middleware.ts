@@ -61,13 +61,19 @@ export async function middleware(request: NextRequest) {
     {
     user = await whoami(accessToken)
 
+    console.log('user', user);
+
     if (!user?._id && refreshToken) {
       const response = NextResponse.next();
       const newTokenResponse = await refreshAccessToken(refreshToken);
-      if (newTokenResponse?.accessToken) {
-        response.cookies.set('at', newTokenResponse?.accessToken,  {
-          path: '/',
-        });
+
+        if (newTokenResponse?.accessToken) {
+          const expires = new Date();
+          expires.setHours(expires.getHours() + newTokenResponse.expires);
+          response.cookies.set('at', newTokenResponse?.accessToken,  {
+            path: '/',
+            expires: expires,
+          });
         return response;
       } else {
         const response = NextResponse.redirect(new URL('/login', request.url));

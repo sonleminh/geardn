@@ -132,7 +132,7 @@ const Cart = () => {
                 : item
             )
           : cart?.items?.filter(
-              (item) => item?.model?._id !== itemToUpdate?.model?._id
+              (item) => item?.model_id !== itemToUpdate?.model_id
             ),
     };
     mutate(optimisticCart, false);
@@ -322,16 +322,16 @@ const Cart = () => {
                                   mr: 2,
                                 }}>
                                 <SkeletonImage
-                                  src={row?.model?.image}
-                                  alt={row.model?.product_name}
+                                  src={row?.image}
+                                  alt={row?.product_name}
                                   fill
                                 />
                               </Box>
                               <Box>
                                 <Typography fontSize={15}>
-                                  {row.model?.product_name}
+                                  {row?.product_name}
                                 </Typography>
-                                {row.model?.name && (
+                                {row?.name && (
                                   <Typography
                                     sx={{
                                       display: 'inline-block',
@@ -341,7 +341,7 @@ const Cart = () => {
                                       fontSize: 11,
                                       borderRadius: 0.5,
                                     }}>
-                                    {row.model?.name}
+                                    {row?.name}
                                   </Typography>
                                 )}
                               </Box>
@@ -351,7 +351,7 @@ const Cart = () => {
                               component='th'
                               scope='row'
                               align='center'>
-                              {formatPrice(row.model?.price)}
+                              {formatPrice(row?.price)}
                             </TableCell>
                             <TableCell
                               component='th'
@@ -374,7 +374,7 @@ const Cart = () => {
                                     borderBottomRightRadius: 0,
                                   }}
                                   onClick={() =>
-                                    handleSubtractItem(row?.model?._id)
+                                    handleSubtractItem(row?.model_id)
                                   }>
                                   -
                                 </Button>
@@ -412,23 +412,19 @@ const Cart = () => {
                                   type='number'
                                   size='small'
                                   value={
-                                    quantityInputs[row.model._id] ??
-                                    row.quantity
+                                    quantityInputs[row.model_id] ?? row.quantity
                                   }
                                   onChange={(e) =>
-                                    handleQuantityInputChange(
-                                      e,
-                                      row?.model?._id
-                                    )
+                                    handleQuantityInputChange(e, row?.model_id)
                                   }
                                   onBlur={() =>
-                                    handleQuantityInputBlur(row?.model?._id)
+                                    handleQuantityInputBlur(row?.model_id)
                                   }
                                   onKeyDown={(e) =>
-                                    handleKeyDown(e, row?.model?._id)
+                                    handleKeyDown(e, row?.model_id)
                                   }
                                   inputRef={(ref) =>
-                                    (inputRefs.current[row.model._id] = ref)
+                                    (inputRefs.current[row.model_id] = ref)
                                   }
                                 />
                                 <Button
@@ -436,9 +432,7 @@ const Cart = () => {
                                     borderTopLeftRadius: 0,
                                     borderBottomLeftRadius: 0,
                                   }}
-                                  onClick={() =>
-                                    handleAddItem(row?.model?._id)
-                                  }>
+                                  onClick={() => handleAddItem(row?.model_id)}>
                                   +
                                 </Button>
                               </Box>
@@ -455,9 +449,7 @@ const Cart = () => {
                                     color: 'red',
                                   },
                                 }}
-                                onClick={() =>
-                                  handleDeleteItem(row?.model?._id)
-                                }>
+                                onClick={() => handleDeleteItem(row?.model_id)}>
                                 Xoá
                               </Typography>
                             </TableCell>

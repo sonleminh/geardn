@@ -96,7 +96,7 @@ const Checkout = () => {
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      const newSelected = cart?.items?.map((n) => n?.model?._id);
+      const newSelected = cart?.items?.map((n) => n?.model_id);
       if (newSelected) {
         setSelected(newSelected);
       }
@@ -125,9 +125,7 @@ const Checkout = () => {
   };
 
   const handleAddItem = async (item_id: string) => {
-    const itemToUpdate = cart?.items?.find(
-      (item) => item.model._id === item_id
-    );
+    const itemToUpdate = cart?.items?.find((item) => item.model_id === item_id);
 
     if (!itemToUpdate) return;
 
@@ -135,7 +133,7 @@ const Checkout = () => {
     const optimisticCart = {
       ...cart,
       items: cart?.items?.map((item) =>
-        item.model._id === item_id ? { ...item, quantity: newQuantity } : item
+        item.model_id === item_id ? { ...item, quantity: newQuantity } : item
       ),
     };
 
@@ -157,9 +155,7 @@ const Checkout = () => {
   };
 
   const handleSubtractItem = async (item_id: string) => {
-    const itemToUpdate = cart?.items?.find(
-      (item) => item.model._id === item_id
-    );
+    const itemToUpdate = cart?.items?.find((item) => item.model_id === item_id);
     if (!itemToUpdate) return;
 
     const newQuantity = itemToUpdate.quantity - 1;
@@ -169,12 +165,12 @@ const Checkout = () => {
       items:
         newQuantity > 0
           ? cart?.items?.map((item) =>
-              item.model._id === item_id
+              item.model_id === item_id
                 ? { ...item, quantity: newQuantity }
                 : item
             )
           : cart?.items?.filter(
-              (item) => item?.model?._id !== itemToUpdate?.model?._id
+              (item) => item?.model_id !== itemToUpdate?.model_id
             ),
     };
     mutate(optimisticCart, false);
@@ -212,7 +208,7 @@ const Checkout = () => {
     // If the input is not a valid number or is empty, reset it to the current cart quantity
     if (isNaN(newQuantity) || newQuantity < 1) {
       const originalQuantity = cart?.items?.find(
-        (item) => item.model._id === item_id
+        (item) => item.model_id === item_id
       )?.quantity;
       setQuantityInputs((prev) => ({
         ...prev,
@@ -221,16 +217,14 @@ const Checkout = () => {
       return;
     }
 
-    const itemToUpdate = cart?.items?.find(
-      (item) => item.model._id === item_id
-    );
+    const itemToUpdate = cart?.items?.find((item) => item.model_id === item_id);
 
     if (!itemToUpdate || newQuantity === itemToUpdate.quantity) return;
 
     const optimisticCart = {
       ...cart,
       items: cart?.items?.map((item) =>
-        item.model._id === item_id ? { ...item, quantity: newQuantity } : item
+        item.model_id === item_id ? { ...item, quantity: newQuantity } : item
       ),
     };
 
@@ -268,7 +262,7 @@ const Checkout = () => {
   const handleDeleteItem = async (item_id: string) => {
     const optimisticCart = {
       ...cart,
-      items: cart?.items.filter((item) => item.model._id !== item_id),
+      items: cart?.items.filter((item) => item.model_id !== item_id),
     };
     mutate(optimisticCart, false);
     try {
@@ -284,11 +278,11 @@ const Checkout = () => {
 
   const totalAmount = () => {
     const selectedItems = selected
-      .map((item_id) => cart?.items?.find((item) => item.model._id === item_id))
+      .map((item_id) => cart?.items?.find((item) => item.model_id === item_id))
       .filter((item) => item !== undefined);
 
     return selectedItems?.reduce(
-      (acc, item) => acc + (item?.model?.price ?? 0) * (item?.quantity ?? 0),
+      (acc, item) => acc + (item?.price ?? 0) * (item?.quantity ?? 0),
       0
     );
   };
@@ -343,7 +337,7 @@ const Checkout = () => {
                         pb: 3,
                         borderTop: index !== 0 ? '1px solid #f3f4f6' : 'none',
                       }}
-                      key={item.model._id}>
+                      key={item.model_id}>
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <Box
                           sx={{
@@ -355,11 +349,11 @@ const Checkout = () => {
                             border: '1px solid #d1d5db',
                             overflow: 'hidden',
                           }}>
-                          <SkeletonImage src={item.model.image} alt={''} fill />
+                          <SkeletonImage src={item.image} alt={''} fill />
                         </Box>
                         <Box>
-                          <Typography>{item.model.product_name}</Typography>
-                          {item?.model?.name && (
+                          <Typography>{item.product_name}</Typography>
+                          {item?.name && (
                             <Typography
                               sx={{
                                 display: 'inline-block',
@@ -369,12 +363,12 @@ const Checkout = () => {
                                 fontSize: 11,
                                 borderRadius: 0.5,
                               }}>
-                              {item?.model?.name}
+                              {item?.name}
                             </Typography>
                           )}
                         </Box>
                       </Box>
-                      <Typography>{formatPrice(item.model.price)}</Typography>
+                      <Typography>{formatPrice(item.price)}</Typography>
                     </Box>
                   ))}
                 </Box>
