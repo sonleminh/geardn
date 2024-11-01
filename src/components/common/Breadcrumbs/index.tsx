@@ -7,7 +7,7 @@ interface IBreadcrumbsProps {
 }
 
 export interface IBreadcrumbOption {
-  link: string;
+  href: string;
   label: string;
 }
 
@@ -33,7 +33,7 @@ const Breadcrumbs = ({ options }: IBreadcrumbsProps) => {
       }}>
       {options?.map((item, index) => {
         return (
-          <AppLink component={'span'} key={index} href={item.link}>
+          <AppLink component={'span'} key={index} href={item.href}>
             <Typography
               sx={{
                 fontSize: { xs: 13, lg: 16 },

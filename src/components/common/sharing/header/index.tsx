@@ -26,6 +26,7 @@ import {
 import LOGO from '@/assets/geardn-logo.png';
 import { HeaderStyle } from './style';
 import { useGetCart } from '@/services/cart/api';
+import { ROUTES } from '@/constants/route';
 
 const Header = ({ showHeader }: { showHeader: boolean }) => {
   const router = useRouter();
@@ -89,7 +90,9 @@ const Header = ({ showHeader }: { showHeader: boolean }) => {
               sx={{ position: 'relative', minWidth: 40, height: 40, ml: 2 }}>
               <ShoppingCartOutlinedIcon
                 onClick={() => {
-                  user !== null ? router.push('/cart') : router.push('/login');
+                  user !== null
+                    ? router.push(ROUTES.CART)
+                    : router.push(ROUTES.LOGIN);
                 }}
               />
               <Typography

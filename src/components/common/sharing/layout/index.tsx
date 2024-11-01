@@ -55,7 +55,7 @@ const Layout = ({ children }: LayoutType) => {
       <DarkModeBtn />
       <Box
         sx={{
-          minHeight: 'calc(100vh - 241.23px)',
+          // minHeight: 'calc(100vh - 241.23px)',
           pt: pathname !== '/' ? '80px' : '0',
         }}>
         {children}

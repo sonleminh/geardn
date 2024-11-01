@@ -47,11 +47,13 @@ import MinHeightTextarea from '@/components/common/Textarea';
 import Textarea from '@/components/common/Textarea';
 import { useAuthStore } from '@/providers/auth-store-provider';
 import { useFormik } from 'formik';
+import { createOrder } from '@/services/order/api';
+import { ROUTES } from '@/constants/route';
 
 const Checkout = () => {
   const breadcrumbsOptions = [
     { link: '/', label: 'Home' },
-    { link: '/cart', label: 'Thanh toán' },
+    { link: ROUTES.CHECKOUT, label: 'Thanh toán' },
   ];
   const { cart, mutate } = useGetCart();
   const { mutate: mutateCart } = useUpsertCart();
@@ -91,6 +93,13 @@ const Checkout = () => {
     validateOnChange: false,
     async onSubmit(values) {
       console.log(2, values);
+      const payload = {
+        ...values,
+        items: orderFormData?.products ?? [],
+        totalAmount: 0,
+      };
+      const userData = await createOrder(payload);
+      console.log(userData);
     },
   });
 

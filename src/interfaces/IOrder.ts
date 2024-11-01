@@ -1,10 +1,5 @@
 import { IModel } from "./IProduct";
 
-export interface ICart {
-    user_id: string;
-    items: ICartItem[]
-}
-
 export interface ICartPayload {
     model: string;
     quantity: number;
@@ -50,4 +45,21 @@ export interface IOrder {
         state: string;
         country: string;
     };
+}
+
+export interface ICreateOrder {
+    name: string;
+    phone: string;
+    email: string;
+    items: IOrderItem[]
+    totalAmount: number;
+    address: {
+        street: string;
+        city: string;
+        state: string;
+        country: string;
+    };
+    receiveOption: string;
+    note: string;
+    payment_method: string;
 }

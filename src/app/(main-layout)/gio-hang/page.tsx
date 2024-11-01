@@ -36,11 +36,12 @@ import Link from 'next/link';
 import { useAuthStore } from '@/providers/auth-store-provider';
 import { ICartItem } from '@/interfaces/ICart';
 import { useRouter } from 'next/navigation';
+import { ROUTES } from '@/constants/route';
 
 const Cart = () => {
   const breadcrumbsOptions = [
-    { link: '/', label: 'Home' },
-    { link: '/cart', label: 'Giỏ hàng' },
+    { href: '/', label: 'Home' },
+    { href: ROUTES.CART, label: 'Giỏ hàng' },
   ];
   const { cart, mutate } = useGetCart();
   const router = useRouter();

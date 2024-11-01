@@ -24,13 +24,11 @@ import { fetcher } from '@/services/fetcher';
 import Link from 'next/link';
 import { BASE_API_URL } from '@/constants/env';
 import { useRouter } from 'next/navigation';
-import { useSignUpAPI } from '@/services/auth/mutations';
 import { signUpAPI } from '@/services/auth/api';
 
 export default function SignUp() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const { mutate } = useSignUpAPI();
 
   const formik = useFormik({
     initialValues: { name: '', email: '', password: '' },
@@ -39,7 +37,6 @@ export default function SignUp() {
     async onSubmit(values) {
       // signInMutation.mutate(values);
       const result = await signUpAPI(values);
-      mutate(result, false);
       if (result._id) {
         router.push('/login');
       }

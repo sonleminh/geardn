@@ -3,6 +3,7 @@ import { IUser } from '@/interfaces/IUser'
 import { createStore } from 'zustand/vanilla'
 import { PersistStorage, devtools, persist } from 'zustand/middleware';
 import { ICartItem } from '@/interfaces/ICart';
+import { IOrderItem } from '@/interfaces/IOrder';
 
 export type AuthState = {
   user?: IUser | null;
@@ -13,7 +14,7 @@ export type AuthState = {
         name: string,
         phone: string,
       },
-      products: ICartItem[]; 
+      products: IOrderItem[]; 
     }
 }
 

@@ -23,6 +23,8 @@ import AppLink from '../../AppLink';
 import SkeletonImage from '../../SkeletonImage';
 import LayoutContainer from '../layout-container';
 import { FullWidthHeaderStyle } from './style';
+import { ROUTES } from '@/constants/route';
+import Link from 'next/link';
 
 const FullWidthHeader = ({
   showFullWidthHeader,
@@ -45,13 +47,13 @@ const FullWidthHeader = ({
     const result = await logoutAPI();
     if (result?.statusCode === 200) {
       logout();
-      router.push('/login');
+      router.push(ROUTES.LOGIN);
     }
   };
 
   const handleUserClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     if (user === null) {
-      router.push('/login');
+      router.push(ROUTES.LOGIN);
     } else {
       setAnchorEl(event.currentTarget);
     }
@@ -91,7 +93,9 @@ const FullWidthHeader = ({
               <Button
                 sx={{ position: 'relative', minWidth: 40, height: 40, ml: 2 }}
                 onClick={() => {
-                  user !== null ? router.push('/cart') : router.push('/login');
+                  user !== null
+                    ? router.push(ROUTES.CART)
+                    : router.push('/login');
                 }}>
                 <ShoppingCartOutlinedIcon />
                 <Typography
@@ -160,8 +164,10 @@ const FullWidthHeader = ({
                   'aria-labelledby': 'basic-button',
                 }}
                 disableScrollLock={true}>
-                <MenuItem onClick={handleClose}>Profile</MenuItem>
-                <MenuItem onClick={handleClose}>My account</MenuItem>
+                <MenuItem onClick={handleClose}>Tài khoản</MenuItem>
+                <MenuItem component={Link} href={ROUTES.PURCHASE}>
+                  Đơn mua
+                </MenuItem>
                 <MenuItem onClick={handleLogout}>Đăng xuất</MenuItem>
               </Menu>
             </Box>

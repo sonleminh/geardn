@@ -25,7 +25,6 @@ import { ChangeEvent, useState } from 'react';
 import Cookies from 'js-cookie';
 import { useAuthStore } from '@/providers/auth-store-provider';
 import { ICustomJwtPayload } from '@/interfaces/IAuth';
-import { useLoginAPI } from '@/services/auth/mutations';
 import { loginAPI } from '@/services/auth/api';
 
 export default function Login() {
@@ -33,7 +32,6 @@ export default function Login() {
   const { login } = useAuthStore((state) => state);
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const { mutate } = useLoginAPI();
 
   const formik = useFormik({
     initialValues: { email: '', password: '' },
@@ -41,7 +39,7 @@ export default function Login() {
     validateOnChange: false,
     async onSubmit(values) {
       const userData = await loginAPI(values);
-      mutate(userData, false);
+      // mutate(userData, false);
 
       login({
         _id: userData?._id,
