@@ -9,7 +9,7 @@ import { fetcher } from '../fetcher';
 import { ICreateOrder, IOrder } from '@/interfaces/IOrder';
 
 type TOrdersByUserRes = {
-  orderList: IOrder[];
+  order_list: IOrder[];
   total: number;
 };
 
