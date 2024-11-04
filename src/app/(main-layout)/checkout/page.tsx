@@ -52,8 +52,8 @@ import { ROUTES } from '@/constants/route';
 
 const Checkout = () => {
   const breadcrumbsOptions = [
-    { link: '/', label: 'Home' },
-    { link: ROUTES.CHECKOUT, label: 'Thanh toán' },
+    { href: '/', label: 'Home' },
+    { href: ROUTES.CHECKOUT, label: 'Thanh toán' },
   ];
   const { cart, mutate } = useGetCart();
   const { mutate: mutateCart } = useUpsertCart();

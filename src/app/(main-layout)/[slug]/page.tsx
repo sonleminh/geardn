@@ -50,8 +50,8 @@ const ProductDetail = () => {
   const { mutate } = useUpsertCart();
 
   const breadcrumbsOptions = [
-    { link: '/', label: 'Home' },
-    { link: `/product/${product?._id}`, label: product?.name as string },
+    { href: '/', label: 'Home' },
+    { href: `/product/${product?._id}`, label: product?.name as string },
   ];
 
   useEffect(() => {
