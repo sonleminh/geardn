@@ -48,7 +48,7 @@ export default function Login() {
       });
 
       if (userData?._id) {
-        router.push('/profile');
+        router.push('/tai-khoan');
       }
     },
   });
@@ -73,7 +73,7 @@ export default function Login() {
         name: credentialDecoded?.name as string,
         picture: credentialDecoded?.picture,
       });
-      router.push('/profile');
+      router.push('/tai-khoan');
     }
   };
 

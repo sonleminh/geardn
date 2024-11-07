@@ -53,8 +53,6 @@ const Cart = () => {
   }>({});
   const { addProducts } = useAuthStore((state) => state);
 
-  console.log(selected);
-
   const inputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -265,9 +263,9 @@ const Cart = () => {
         <Box sx={{ mb: 2 }}>
           <Breadcrumbs options={breadcrumbsOptions} />
         </Box>
-        <Box sx={{ bgcolor: '#fff', borderRadius: '4px' }}>
+        <Box>
           {cart?.items?.length > 0 ? (
-            <Grid2 container>
+            <Grid2 container spacing={2}>
               <Grid2 size={8.5}>
                 <TableContainer component={Paper}>
                   <Table sx={{ minWidth: 650 }} aria-label='simple table'>
@@ -461,7 +459,7 @@ const Cart = () => {
                   </Table>
                 </TableContainer>
               </Grid2>
-              <Grid2 size={3.5} p={3}>
+              <Grid2 sx={{ bgcolor: '#fff', borderRadius: 1 }} size={3.5} p={3}>
                 <Grid2 className='total'>
                   <Grid2 size={6} mb={2} className='total-price-label'>
                     Tổng thanh toán ({selected?.length} sản phẩm):

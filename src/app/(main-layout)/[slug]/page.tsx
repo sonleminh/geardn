@@ -85,8 +85,6 @@ const ProductDetail = () => {
     setSelectedModel(updatedSelectedModel);
   };
 
-  console.log('selectedModel:', selectedModel);
-
   const handleDisableOption = (variantIndex: number, optionIndex: number) => {
     const updatedSelectedModel = [...selectedModel];
     updatedSelectedModel[variantIndex] = optionIndex;
@@ -109,7 +107,7 @@ const ProductDetail = () => {
 
   const handleAddCart = async () => {
     if (!user) {
-      router.push('/login');
+      router.push('/tai-khoan');
     }
     if (
       matchedModel &&

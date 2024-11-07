@@ -44,13 +44,13 @@ const Header = ({ showHeader }: { showHeader: boolean }) => {
     const result = await logoutAPI();
     if (result?.statusCode === 200) {
       logout();
-      router.push('/login');
+      router.push('/tai-khoan');
     }
   };
 
   const handleUserClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     if (user === null) {
-      router.push('/login');
+      router.push('/tai-khoan');
     } else {
       setAnchorEl(event.currentTarget);
     }

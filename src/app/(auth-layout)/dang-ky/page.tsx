@@ -38,7 +38,7 @@ export default function SignUp() {
       // signInMutation.mutate(values);
       const result = await signUpAPI(values);
       if (result._id) {
-        router.push('/login');
+        router.push('/tai-khoan');
       }
     },
   });
@@ -229,7 +229,7 @@ export default function SignUp() {
             </Box>
             <Typography sx={{ mb: 2 }}>
               Already have an account?{' '}
-              <Link href={'/login'}>
+              <Link href={'/tai-khoan'}>
                 <Typography component={'span'}>Login</Typography>
               </Link>
             </Typography>

@@ -8,8 +8,8 @@ import { ICustomJwtPayload, IRefreshTokenResponse } from './interfaces/IAuth';
 import { RequestCookie } from 'next/dist/compiled/@edge-runtime/cookies';
 import { JwtPayload, jwtDecode } from 'jwt-decode';
 
-const protectedRoute = ['/profile'];
-const publicRoute = ['/login'];
+const protectedRoute = ['/tai-khoan'];
+const publicRoute = ['/dang-nhap'];
 
 async function whoami(accessToken: RequestCookie | undefined): Promise<IWhoIAmResponse | null> {
     try {
@@ -76,7 +76,7 @@ export async function middleware(request: NextRequest) {
           });
         return response;
       } else {
-        const response = NextResponse.redirect(new URL('/login', request.url));
+        const response = NextResponse.redirect(new URL('/tai-khoan', request.url));
   
         response.cookies.set('at', '', { maxAge: 0 });
         response.cookies.set('rt', '', { maxAge: 0 });
@@ -90,12 +90,12 @@ export async function middleware(request: NextRequest) {
   const isPublicRoute = publicRoute.includes(path);
 
   if (isProtectedRoute && !user?._id) {
-    return NextResponse.redirect(new URL('/login', request.url));
+    return NextResponse.redirect(new URL('/tai-khoan', request.url));
   }
 
 
   if (isPublicRoute && user?._id) {
-    return NextResponse.redirect(new URL('/profile', request.url));
+    return NextResponse.redirect(new URL('/tai-khoan', request.url));
   }
   return NextResponse.next();
 }

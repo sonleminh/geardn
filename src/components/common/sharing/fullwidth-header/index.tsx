@@ -95,7 +95,7 @@ const FullWidthHeader = ({
                 onClick={() => {
                   user !== null
                     ? router.push(ROUTES.CART)
-                    : router.push('/login');
+                    : router.push('/tai-khoan');
                 }}>
                 <ShoppingCartOutlinedIcon />
                 <Typography
