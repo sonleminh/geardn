@@ -10,7 +10,7 @@ import { IProduct } from '@/interfaces/IProduct';
 import { ISku } from '@/interfaces/ISku';
 
 type TProductsRes = {
-  productList: IProduct[];
+  products: IProduct[];
   categories: {
     _id: string;
     label: string;

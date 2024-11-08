@@ -63,7 +63,7 @@ const Explore = () => {
             },
           }}
           className='mySwiper'>
-          {products?.productList.map((item, index) => (
+          {products?.products.map((item, index) => (
             <SwiperSlide key={index}>
               <Box
                 sx={{

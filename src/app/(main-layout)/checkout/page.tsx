@@ -292,17 +292,6 @@ const Checkout = () => {
     }
   };
 
-  const totalAmount = () => {
-    const selectedItems = selected
-      .map((item_id) => cart?.items?.find((item) => item.model_id === item_id))
-      .filter((item) => item !== undefined);
-
-    return selectedItems?.reduce(
-      (acc, item) => acc + (item?.price ?? 0) * (item?.quantity ?? 0),
-      0
-    );
-  };
-
   const handleCustomerChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setCustomerData((prevFormData) => ({
