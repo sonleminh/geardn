@@ -103,6 +103,13 @@ const Checkout = () => {
     },
   });
 
+  function getTotalAmount() {
+    return orderFormData?.products?.reduce(
+      (acc, item) => acc + item.price * item.quantity,
+      0
+    );
+  }
+
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
       const newSelected = cart?.items?.map((n) => n?.model_id);
@@ -504,8 +511,7 @@ const Checkout = () => {
                     className='total-price-cost'>
                     <Typography sx={{ fontSize: 13 }}>Tổng tiền:</Typography>
                     <Typography sx={{ fontSize: 16, fontWeight: 700 }}>
-                      {/* {formatPrice(totalAmount())} */}
-                      2.000.000 đ
+                      {formatPrice(getTotalAmount() ?? 0)}
                     </Typography>
                   </Box>
                   <Divider sx={{ mt: 2, mb: 1 }} />
