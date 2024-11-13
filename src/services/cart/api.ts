@@ -6,13 +6,14 @@ import { ICart, ICartPayload } from '@/interfaces/ICart';
 import { deleteRequest, patchRequest, postRequest } from '@/utils/fetch-client';
 import useSWR from 'swr';
 import { fetcher } from '../fetcher';
+import { IError } from '@/interfaces/IError';
 
 export const addCartAPI = (payload: ICartPayload) => {
   try {
     const res = postRequest(`${BASE_API_URL}/cart/add`, payload);
-    return res;
+    return res as ICart;
   } catch (error) {
-    throw error
+    throw error as IError
   }
 };
 

@@ -1,6 +1,13 @@
 import { IModel } from "./IProduct";
 
 export interface ICart {
+    _id: string;
+    user_id: string;
+    items: ICartItem[]
+}
+
+export interface ICart {
+    _id: string;
     user_id: string;
     items: ICartItem[]
 }

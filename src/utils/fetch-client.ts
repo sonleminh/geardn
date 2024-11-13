@@ -20,11 +20,20 @@ async function fetchRequest<T>(
       credentials: "include",
     });
 
-    const responseData: T = await response.json();
+    const responseData = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        Array.isArray(responseData?.message) && responseData?.message?.length >= 0
+          ? responseData?.message?.[0]
+          : responseData?.message
+      );
+    }
+
     return responseData;
   } catch (error: any) {
-    errCallback && errCallback();
     console.error('Error', error.message);
+    errCallback?.();
     throw error;
   }
 }

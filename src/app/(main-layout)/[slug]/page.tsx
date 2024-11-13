@@ -30,11 +30,15 @@ import ThumbSwiper from './components/thumb-swiper';
 import { addCartAPI } from '@/services/cart/api';
 import { useSWRConfig } from 'swr';
 import { BASE_API_URL } from '@/constants/env';
+import { useNotificationContext } from '@/contexts/NotificationContext';
+import { ICart } from '@/interfaces/ICart';
+import { IError } from '@/interfaces/IError';
 
 const ProductDetail = () => {
   const params = useParams();
   const router = useRouter();
   const { mutate: globalMutate } = useSWRConfig();
+  const { showNotification } = useNotificationContext();
   const { user, logout } = useAuthStore((state) => state);
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperClass | null>(null);
   const [count, setCount] = useState<number | null>(1);
@@ -45,6 +49,7 @@ const ProductDetail = () => {
   const [optionImage, setOptionImage] = useState<string>('');
   const [matchedModel, setMatchedModel] = useState<IModel | null>(null);
   const [selectOptionError, setSelectOptionError] = useState<boolean>(false);
+  const [addCartError, setAddCartError] = useState<boolean>(false);
 
   const { product } = useGetProductById(params?.slug as string);
   const { mutate } = useUpsertCart();
@@ -109,17 +114,40 @@ const ProductDetail = () => {
     if (!user) {
       router.push('/tai-khoan');
     }
-    if (
-      matchedModel &&
-      selectedModel?.length === product?.tier_variations?.length
-    ) {
-      const cartData = await addCartAPI({
-        model: matchedModel?._id,
+      const cartData: IError = await addCartAPI({
+        model:
+          product?.tier_variations?.length === 0
+            ? product?.models[0]?._id ?? ''
+            : matchedModel?._id ?? '',
         quantity: count ?? 1,
       });
+      console.log(cartData);
+      if (cartData?.) {
+        showNotification('Sản phẩm đã dược thêm vào giỏ hàng!', 'success');
+      }
       globalMutate(`${BASE_API_URL}/cart`, undefined, { revalidate: true });
-    }
+   
+    // if
+    // if (
+    //   matchedModel &&
+    //   selectedModel?.length === product?.tier_variations?.length ||
+    // ) {
+    //   try {
+    //     const cartData = await addCartAPI({
+    //       model: matchedModel?._id,
+    //       quantity: count ?? 1,
+    //     });
+    //     globalMutate(`${BASE_API_URL}/cart`, undefined, { revalidate: true });
+    //     showNotification('Sản phẩm đã dược thêm vào giỏ hàng!', 'success');
+    //   } catch (error) {
+    //     console.error(error);
+    //   }
+    // }
   };
+
+  function getTotalStock() {
+    return product?.models?.reduce((sum, model) => sum + model.stock, 0);
+  }
 
   return (
     <Box pt={2} pb={4} bgcolor={'#eee'}>
@@ -332,9 +360,15 @@ const ProductDetail = () => {
                       </Button>
                     </ButtonGroup>
                     <Typography sx={{ fontSize: 14, lineHeight: '32px' }}>
-                      69 sản phẩm có sẵn
+                      {matchedModel ? matchedModel?.stock : getTotalStock()} sản
+                      phẩm có sẵn
                     </Typography>
                   </Grid2>
+                  {addCartError && (
+                    <Typography sx={{ mt: 1, fontSize: 14, color: 'red' }}>
+                      Vui lòng chọn phân loại hàng
+                    </Typography>
+                  )}
                 </Grid2>
                 <Box>
                   <Button

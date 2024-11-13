@@ -13,6 +13,7 @@ import 'swiper/css/free-mode';
 import 'swiper/css/scrollbar';
 import 'swiper/css/thumbs';
 import 'swiper/css';
+import { NotificationContextProvider } from '@/contexts/NotificationContext';
 
 const inter = Inter({
   weight: ['400', '600', '700', '800', '900'],
@@ -34,9 +35,11 @@ export default function RootLayout({
       <ColorModeProvider>
         <CssBaseline />
         <body className={inter.className}>
-          <AuthStoreProvider>
-            <Layout>{children}</Layout>
-          </AuthStoreProvider>
+          <NotificationContextProvider>
+            <AuthStoreProvider>
+              <Layout>{children}</Layout>
+            </AuthStoreProvider>
+          </NotificationContextProvider>
         </body>
       </ColorModeProvider>
     </html>
