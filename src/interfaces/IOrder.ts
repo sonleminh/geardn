@@ -6,18 +6,6 @@ export interface ICartPayload {
 }
 
 export interface IOrderItem {
-    // model: {
-    //     _id: string;
-    //     name: string;
-    //     image: string;
-    //     price: number;
-    //     extinfo: {
-    //         tier_index: number[];
-    //         is_pre_order: boolean;
-    //     };
-    //     product_id: string;
-    //     product_name: string;
-    // };
     model_id: string;
     name: string;
     image: string;
@@ -49,17 +37,16 @@ export interface IOrder {
 
 export interface ICreateOrder {
     name: string;
-    phone: string;
-    email: string;
+    phone?: string;
+    email?: string;
     items: IOrderItem[]
-    totalAmount: number;
-    address: {
+    address?: {
         street: string;
         city: string;
         state: string;
         country: string;
     };
-    receiveOption: string;
-    note: string;
+    receive_option: string;
+    note?: string;
     payment_method: string;
 }

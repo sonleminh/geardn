@@ -28,6 +28,7 @@ import {
   Paper,
   Radio,
   RadioGroup,
+  SxProps,
   Table,
   TableBody,
   TableCell,
@@ -36,6 +37,7 @@ import {
   TableRow,
   TextField,
   TextareaAutosize,
+  Theme,
   Typography,
   styled,
 } from '@mui/material';
@@ -49,6 +51,8 @@ import { useAuthStore } from '@/providers/auth-store-provider';
 import { useFormik } from 'formik';
 import { createOrder } from '@/services/order/api';
 import { ROUTES } from '@/constants/route';
+import { useNotificationContext } from '@/contexts/NotificationContext';
+import { checkoutSchema } from './utils/schema/checkoutSchema';
 
 const Checkout = () => {
   const breadcrumbsOptions = [
@@ -58,6 +62,7 @@ const Checkout = () => {
   const { cart, mutate } = useGetCart();
   const { mutate: mutateCart } = useUpsertCart();
   const { mutate: globalMutate } = useSWRConfig();
+  const { showNotification } = useNotificationContext();
   const [selected, setSelected] = useState<string[]>([]);
   const [quantityInputs, setQuantityInputs] = useState<{
     [key: string]: string;
@@ -85,11 +90,11 @@ const Checkout = () => {
         state: '',
         country: '',
       },
-      receiveOption: 'DELIVERY',
+      receive_option: 'DELIVERY',
       note: '',
       payment_method: 'COD',
     },
-    // validationSchema: schema,
+    validationSchema: checkoutSchema,
     validateOnChange: false,
     async onSubmit(values) {
       console.log(2, values);
@@ -98,8 +103,11 @@ const Checkout = () => {
         items: orderFormData?.products ?? [],
         totalAmount: 0,
       };
-      const userData = await createOrder(payload);
-      console.log(userData);
+      // try {
+      //   const userData = await createOrder(payload);
+      // } catch (error: any) {
+      //   showNotification(error?.message, 'error');
+      // }
     },
   });
 
@@ -170,136 +178,6 @@ const Checkout = () => {
     }
   };
 
-  const handleSubtractItem = async (item_id: string) => {
-    const itemToUpdate = cart?.items?.find((item) => item.model_id === item_id);
-    if (!itemToUpdate) return;
-
-    const newQuantity = itemToUpdate.quantity - 1;
-
-    const optimisticCart = {
-      ...cart,
-      items:
-        newQuantity > 0
-          ? cart?.items?.map((item) =>
-              item.model_id === item_id
-                ? { ...item, quantity: newQuantity }
-                : item
-            )
-          : cart?.items?.filter(
-              (item) => item?.model_id !== itemToUpdate?.model_id
-            ),
-    };
-    mutate(optimisticCart, false);
-
-    try {
-      const updatedCartData = await subtractCartAPI({
-        model: item_id,
-        quantity: 1,
-      });
-
-      mutateCart(updatedCartData, false);
-      globalMutate('/api/cart');
-    } catch (error) {
-      mutate(cart, false);
-      console.error('Failed to update cart:', error);
-    }
-  };
-
-  const handleQuantityInputChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-    item_id: string
-  ) => {
-    const newQuantity = e.target.value;
-
-    setQuantityInputs((prev) => ({
-      ...prev,
-      [item_id]: newQuantity,
-    }));
-  };
-
-  const handleQuantityInputBlur = async (item_id: string) => {
-    const inputQuantity = quantityInputs[item_id];
-    const newQuantity = parseInt(inputQuantity, 10);
-
-    // If the input is not a valid number or is empty, reset it to the current cart quantity
-    if (isNaN(newQuantity) || newQuantity < 1) {
-      const originalQuantity = cart?.items?.find(
-        (item) => item.model_id === item_id
-      )?.quantity;
-      setQuantityInputs((prev) => ({
-        ...prev,
-        [item_id]: originalQuantity?.toString() ?? '1',
-      }));
-      return;
-    }
-
-    const itemToUpdate = cart?.items?.find((item) => item.model_id === item_id);
-
-    if (!itemToUpdate || newQuantity === itemToUpdate.quantity) return;
-
-    const optimisticCart = {
-      ...cart,
-      items: cart?.items?.map((item) =>
-        item.model_id === item_id ? { ...item, quantity: newQuantity } : item
-      ),
-    };
-
-    mutate(optimisticCart, false);
-
-    try {
-      const updatedCartData = await updateCartQuantityAPI({
-        model: item_id,
-        quantity: newQuantity,
-      });
-      mutateCart(updatedCartData, false);
-
-      globalMutate('/api/cart');
-    } catch (error) {
-      console.error('Failed to update cart:', error);
-      mutate(cart, false);
-    }
-    setQuantityInputs({});
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent, itemId: string) => {
-    const target = e.currentTarget as HTMLInputElement;
-
-    if (e.key === '0' && target.value === '') {
-      e.preventDefault();
-    }
-    if (e.key === 'Enter') {
-      handleQuantityInputBlur(itemId);
-      if (inputRefs.current[itemId]) {
-        inputRefs.current[itemId]?.blur();
-      }
-    }
-  };
-
-  const handleDeleteItem = async (item_id: string) => {
-    const optimisticCart = {
-      ...cart,
-      items: cart?.items.filter((item) => item.model_id !== item_id),
-    };
-    mutate(optimisticCart, false);
-    try {
-      const updatedCartData = await deleteCartItem(item_id);
-
-      mutateCart(updatedCartData, false);
-      globalMutate('/api/cart');
-    } catch (error) {
-      mutate(cart, false);
-      console.error('Failed to update cart:', error);
-    }
-  };
-
-  const handleCustomerChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setCustomerData((prevFormData) => ({
-      ...prevFormData,
-      [name]: value,
-    }));
-  };
-
   useEffect(() => {
     changeCustomer(customerData);
   }, [customerData, changeCustomer]);
@@ -353,8 +231,14 @@ const Checkout = () => {
                             borderRadius: '4px',
                             border: '1px solid #d1d5db',
                             overflow: 'hidden',
+                            '.cart-item': { objectFit: 'cover' },
                           }}>
-                          <SkeletonImage src={item.image} alt={''} fill />
+                          <SkeletonImage
+                            src={item.image}
+                            alt={''}
+                            fill
+                            className='cart-item'
+                          />
                         </Box>
                         <Box>
                           <Typography>{item.product_name}</Typography>
@@ -373,7 +257,14 @@ const Checkout = () => {
                           )}
                         </Box>
                       </Box>
-                      <Typography>{formatPrice(item.price)}</Typography>
+                      <Box sx={{ display: 'flex' }}>
+                        <Typography sx={{ width: 88, mr: 4, fontSize: 14 }}>
+                          Số lượng: {item.quantity}
+                        </Typography>
+                        <Typography sx={{ width: 120, textAlign: 'end' }}>
+                          {formatPrice(item.price)}
+                        </Typography>
+                      </Box>
                     </Box>
                   ))}
                 </Box>
@@ -387,6 +278,11 @@ const Checkout = () => {
                     name='name'
                     onChange={handleChange}
                     value={formik?.values?.name}
+                    helperText={
+                      <Box component={'span'} sx={helperTextStyle}>
+                        {formik.errors.name}
+                      </Box>
+                    }
                     // value={customerData?.name ?? ''}
                   />
                   <TextField
@@ -397,7 +293,11 @@ const Checkout = () => {
                     name='phone'
                     onChange={handleChange}
                     value={formik?.values?.phone}
-
+                    helperText={
+                      <Box component={'span'} sx={helperTextStyle}>
+                        {formik.errors.phone}
+                      </Box>
+                    }
                     // onChange={handleCustomerChange}
                     // value={customerData?.phone ?? ''}
                   />
@@ -405,11 +305,16 @@ const Checkout = () => {
                     sx={{ mb: 1 }}
                     fullWidth
                     placeholder='Email (Không bắt buộc)'
+                    type='email'
                     size='small'
                     name='email'
                     onChange={handleChange}
                     value={formik?.values?.email}
-
+                    helperText={
+                      <Box component={'span'} sx={helperTextStyle}>
+                        {formik.errors.email}
+                      </Box>
+                    }
                     // onChange={handleCustomerChange}
                     // value={customerData?.email ?? ''}
                   />
@@ -421,9 +326,9 @@ const Checkout = () => {
                     </FormLabel>
                     <RadioGroup
                       row
-                      name='receiveOption'
+                      name='receive_option'
                       onChange={handleChange}
-                      value={formik?.values?.receiveOption}>
+                      value={formik?.values?.receive_option}>
                       <FormControlLabel
                         value='DELIVERY'
                         control={<Radio size='small' />}
@@ -584,3 +489,8 @@ const Checkout = () => {
 };
 
 export default Checkout;
+
+const helperTextStyle: SxProps<Theme> = {
+  color: 'red',
+  fontSize: 13,
+};

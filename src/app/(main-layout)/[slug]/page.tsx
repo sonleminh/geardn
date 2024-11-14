@@ -30,6 +30,7 @@ import { Swiper as SwiperClass } from 'swiper';
 import { useSWRConfig } from 'swr';
 import MainSwiper from './components/main-swiper';
 import ThumbSwiper from './components/thumb-swiper';
+import { ICartItem } from '@/interfaces/ICart';
 
 const ProductDetail = () => {
   const params = useParams();
@@ -38,7 +39,7 @@ const ProductDetail = () => {
 
   const { mutate: globalMutate } = useSWRConfig();
   const { showNotification } = useNotificationContext();
-  const { user } = useAuthStore((state) => state);
+  const { user, addProducts } = useAuthStore((state) => state);
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperClass | null>(null);
   const [count, setCount] = useState<number | null>(1);
 
@@ -131,21 +132,18 @@ const ProductDetail = () => {
     if (matchedModel === null) {
       return setAddCartError(true);
     }
-    if (matchedModel === null) {
-      return setAddCartError(true);
-    }
     const modelInCart = cart?.items?.find(
       (item) => item.model_id === matchedModel?._id
     );
 
-    if (!modelInCart) {
-      return showNotification('Đã có lỗi xảy ra!', 'error');
-    }
-    if (count ?? 1 + modelInCart?.quantity > matchedModel?.stock) {
+    if (
+      modelInCart &&
+      (count ?? 1) + modelInCart?.quantity > matchedModel?.stock
+    ) {
       return setAddQuantityError(true);
     }
     try {
-      const cartData = await addCartAPI({
+      await addCartAPI({
         model:
           product?.tier_variations?.length === 0
             ? product?.models[0]?._id ?? ''
@@ -157,6 +155,38 @@ const ProductDetail = () => {
     } catch (error: any) {
       showNotification(error?.message, 'error');
     }
+  };
+
+  const handleBuyBtn = () => {
+    if (!user) {
+      router.push('/tai-khoan');
+    }
+    if (matchedModel === null) {
+      return setAddCartError(true);
+    }
+
+    const modelInCart = cart?.items?.find(
+      (item) => item.model_id === matchedModel?._id
+    );
+
+    // if (
+    //   modelInCart &&
+    //   (count ?? 1) + modelInCart?.quantity > matchedModel?.stock
+    // ) {
+    //   return setAddQuantityError(true);
+    // }
+
+    const currentModel = {
+      ...matchedModel,
+      model_id: matchedModel?._id,
+      image: optionImage,
+      product_id: product?._id,
+      product_name: product?.name,
+      quantity: count ?? 1,
+    };
+    const { stock, ...rest } = currentModel;
+    addProducts([rest]);
+    router.push('/checkout');
   };
 
   function getTotalStock() {
@@ -403,10 +433,11 @@ const ProductDetail = () => {
                     <ShoppingCartOutlinedIcon />
                   </Button>
                   <Button
+                    sx={{ width: 200 }}
                     variant='contained'
                     size='large'
-                    sx={{ width: 200 }}
-                    disabled={isOutOfStock}>
+                    disabled={isOutOfStock}
+                    onClick={handleBuyBtn}>
                     {isOutOfStock ? 'Hết hàng' : 'Mua ngay'}
                   </Button>
                 </Box>

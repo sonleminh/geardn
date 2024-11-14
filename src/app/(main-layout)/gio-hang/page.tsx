@@ -250,11 +250,13 @@ const Cart = () => {
     );
   };
 
-  const checkoutItems = () => {
+  const handlePayBtn = () => {
+    if (selected.length === 0) {
+      return showNotification('Vui lòng chọn sản phẩm', 'warning');
+    }
     const selectedItems = selected
       .map((item_id) => cart?.items?.find((item) => item.model_id === item_id))
       .filter((item): item is ICartItem => item !== undefined);
-
     addProducts(selectedItems);
     router.push('/checkout');
   };
@@ -492,10 +494,7 @@ const Cart = () => {
                     variant='contained'
                     size='large'
                     fullWidth
-                    onClick={() => {
-                      checkoutItems();
-                      console.log(2);
-                    }}>
+                    onClick={handlePayBtn}>
                     Thanh toán
                   </Button>
                   <Button
