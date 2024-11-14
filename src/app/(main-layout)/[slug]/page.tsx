@@ -5,9 +5,11 @@ import Breadcrumbs from '@/components/common/Breadcrumbs';
 import HtmlRenderBox from '@/components/common/HtmlRenderBox';
 import LayoutContainer from '@/components/common/sharing/layout-container';
 import SkeletonImage from '@/components/common/SkeletonImage';
+import { BASE_API_URL } from '@/constants/env';
+import { useNotificationContext } from '@/contexts/NotificationContext';
 import { IModel, IVariant } from '@/interfaces/IProduct';
 import { useAuthStore } from '@/providers/auth-store-provider';
-import { useUpsertCart } from '@/services/cart/mutations';
+import { addCartAPI, useGetCart } from '@/services/cart/api';
 import { useGetProductById } from '@/services/product/api';
 import { formatPrice } from '@/utils/format-price';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
@@ -25,21 +27,18 @@ import {
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Swiper as SwiperClass } from 'swiper';
+import { useSWRConfig } from 'swr';
 import MainSwiper from './components/main-swiper';
 import ThumbSwiper from './components/thumb-swiper';
-import { addCartAPI } from '@/services/cart/api';
-import { useSWRConfig } from 'swr';
-import { BASE_API_URL } from '@/constants/env';
-import { useNotificationContext } from '@/contexts/NotificationContext';
-import { ICart } from '@/interfaces/ICart';
-import { IError } from '@/interfaces/IError';
 
 const ProductDetail = () => {
   const params = useParams();
   const router = useRouter();
+  const { cart } = useGetCart();
+
   const { mutate: globalMutate } = useSWRConfig();
   const { showNotification } = useNotificationContext();
-  const { user, logout } = useAuthStore((state) => state);
+  const { user } = useAuthStore((state) => state);
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperClass | null>(null);
   const [count, setCount] = useState<number | null>(1);
 
@@ -48,11 +47,11 @@ const ProductDetail = () => {
   );
   const [optionImage, setOptionImage] = useState<string>('');
   const [matchedModel, setMatchedModel] = useState<IModel | null>(null);
-  const [selectOptionError, setSelectOptionError] = useState<boolean>(false);
   const [addCartError, setAddCartError] = useState<boolean>(false);
+  const [addQuantityError, setAddQuantityError] = useState<boolean>(false);
+  const [isOutOfStock, setIsOutOfStock] = useState<boolean>(false);
 
   const { product } = useGetProductById(params?.slug as string);
-  const { mutate } = useUpsertCart();
 
   const breadcrumbsOptions = [
     { href: '/', label: 'Home' },
@@ -60,12 +59,26 @@ const ProductDetail = () => {
   ];
 
   useEffect(() => {
-    const matchedModel = product?.models?.find(
-      (model) =>
-        JSON.stringify(model?.extinfo?.tier_index) ===
-        JSON.stringify(selectedModel)
-    );
-    setMatchedModel(matchedModel ?? null);
+    if (product?.tier_variations?.length) {
+      const matchedModel = product?.models?.find(
+        (model) =>
+          JSON.stringify(model?.extinfo?.tier_index) ===
+          JSON.stringify(selectedModel)
+      );
+      setMatchedModel(matchedModel ?? null);
+    } else {
+      setMatchedModel(product?.models?.[0]);
+    }
+  }, [selectedModel, product]);
+
+  useEffect(() => {
+    if (
+      (product?.tier_variations?.length === 0 &&
+        product?.models?.[0]?.stock === 0) ||
+      getTotalStock() === 0
+    ) {
+      setIsOutOfStock(true);
+    }
   }, [selectedModel, product]);
 
   useEffect(() => {
@@ -88,6 +101,8 @@ const ProductDetail = () => {
       updatedSelectedModel[vIndex] = undefined;
     }
     setSelectedModel(updatedSelectedModel);
+    setAddCartError(false);
+    setAddQuantityError(false);
   };
 
   const handleDisableOption = (variantIndex: number, optionIndex: number) => {
@@ -104,7 +119,6 @@ const ProductDetail = () => {
     return !validCombination;
   };
   const handleCountChange = (value: number | null) => {
-    // Ensure count is non-negative
     if (value && value >= 0) {
       setCount(value);
     }
@@ -114,35 +128,35 @@ const ProductDetail = () => {
     if (!user) {
       router.push('/tai-khoan');
     }
-      const cartData: IError = await addCartAPI({
+    if (matchedModel === null) {
+      return setAddCartError(true);
+    }
+    if (matchedModel === null) {
+      return setAddCartError(true);
+    }
+    const modelInCart = cart?.items?.find(
+      (item) => item.model_id === matchedModel?._id
+    );
+
+    if (!modelInCart) {
+      return showNotification('Đã có lỗi xảy ra!', 'error');
+    }
+    if (count ?? 1 + modelInCart?.quantity > matchedModel?.stock) {
+      return setAddQuantityError(true);
+    }
+    try {
+      const cartData = await addCartAPI({
         model:
           product?.tier_variations?.length === 0
             ? product?.models[0]?._id ?? ''
             : matchedModel?._id ?? '',
         quantity: count ?? 1,
       });
-      console.log(cartData);
-      if (cartData?.) {
-        showNotification('Sản phẩm đã dược thêm vào giỏ hàng!', 'success');
-      }
       globalMutate(`${BASE_API_URL}/cart`, undefined, { revalidate: true });
-   
-    // if
-    // if (
-    //   matchedModel &&
-    //   selectedModel?.length === product?.tier_variations?.length ||
-    // ) {
-    //   try {
-    //     const cartData = await addCartAPI({
-    //       model: matchedModel?._id,
-    //       quantity: count ?? 1,
-    //     });
-    //     globalMutate(`${BASE_API_URL}/cart`, undefined, { revalidate: true });
-    //     showNotification('Sản phẩm đã dược thêm vào giỏ hàng!', 'success');
-    //   } catch (error) {
-    //     console.error(error);
-    //   }
-    // }
+      showNotification('Sản phẩm đã dược thêm vào giỏ hàng!', 'success');
+    } catch (error: any) {
+      showNotification(error?.message, 'error');
+    }
   };
 
   function getTotalStock() {
@@ -265,11 +279,6 @@ const ProductDetail = () => {
                               ]
                             : ''
                         }
-                        // value={
-                        //   product?.tier_variations[vIndex]?.options[
-                        //     selectedModel[vIndex]
-                        //   ]
-                        // }
                         exclusive
                         size='small'
                         onChange={(event, newValue) =>
@@ -314,30 +323,13 @@ const ProductDetail = () => {
                     <ButtonGroup
                       variant='outlined'
                       size='small'
+                      disabled={isOutOfStock || matchedModel === null}
                       sx={{ mr: 2, height: 32 }}>
                       <Button
                         onClick={() => handleCountChange((count ?? 0) - 1)}>
                         -
                       </Button>
                       <TextField
-                        type='number'
-                        value={count ?? ''}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          setCount(value ? parseInt(value, 10) : null);
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === '-') {
-                            e.preventDefault();
-                          }
-                          if (
-                            count === null &&
-                            (e.key === '0' || e.key === 'Enter')
-                          ) {
-                            e.preventDefault();
-                          }
-                        }}
-                        size='small'
                         sx={{
                           width: '48px',
                           '.MuiInputBase-root': {
@@ -353,6 +345,29 @@ const ProductDetail = () => {
                             },
                           },
                         }}
+                        type='number'
+                        disabled={isOutOfStock || matchedModel === null}
+                        value={count ?? ''}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (matchedModel && +value > matchedModel?.stock) {
+                            setCount(matchedModel?.stock);
+                          } else {
+                            setCount(value ? parseInt(value, 10) : null);
+                          }
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === '-') {
+                            e.preventDefault();
+                          }
+                          if (
+                            count === null &&
+                            (e.key === '0' || e.key === 'Enter')
+                          ) {
+                            e.preventDefault();
+                          }
+                        }}
+                        size='small'
                       />
                       <Button
                         onClick={() => handleCountChange((count ?? 0) + 1)}>
@@ -369,17 +384,30 @@ const ProductDetail = () => {
                       Vui lòng chọn phân loại hàng
                     </Typography>
                   )}
+                  {addQuantityError && (
+                    <Typography sx={{ mt: 1, fontSize: 14, color: 'red' }}>
+                      Số lượng bạn chọn đã đạt mức tối đa của sản phẩm này
+                    </Typography>
+                  )}
                 </Grid2>
                 <Box>
                   <Button
                     sx={{ mr: 2, bgcolor: '#f0f0f0' }}
                     variant='outlined'
                     size='large'
+                    disabled={
+                      product?.tier_variations?.length === 0 &&
+                      product?.models?.[0]?.stock === 0
+                    }
                     onClick={handleAddCart}>
                     <ShoppingCartOutlinedIcon />
                   </Button>
-                  <Button variant='contained' size='large' sx={{ width: 200 }}>
-                    Mua ngay
+                  <Button
+                    variant='contained'
+                    size='large'
+                    sx={{ width: 200 }}
+                    disabled={isOutOfStock}>
+                    {isOutOfStock ? 'Hết hàng' : 'Mua ngay'}
                   </Button>
                 </Box>
               </Box>

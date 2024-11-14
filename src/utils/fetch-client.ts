@@ -2,7 +2,7 @@ const baseURL = process.env.NEXT_PUBLIC_HOST;
 
 async function fetchRequest<T>(
   url: string,
-  method: string,
+  method: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE',
   data?: any,
   config?: RequestInit,
   errCallback?: () => void

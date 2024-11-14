@@ -37,6 +37,7 @@ import { useAuthStore } from '@/providers/auth-store-provider';
 import { ICartItem } from '@/interfaces/ICart';
 import { useRouter } from 'next/navigation';
 import { ROUTES } from '@/constants/route';
+import { useNotificationContext } from '@/contexts/NotificationContext';
 
 const Cart = () => {
   const breadcrumbsOptions = [
@@ -45,6 +46,7 @@ const Cart = () => {
   ];
   const { cart, mutate } = useGetCart();
   const router = useRouter();
+  const { showNotification } = useNotificationContext();
   const { mutate: mutateCart } = useUpsertCart();
   const { mutate: globalMutate } = useSWRConfig();
   const [selected, setSelected] = useState<string[]>([]);
@@ -109,9 +111,9 @@ const Cart = () => {
       mutateCart(updatedCartData, false);
 
       globalMutate('/api/cart');
-    } catch (error) {
+    } catch (error: any) {
       mutate(cart, false);
-      console.error('Failed to update cart:', error);
+      showNotification(error?.message, 'error');
     }
   };
 
@@ -144,9 +146,9 @@ const Cart = () => {
 
       mutateCart(updatedCartData, false);
       globalMutate('/api/cart');
-    } catch (error) {
+    } catch (error: any) {
       mutate(cart, false);
-      console.error('Failed to update cart:', error);
+      showNotification(error?.message, 'error');
     }
   };
 
@@ -199,8 +201,8 @@ const Cart = () => {
       mutateCart(updatedCartData, false);
 
       globalMutate('/api/cart');
-    } catch (error) {
-      console.error('Failed to update cart:', error);
+    } catch (error: any) {
+      showNotification(error?.message, 'error');
       mutate(cart, false);
     }
     setQuantityInputs({});
@@ -319,11 +321,15 @@ const Cart = () => {
                                   width: 68,
                                   height: 68,
                                   mr: 2,
+                                  '.product-image': {
+                                    objectFit: 'cover',
+                                  },
                                 }}>
                                 <SkeletonImage
                                   src={row?.image}
                                   alt={row?.product_name}
                                   fill
+                                  className='product-image'
                                 />
                               </Box>
                               <Box>
@@ -446,10 +452,11 @@ const Cart = () => {
                                   fontSize: 14,
                                   ':hover': {
                                     color: 'red',
+                                    cursor: 'pointer',
                                   },
                                 }}
                                 onClick={() => handleDeleteItem(row?.model_id)}>
-                                Xoá
+                                Xóa
                               </Typography>
                             </TableCell>
                           </TableRow>

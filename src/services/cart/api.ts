@@ -11,7 +11,7 @@ import { IError } from '@/interfaces/IError';
 export const addCartAPI = (payload: ICartPayload) => {
   try {
     const res = postRequest(`${BASE_API_URL}/cart/add`, payload);
-    return res as ICart;
+    return res;
   } catch (error) {
     throw error as IError
   }
