@@ -13,6 +13,32 @@ type TOrdersByUserRes = {
   total: number;
 };
 
+interface IProvince {
+  name: string;
+  code: number;
+  division_type: string;
+  codename: string;
+  phone_code: number;
+  districts: IDistrict[];
+}
+
+interface IDistrict {
+  name: string;
+  code: number;
+  division_type: string;
+  codename: string;
+  province_code: number;
+  wards: IWards[];
+}
+
+interface IWards {
+  name: string;
+  code: number;
+  division_type: string;
+  codename: string;
+  short_codename: string;
+}
+
 export const createOrder = (payload: ICreateOrder) => {
   try {
     const res = postRequest(`${BASE_API_URL}/order`, payload);
@@ -28,5 +54,25 @@ export const useGetOrdersByUser = () => {
     data: data as TOrdersByUserRes,
     isLoading,
     isError: error,
+  };
+};
+
+export const useGetProvinces = () => {
+  const { data, error, isLoading, mutate } = useSWR('https://provinces.open-api.vn/api/?depth=2',  (url) => fetcher(url, false));
+  return {
+   provinces: data as IProvince[],
+    isLoading,
+    isError: error,
+    mutate
+  };
+};
+
+export const useGetDistrict = (code: string) => {
+  const { data, error, isLoading, mutate } = useSWR(`https://provinces.open-api.vn/api/d/${code}?depth=2`,  (url) => fetcher(url, false));
+  return {
+    district: data as IDistrict,
+    isLoading,
+    isError: error,
+    mutate
   };
 };

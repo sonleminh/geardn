@@ -426,8 +426,9 @@ const ProductDetail = () => {
                     variant='outlined'
                     size='large'
                     disabled={
-                      product?.tier_variations?.length === 0 &&
-                      product?.models?.[0]?.stock === 0
+                      (product?.tier_variations?.length === 0 &&
+                        product?.models?.[0]?.stock === 0) ||
+                      matchedModel?.stock === 0
                     }
                     onClick={handleAddCart}>
                     <ShoppingCartOutlinedIcon />
@@ -436,9 +437,11 @@ const ProductDetail = () => {
                     sx={{ width: 200 }}
                     variant='contained'
                     size='large'
-                    disabled={isOutOfStock}
+                    disabled={isOutOfStock || matchedModel?.stock === 0}
                     onClick={handleBuyBtn}>
-                    {isOutOfStock ? 'Hết hàng' : 'Mua ngay'}
+                    {isOutOfStock || matchedModel?.stock === 0
+                      ? 'Hết hàng'
+                      : 'Mua ngay'}
                   </Button>
                 </Box>
               </Box>
