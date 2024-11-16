@@ -3,23 +3,26 @@
 import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useSWRConfig } from 'swr';
 
-import LayoutContainer from '@/components/common/sharing/layout-container';
-import SkeletonImage from '@/components/common/SkeletonImage';
 import Breadcrumbs from '@/components/common/Breadcrumbs';
-import {
-  addCartAPI,
-  deleteCartItem,
-  subtractCartAPI,
-  updateCartQuantityAPI,
-  useGetCart,
-} from '@/services/cart/api';
+import SkeletonImage from '@/components/common/SkeletonImage';
+import LayoutContainer from '@/components/common/sharing/layout-container';
+import { addCartAPI, useGetCart } from '@/services/cart/api';
 import { useUpsertCart } from '@/services/cart/mutations';
 import { formatPrice } from '@/utils/format-price';
 
+import EMPTY_CART from '@/assets/empty-cart.png';
+import { ROUTES } from '@/constants/route';
+import { useNotificationContext } from '@/contexts/NotificationContext';
+import { useAuthStore } from '@/providers/auth-store-provider';
+import {
+  createOrder,
+  useGetDistrict,
+  useGetProvinces,
+} from '@/services/order/api';
+import ChevronLeftOutlinedIcon from '@mui/icons-material/ChevronLeftOutlined';
 import {
   Box,
   Button,
-  Checkbox,
   Divider,
   FormControl,
   FormControlLabel,
@@ -28,39 +31,17 @@ import {
   Grid2,
   InputLabel,
   MenuItem,
-  Paper,
   Radio,
   RadioGroup,
   Select,
   SelectChangeEvent,
   SxProps,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   TextField,
-  TextareaAutosize,
   Theme,
   Typography,
-  styled,
 } from '@mui/material';
-import EMPTY_CART from '@/assets/empty-cart.png';
-import Link from 'next/link';
-import ChevronLeftOutlinedIcon from '@mui/icons-material/ChevronLeftOutlined';
-import { Label } from '@mui/icons-material';
-import MinHeightTextarea from '@/components/common/Textarea';
-import Textarea from '@/components/common/Textarea';
-import { useAuthStore } from '@/providers/auth-store-provider';
 import { useFormik } from 'formik';
-import {
-  createOrder,
-  useGetDistrict,
-  useGetProvinces,
-} from '@/services/order/api';
-import { ROUTES } from '@/constants/route';
-import { useNotificationContext } from '@/contexts/NotificationContext';
+import Link from 'next/link';
 import { checkoutSchema } from './utils/schema/checkoutSchema';
 
 const Checkout = () => {
@@ -75,9 +56,6 @@ const Checkout = () => {
   const { mutate: globalMutate } = useSWRConfig();
   const { showNotification } = useNotificationContext();
   const [selected, setSelected] = useState<string[]>([]);
-  const [quantityInputs, setQuantityInputs] = useState<{
-    [key: string]: string;
-  }>({});
   const [customerData, setCustomerData] = useState<{
     name: string;
     phone: string;
@@ -108,17 +86,16 @@ const Checkout = () => {
     validationSchema: checkoutSchema,
     validateOnChange: false,
     async onSubmit(values) {
-      console.log(2, values);
       const payload = {
         ...values,
         items: orderFormData?.products ?? [],
         totalAmount: 0,
       };
-      // try {
-      //   const userData = await createOrder(payload);
-      // } catch (error: any) {
-      //   showNotification(error?.message, 'error');
-      // }
+      try {
+        const userData = await createOrder(payload);
+      } catch (error: any) {
+        showNotification(error?.message, 'error');
+      }
     },
   });
 
@@ -161,36 +138,6 @@ const Checkout = () => {
     setSelected(newSelected);
   };
 
-  const handleAddItem = async (item_id: string) => {
-    const itemToUpdate = cart?.items?.find((item) => item.model_id === item_id);
-
-    if (!itemToUpdate) return;
-
-    const newQuantity = itemToUpdate.quantity + 1;
-    const optimisticCart = {
-      ...cart,
-      items: cart?.items?.map((item) =>
-        item.model_id === item_id ? { ...item, quantity: newQuantity } : item
-      ),
-    };
-
-    mutate(optimisticCart, false);
-
-    try {
-      const updatedCartData = await addCartAPI({
-        model: item_id,
-        quantity: 1,
-      });
-
-      mutateCart(updatedCartData, false);
-
-      globalMutate('/api/cart');
-    } catch (error) {
-      mutate(cart, false);
-      console.error('Failed to update cart:', error);
-    }
-  };
-
   useEffect(() => {
     changeCustomer(customerData);
   }, [customerData, changeCustomer]);
@@ -207,7 +154,6 @@ const Checkout = () => {
     formik.setFieldValue(name, value);
   };
 
-  console.log('customerData:', customerData);
   return (
     <Box pt={2} pb={4} bgcolor={'#eee'}>
       <LayoutContainer>
@@ -279,7 +225,12 @@ const Checkout = () => {
                         <Typography sx={{ width: 88, mr: 4, fontSize: 14 }}>
                           Số lượng: {item.quantity}
                         </Typography>
-                        <Typography sx={{ width: 120, textAlign: 'end' }}>
+                        <Typography
+                          sx={{
+                            width: 120,
+                            fontWeight: 600,
+                            textAlign: 'end',
+                          }}>
                           {formatPrice(item.price)}
                         </Typography>
                       </Box>
@@ -287,12 +238,11 @@ const Checkout = () => {
                   ))}
                 </Box>
                 <Box sx={{ p: 2, mb: 2, bgcolor: '#fff', borderRadius: '4px' }}>
-                  <Typography mb={2}>Thông tin đặt hàng</Typography>
+                  <Typography mb={1}>Thông tin đặt hàng</Typography>
                   <TextField
-                    sx={{ mb: 1 }}
                     fullWidth
+                    margin='dense'
                     placeholder='Họ và tên'
-                    size='small'
                     name='name'
                     onChange={handleChange}
                     value={formik?.values?.name}
@@ -301,13 +251,11 @@ const Checkout = () => {
                         {formik.errors.name}
                       </Box>
                     }
-                    // value={customerData?.name ?? ''}
                   />
                   <TextField
-                    sx={{ mb: 1 }}
+                    margin='dense'
                     fullWidth
                     placeholder='Số điện thoại'
-                    size='small'
                     name='phone'
                     onChange={handleChange}
                     value={formik?.values?.phone}
@@ -316,15 +264,12 @@ const Checkout = () => {
                         {formik.errors.phone}
                       </Box>
                     }
-                    // onChange={handleCustomerChange}
-                    // value={customerData?.phone ?? ''}
                   />
                   <TextField
-                    sx={{ mb: 1 }}
+                    margin='dense'
                     fullWidth
                     placeholder='Email (Không bắt buộc)'
                     type='email'
-                    size='small'
                     name='email'
                     onChange={handleChange}
                     value={formik?.values?.email}
@@ -333,12 +278,10 @@ const Checkout = () => {
                         {formik.errors.email}
                       </Box>
                     }
-                    // onChange={handleCustomerChange}
-                    // value={customerData?.email ?? ''}
                   />
                 </Box>
                 <Box sx={{ p: 2, mb: 2, bgcolor: '#fff', borderRadius: '4px' }}>
-                  <FormControl>
+                  <FormControl sx={{ mb: 1 }}>
                     <FormLabel id='receiveOption'>
                       Hình thức nhận hàng
                     </FormLabel>
@@ -363,33 +306,14 @@ const Checkout = () => {
                     formik?.values?.receive_option === 'DELIVERY' && (
                       <>
                         <FormControl
+                          sx={selectStyle}
+                          margin='dense'
                           variant='filled'
-                          fullWidth
-                          size='small'
-                          sx={{
-                            height: 40,
-                            mb: 2,
-                            '& .MuiFilledInput-root': {
-                              overflow: 'hidden',
-                              borderRadius: 1,
-                              backgroundColor: '#fff !important',
-                              border: '1px solid',
-                              borderColor: 'rgba(0,0,0,0.23)',
-                              '&:hover': {
-                                backgroundColor: 'transparent',
-                              },
-                              '&.Mui-focused': {
-                                backgroundColor: 'transparent',
-                                border: '2px solid',
-                              },
-                            },
-                            '& .MuiInputLabel-asterisk': {
-                              color: 'red',
-                            },
-                          }}>
+                          fullWidth>
                           <InputLabel>Tỉnh/Thành phố</InputLabel>
                           <Select
                             disableUnderline
+                            size='small'
                             name='address.city'
                             onChange={handleSelectChange}
                             value={formik?.values?.address?.city ?? ''}>
@@ -406,34 +330,17 @@ const Checkout = () => {
                         </FormControl>
                         {formik?.values?.address?.city && (
                           <FormControl
+                            sx={selectStyle}
+                            margin='dense'
                             variant='filled'
-                            fullWidth
-                            sx={{
-                              '& .MuiFilledInput-root': {
-                                overflow: 'hidden',
-                                borderRadius: 1,
-                                backgroundColor: '#fff !important',
-                                border: '1px solid',
-                                borderColor: 'rgba(0,0,0,0.23)',
-                                '&:hover': {
-                                  backgroundColor: 'transparent',
-                                },
-                                '&.Mui-focused': {
-                                  backgroundColor: 'transparent',
-                                  border: '2px solid',
-                                },
-                              },
-                              '& .MuiInputLabel-asterisk': {
-                                color: 'red',
-                              },
-                            }}>
+                            fullWidth>
                             <InputLabel>Quận/Huyện</InputLabel>
                             <Select
                               disableUnderline
                               size='small'
                               name='address.district'
                               onChange={handleSelectChange}
-                              value={formik?.values?.address?.district}>
+                              value={formik?.values?.address?.district ?? ''}>
                               {provinces
                                 ?.find(
                                   (item) =>
@@ -445,6 +352,7 @@ const Checkout = () => {
                                   </MenuItem>
                                 ))}
                             </Select>
+
                             <FormHelperText sx={helperTextStyle}>
                               {formik?.errors?.address?.district}
                             </FormHelperText>
@@ -452,32 +360,15 @@ const Checkout = () => {
                         )}
                         {district && formik?.values?.address?.district && (
                           <FormControl
+                            sx={selectStyle}
+                            margin='dense'
                             variant='filled'
-                            fullWidth
-                            sx={{
-                              '& .MuiFilledInput-root': {
-                                overflow: 'hidden',
-                                borderRadius: 1,
-                                backgroundColor: '#fff !important',
-                                border: '1px solid',
-                                borderColor: 'rgba(0,0,0,0.23)',
-                                '&:hover': {
-                                  backgroundColor: 'transparent',
-                                },
-                                '&.Mui-focused': {
-                                  backgroundColor: 'transparent',
-                                  border: '2px solid',
-                                },
-                              },
-                              '& .MuiInputLabel-asterisk': {
-                                color: 'red',
-                              },
-                            }}>
+                            fullWidth>
                             <InputLabel>Phường/Xã</InputLabel>
                             <Select
                               disableUnderline
-                              name='address.ward'
                               size='small'
+                              name='address.ward'
                               onChange={handleSelectChange}
                               value={formik?.values?.address?.ward ?? ''}>
                               {district?.wards?.map((item) => (
@@ -605,6 +496,8 @@ const Checkout = () => {
                   </Button>
                   <Button
                     sx={{ fontWeight: 600 }}
+                    component={Link}
+                    href='/'
                     variant='outlined'
                     size='large'
                     fullWidth>
@@ -665,4 +558,24 @@ export default Checkout;
 const helperTextStyle: SxProps<Theme> = {
   color: 'red',
   fontSize: 13,
+};
+
+const selectStyle: SxProps<Theme> = {
+  '& .MuiFilledInput-root': {
+    overflow: 'hidden',
+    borderRadius: 1,
+    backgroundColor: '#fff !important',
+    border: '1px solid',
+    borderColor: 'rgba(0,0,0,0.23)',
+    '&:hover': {
+      backgroundColor: 'transparent',
+    },
+    '&.Mui-focused': {
+      backgroundColor: 'transparent',
+      border: '2px solid',
+    },
+  },
+  '& .MuiInputLabel-asterisk': {
+    color: 'red',
+  },
 };

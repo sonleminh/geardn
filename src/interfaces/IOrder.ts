@@ -41,10 +41,10 @@ export interface ICreateOrder {
     email?: string;
     items: IOrderItem[]
     address?: {
-        street: string;
         city: string;
-        state: string;
-        country: string;
+        district: string;
+        ward: string;
+        specific_address: string;
     };
     receive_option: string;
     note?: string;

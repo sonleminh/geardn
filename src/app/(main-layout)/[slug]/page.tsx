@@ -152,6 +152,7 @@ const ProductDetail = () => {
       });
       globalMutate(`${BASE_API_URL}/cart`, undefined, { revalidate: true });
       showNotification('Sản phẩm đã dược thêm vào giỏ hàng!', 'success');
+      setAddQuantityError(false);
     } catch (error: any) {
       showNotification(error?.message, 'error');
     }
