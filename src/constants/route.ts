@@ -4,5 +4,5 @@ export const ROUTES = {
     SIGNUP: '/dang-ky',
     CART: '/gio-hang',
     PURCHASE: '/don-hang',
-    CHECKOUT: '/thanh-toan',
+    CHECKOUT: '/dat-hang',
   };

@@ -31,6 +31,7 @@ import { useSWRConfig } from 'swr';
 import MainSwiper from './components/main-swiper';
 import ThumbSwiper from './components/thumb-swiper';
 import { ICartItem } from '@/interfaces/ICart';
+import { ROUTES } from '@/constants/route';
 
 const ProductDetail = () => {
   const params = useParams();
@@ -187,7 +188,7 @@ const ProductDetail = () => {
     };
     const { stock, ...rest } = currentModel;
     addProducts([rest]);
-    router.push('/checkout');
+    router.push(ROUTES.CHECKOUT);
   };
 
   function getTotalStock() {

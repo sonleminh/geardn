@@ -13,7 +13,7 @@ type TOrdersByUserRes = {
   total: number;
 };
 
-interface IProvince {
+export interface IProvince {
   name: string;
   code: number;
   division_type: string;

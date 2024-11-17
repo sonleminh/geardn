@@ -258,7 +258,7 @@ const Cart = () => {
       .map((item_id) => cart?.items?.find((item) => item.model_id === item_id))
       .filter((item): item is ICartItem => item !== undefined);
     addProducts(selectedItems);
-    router.push('/checkout');
+    router.push(ROUTES.CHECKOUT);
   };
 
   return (

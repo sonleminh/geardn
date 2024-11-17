@@ -63,7 +63,7 @@ const Header = ({ showHeader }: { showHeader: boolean }) => {
             <SkeletonImage src={LOGO} alt='geardn' fill unoptimized={true} />
           </Box>
         </Grid2>
-        <Grid2 size={3} sx={{ display: 'flex', alignItems: 'center' }}>
+        {/* <Grid2 size={3} sx={{ display: 'flex', alignItems: 'center' }}>
           <List
             sx={{
               display: 'flex',
@@ -76,8 +76,8 @@ const Header = ({ showHeader }: { showHeader: boolean }) => {
             <ListItem>Blog</ListItem>
             <ListItem>Contact</ListItem>
           </List>
-        </Grid2>
-        <Grid2 size={4.5} sx={{ display: 'flex', alignItems: 'center' }}>
+        </Grid2> */}
+        {/* <Grid2 size={4.5} sx={{ display: 'flex', alignItems: 'center' }}>
           <Box
             sx={{
               display: 'flex',
@@ -164,7 +164,7 @@ const Header = ({ showHeader }: { showHeader: boolean }) => {
               <MenuItem onClick={handleLogout}>Đăng xuất</MenuItem>
             </Menu>
           </Box>
-        </Grid2>
+        </Grid2> */}
       </Grid2>
     </Box>
   );

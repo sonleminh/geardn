@@ -32,7 +32,7 @@ async function refreshAccessToken(refreshToken: RequestCookie | undefined): Prom
       return await getRequest(`${BASE_API_URL}/auth/refresh-token`, {
       headers: {
           'Content-Type': 'application/json',
-          Cookie: `rt=${refreshToken?.value}`,
+          Cookie: `rt=${refreshToken?.value}`
       },
       }) as IRefreshTokenResponse;
     } catch (error) {
