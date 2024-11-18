@@ -27,6 +27,7 @@ import LOGO from '@/assets/geardn-logo.png';
 import { HeaderStyle } from './style';
 import { useGetCart } from '@/services/cart/api';
 import { ROUTES } from '@/constants/route';
+import Link from 'next/link';
 
 const Header = ({ showHeader }: { showHeader: boolean }) => {
   const router = useRouter();
@@ -44,13 +45,13 @@ const Header = ({ showHeader }: { showHeader: boolean }) => {
     const result = await logoutAPI();
     if (result?.statusCode === 200) {
       logout();
-      router.push('/tai-khoan');
+      router.push('/login');
     }
   };
 
   const handleUserClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     if (user === null) {
-      router.push('/tai-khoan');
+      router.push('/login');
     } else {
       setAnchorEl(event.currentTarget);
     }
@@ -59,11 +60,13 @@ const Header = ({ showHeader }: { showHeader: boolean }) => {
     <Box sx={HeaderStyle(showHeader)}>
       <Grid2 container height={80}>
         <Grid2 size={4.5} sx={{ display: 'flex', alignItems: 'center' }}>
-          <Box component={AppLink} href={'/'} className='header-logo'>
-            <SkeletonImage src={LOGO} alt='geardn' fill unoptimized={true} />
-          </Box>
+          <Link href={'/'}>
+            <Box className='header-logo'>
+              <SkeletonImage src={LOGO} alt='geardn' fill unoptimized={true} />
+            </Box>
+          </Link>
         </Grid2>
-        {/* <Grid2 size={3} sx={{ display: 'flex', alignItems: 'center' }}>
+        <Grid2 size={3} sx={{ display: 'flex', alignItems: 'center' }}>
           <List
             sx={{
               display: 'flex',
@@ -76,8 +79,8 @@ const Header = ({ showHeader }: { showHeader: boolean }) => {
             <ListItem>Blog</ListItem>
             <ListItem>Contact</ListItem>
           </List>
-        </Grid2> */}
-        {/* <Grid2 size={4.5} sx={{ display: 'flex', alignItems: 'center' }}>
+        </Grid2>
+        <Grid2 size={4.5} sx={{ display: 'flex', alignItems: 'center' }}>
           <Box
             sx={{
               display: 'flex',
@@ -164,7 +167,7 @@ const Header = ({ showHeader }: { showHeader: boolean }) => {
               <MenuItem onClick={handleLogout}>Đăng xuất</MenuItem>
             </Menu>
           </Box>
-        </Grid2> */}
+        </Grid2>
       </Grid2>
     </Box>
   );

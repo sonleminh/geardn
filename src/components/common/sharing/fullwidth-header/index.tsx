@@ -63,9 +63,16 @@ const FullWidthHeader = ({
       <LayoutContainer>
         <Grid2 container height={80} px={3}>
           <Grid2 size={4.5} sx={{ display: 'flex', alignItems: 'center' }}>
-            <Box component={AppLink} href={'/'} className='header-logo'>
-              <SkeletonImage src={LOGO} alt='geardn' fill unoptimized={true} />
-            </Box>
+            <Link href={'/'}>
+              <Box className='header-logo'>
+                <SkeletonImage
+                  src={LOGO}
+                  alt='geardn'
+                  fill
+                  unoptimized={true}
+                />
+              </Box>
+            </Link>
           </Grid2>
           <Grid2 size={3} sx={{ display: 'flex', alignItems: 'center' }}>
             <List

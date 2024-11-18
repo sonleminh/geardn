@@ -25,7 +25,7 @@ export interface IOrder {
     phone: string;
     email: string;
     items: IOrderItem[]
-    totalAmount: number;
+    total_amount: number;
     status: string;
     address: {
         street: string;

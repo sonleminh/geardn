@@ -57,6 +57,15 @@ export const useGetOrdersByUser = () => {
   };
 };
 
+export const useGetOrderById = (id: string) => {
+  const { data, error, isLoading } = useSWR(`${BASE_API_URL}/order/${id}`, fetcher);
+  return {
+    order: data as IOrder,
+    isLoading,
+    isError: error,
+  };
+};
+
 export const useGetProvinces = () => {
   const { data, error, isLoading, mutate } = useSWR('https://provinces.open-api.vn/api/?depth=2',  (url) => fetcher(url, false));
   return {

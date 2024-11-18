@@ -13,8 +13,8 @@ const SkeletonImage: React.FC<ImageProps> = (props) => {
       variant='rectangular'
       animation='wave'
       sx={{
-        height: '100%',
         width: '100%',
+        height: '100%',
       }}
     />
   ) : (
@@ -22,7 +22,7 @@ const SkeletonImage: React.FC<ImageProps> = (props) => {
       {...props}
       src={srcImg}
       alt={props.alt}
-      fill={props.fill ?? true}
+      fill
       sizes={
         props.sizes ??
         '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
@@ -30,8 +30,8 @@ const SkeletonImage: React.FC<ImageProps> = (props) => {
       onError={() => {
         setIsError(true);
       }}
-      priority
-      quality={100}
+      priority={props.priority || false}
+      quality={props.quality || 75}
     />
   );
 };
