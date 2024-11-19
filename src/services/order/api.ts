@@ -7,6 +7,7 @@ import { deleteRequest, getRequest, patchRequest, postRequest } from '@/utils/fe
 import useSWR from 'swr';
 import { fetcher } from '../fetcher';
 import { ICreateOrder, IOrder } from '@/interfaces/IOrder';
+import { IPayment } from '@/interfaces/IPayment';
 
 type TOrdersByUserRes = {
   order_list: IOrder[];
@@ -38,6 +39,12 @@ interface IWards {
   codename: string;
   short_codename: string;
 }
+
+type TPaymentsRes = {
+  status: number;
+  message: string;
+  data: IPayment[];
+};
 
 export const createOrder = (payload: ICreateOrder) => {
   try {
@@ -80,6 +87,16 @@ export const useGetDistrict = (code: string) => {
   const { data, error, isLoading, mutate } = useSWR(`https://provinces.open-api.vn/api/d/${code}?depth=2`,  (url) => fetcher(url, false));
   return {
     district: data as IDistrict,
+    isLoading,
+    isError: error,
+    mutate
+  };
+};
+
+export const useGetPaymentMethods = () => {
+  const { data, error, isLoading, mutate } = useSWR(`${BASE_API_URL}/payment-method`, fetcher);
+  return {
+    paymentMethods: data as TPaymentsRes,
     isLoading,
     isError: error,
     mutate

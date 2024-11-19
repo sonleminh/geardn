@@ -18,6 +18,7 @@ import {
   IProvince,
   createOrder,
   useGetDistrict,
+  useGetPaymentMethods,
   useGetProvinces,
 } from '@/services/order/api';
 import ChevronLeftOutlinedIcon from '@mui/icons-material/ChevronLeftOutlined';
@@ -52,6 +53,7 @@ const Checkout = () => {
     { href: ROUTES.CHECKOUT, label: 'Thanh toán' },
   ];
   const { provinces } = useGetProvinces();
+  const { paymentMethods } = useGetPaymentMethods();
   const { mutate: globalMutate } = useSWRConfig();
   const { showNotification } = useNotificationContext();
   const [customerData, setCustomerData] = useState<{
@@ -77,7 +79,7 @@ const Checkout = () => {
       },
       receive_option: 'DELIVERY',
       note: '',
-      payment_method: 'COD',
+      payment_method: '',
     },
     validationSchema: checkoutSchema,
     validateOnChange: false,
@@ -94,7 +96,6 @@ const Checkout = () => {
       } catch (error: any) {
         showNotification(error?.message, 'error');
       }
-      console.log(payload);
     },
   });
 
@@ -121,7 +122,16 @@ const Checkout = () => {
   const handleChange = (
     e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>
   ) => {
-    const { value, name } = e.target;
+    const { name, value } = e.target;
+    console.log('name:', name);
+    console.log('name:', value);
+    formik.setFieldValue(name, value);
+  };
+
+  const handlePaymentMethodChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const { name, value } = e.target;
     formik.setFieldValue(name, value);
   };
 
@@ -144,7 +154,7 @@ const Checkout = () => {
         <Grid2 container spacing={2}>
           <Grid2 sx={{}} size={8.5}>
             <Box sx={{ p: 2, mb: 2, bgcolor: '#fff', borderRadius: '4px' }}>
-              <Typography sx={{ fontSize: 18, fontWeight: 700 }}>
+              <Typography sx={{ fontWeight: 600 }}>
                 Sản phẩm trong đơn
               </Typography>
 
@@ -212,7 +222,9 @@ const Checkout = () => {
               ))}
             </Box>
             <Box sx={{ p: 2, mb: 2, bgcolor: '#fff', borderRadius: '4px' }}>
-              <Typography mb={1}>Thông tin đặt hàng</Typography>
+              <Typography sx={{ fontWeight: 600 }}>
+                Thông tin đặt hàng
+              </Typography>
               <TextField
                 fullWidth
                 margin='dense'
@@ -256,7 +268,9 @@ const Checkout = () => {
             </Box>
             <Box sx={{ p: 2, mb: 2, bgcolor: '#fff', borderRadius: '4px' }}>
               <FormControl sx={{ mb: 1 }}>
-                <FormLabel id='receiveOption'>Hình thức nhận hàng</FormLabel>
+                <Typography sx={{ mb: 1, fontWeight: 600 }}>
+                  Hình thức nhận hàng
+                </Typography>
                 <RadioGroup
                   row
                   name='receive_option'
@@ -397,20 +411,45 @@ const Checkout = () => {
             </Box>
             <Box sx={{ p: 3, bgcolor: '#fff', borderRadius: '4px' }}>
               <FormControl>
-                <FormLabel id='payment_method'>
+                <Typography sx={{ mb: 2, fontWeight: 600 }}>
                   Phương thức thanh toán
-                </FormLabel>
+                </Typography>
                 <RadioGroup
-                  row
-                  aria-labelledby='payment_method'
                   name='payment_method'
                   onChange={handleChange}
                   value={formik?.values?.payment_method}>
-                  <FormControlLabel
-                    value='COD'
-                    control={<Radio size='small' />}
-                    label='COD'
-                  />
+                  {paymentMethods?.data?.map((item) => (
+                    <FormControlLabel
+                      sx={{ my: 1 }}
+                      key={item?.key}
+                      value={item?.key}
+                      control={<Radio size='small' />}
+                      label={
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                          <Box
+                            sx={{
+                              position: 'relative',
+                              width: 32,
+                              height: 32,
+                              ml: 1,
+                              mr: 1.5,
+                              overflow: 'hidden',
+                              img: { objectFit: 'cover' },
+                            }}>
+                            <SkeletonImage
+                              src={item.image}
+                              alt={''}
+                              fill
+                              className='cart-item'
+                            />
+                          </Box>
+                          <Typography sx={{ fontSize: 14 }}>
+                            {item?.name}
+                          </Typography>
+                        </Box>
+                      }
+                    />
+                  ))}
                 </RadioGroup>
               </FormControl>
             </Box>

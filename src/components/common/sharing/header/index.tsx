@@ -45,13 +45,13 @@ const Header = ({ showHeader }: { showHeader: boolean }) => {
     const result = await logoutAPI();
     if (result?.statusCode === 200) {
       logout();
-      router.push('/login');
+      router.push('/dang-nhap');
     }
   };
 
   const handleUserClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     if (user === null) {
-      router.push('/login');
+      router.push('/dang-nhap');
     } else {
       setAnchorEl(event.currentTarget);
     }

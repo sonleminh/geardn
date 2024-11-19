@@ -61,7 +61,7 @@ export async function middleware(request: NextRequest) {
     {
     user = await whoami(accessToken)
 
-    console.log('user', user);
+    // console.log('user', user);
 
     if (!user?._id && refreshToken) {
       const response = NextResponse.next();
@@ -86,13 +86,13 @@ export async function middleware(request: NextRequest) {
   }
 
   const path = request.nextUrl.pathname;
+  // console.log('path: ', path);
   const isProtectedRoute = protectedRoute.includes(path);
   const isPublicRoute = publicRoute.includes(path);
 
   if (isProtectedRoute && !user?._id) {
-    return NextResponse.redirect(new URL('/tai-khoan', request.url));
+    return NextResponse.redirect(new URL('/dang-nhap', request.url));
   }
-
 
   if (isPublicRoute && user?._id) {
     return NextResponse.redirect(new URL('/tai-khoan', request.url));
