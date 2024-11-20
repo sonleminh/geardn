@@ -49,7 +49,6 @@ export default function Login() {
 
       if (userData?._id) {
         router.push('/tai-khoan');
-        console.log('push');
       }
     },
   });

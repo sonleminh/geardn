@@ -75,7 +75,7 @@ const Checkout = () => {
         city: '',
         district: '',
         ward: '',
-        specific_address: '',
+        detail_address: '',
       },
       receive_option: 'DELIVERY',
       note: '',
@@ -89,13 +89,13 @@ const Checkout = () => {
         items: orderFormData?.products ?? [],
         totalAmount: 0,
       };
-      try {
-        await createOrder(payload);
-        showNotification('Đặt hàng thành công', 'success');
-        globalMutate(`${BASE_API_URL}/cart`, undefined, { revalidate: true });
-      } catch (error: any) {
-        showNotification(error?.message, 'error');
-      }
+      // try {
+      //   await createOrder(payload);
+      //   showNotification('Đặt hàng thành công', 'success');
+      //   globalMutate(`${BASE_API_URL}/cart`, undefined, { revalidate: true });
+      // } catch (error: any) {
+      //   showNotification(error?.message, 'error');
+      // }
     },
   });
 
@@ -256,12 +256,12 @@ const Checkout = () => {
                 fullWidth
                 placeholder='Email (Không bắt buộc)'
                 type='email'
-                name='email'
+                name='mail'
                 onChange={handleChange}
-                value={formik?.values?.email}
+                value={formik?.values?.mail}
                 helperText={
                   <Box component={'span'} sx={helperTextStyle}>
-                    {formik.errors.email}
+                    {formik.errors.mail}
                   </Box>
                 }
               />
@@ -375,14 +375,14 @@ const Checkout = () => {
                         variant='outlined'
                         size='small'
                         fullWidth
-                        name='address.specific_address'
+                        name='address.detail_address'
                         placeholder='Địa chỉ cụ thể'
                         autoFocus
                         helperText={
                           <Typography
                             component={'span'}
                             sx={{ fontSize: 13, color: 'red' }}>
-                            {formik?.errors?.address?.specific_address}
+                            {formik?.errors?.address?.detail_address}
                           </Typography>
                         }
                         onChange={handleChange}
@@ -422,7 +422,7 @@ const Checkout = () => {
                     <FormControlLabel
                       sx={{ my: 1 }}
                       key={item?.key}
-                      value={item?.key}
+                      value={item?._id}
                       control={<Radio size='small' />}
                       label={
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -451,6 +451,9 @@ const Checkout = () => {
                     />
                   ))}
                 </RadioGroup>
+                <FormHelperText sx={helperTextStyle}>
+                  {formik?.errors?.payment_method}
+                </FormHelperText>
               </FormControl>
             </Box>
           </Grid2>
