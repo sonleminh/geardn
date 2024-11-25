@@ -15,11 +15,14 @@ import { ROUTES } from '@/constants/route';
 import { useNotificationContext } from '@/contexts/NotificationContext';
 import { useAuthStore } from '@/providers/auth-store-provider';
 import {
+  IDistrict,
   IProvince,
+  IWard,
   createOrder,
   useGetDistrict,
   useGetPaymentMethods,
-  useGetProvinces,
+  useGetProvince,
+  useGetProvinceList,
 } from '@/services/order/api';
 import ChevronLeftOutlinedIcon from '@mui/icons-material/ChevronLeftOutlined';
 import {
@@ -33,6 +36,7 @@ import {
   Grid2,
   InputLabel,
   MenuItem,
+  Modal,
   Radio,
   RadioGroup,
   Select,
@@ -42,17 +46,24 @@ import {
   Theme,
   Typography,
 } from '@mui/material';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { useFormik } from 'formik';
 import Link from 'next/link';
 import { checkoutSchema } from './utils/schema/checkoutSchema';
 import { BASE_API_URL } from '@/constants/env';
+import moment from 'moment';
+import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import useConfirmModal from '@/hooks/useModalConfirm';
 
 const Checkout = () => {
   const breadcrumbsOptions = [
     { href: '/', label: 'Home' },
     { href: ROUTES.CHECKOUT, label: 'Thanh toán' },
   ];
-  const { provinces } = useGetProvinces();
+  const { confirmModal, showConfirmModal } = useConfirmModal();
+
+  const { province_list } = useGetProvinceList();
   const { paymentMethods } = useGetPaymentMethods();
   const { mutate: globalMutate } = useSWRConfig();
   const { showNotification } = useNotificationContext();
@@ -61,6 +72,30 @@ const Checkout = () => {
     phone: string;
     email: string;
   }>({ name: '', phone: '', email: '' });
+  const [city, setCity] = useState<string>('');
+  const [district, setDistrict] = useState<string>('');
+  const [ward, setWard] = useState<string>('');
+  const [detailAddress, setDetailAddress] = useState<string>('');
+  const [shopAddress, setShopAddress] = useState<string>('');
+  const [modalOpen, setModalOpen] = useState(false);
+  const handleModalOpen = () => setModalOpen(true);
+  const handleModalClose = () => {
+    setModalOpen(false);
+    if (!detailAddress) {
+      setCity('');
+      setDistrict('');
+      setWard('');
+      setDetailAddress('');
+    }
+  };
+
+  const { province } = useGetProvince(
+    province_list?.find?.((item) => item?.name === city)?.code
+  );
+
+  const { districtData } = useGetDistrict(
+    province?.districts?.find?.((item) => item?.name === district)?.code
+  );
 
   const inputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
 
@@ -68,18 +103,22 @@ const Checkout = () => {
 
   const formik = useFormik({
     initialValues: {
-      name: '',
-      phone: '',
-      email: '',
-      address: {
-        city: '',
-        district: '',
-        ward: '',
-        detail_address: '',
+      customer: {
+        name: '',
+        phone: '',
+        mail: '',
       },
-      receive_option: 'DELIVERY',
+      shipment: {
+        method: 1,
+        delivery_date: moment(),
+      },
+      payment: {
+        method: '673c8947d6a67118f380f4ab',
+      },
+      flag: {
+        is_online_order: true,
+      },
       note: '',
-      payment_method: '',
     },
     validationSchema: checkoutSchema,
     validateOnChange: false,
@@ -98,15 +137,16 @@ const Checkout = () => {
       // }
     },
   });
+  console.log('prv:', formik?.values?.shipment?.method);
 
-  const { district } = useGetDistrict(
-    provinces
-      ?.find((item) => item?.name === formik?.values?.address?.city)
-      ?.districts?.find(
-        (item) => item?.name === formik?.values?.address?.district
-      )
-      ?.code.toString() ?? ''
-  );
+  // const { district } = useGetDistrict(
+  //   provinces
+  //     ?.find((item) => item?.name === formik?.values?.address?.city)
+  //     ?.districts?.find(
+  //       (item) => item?.name === formik?.values?.address?.district
+  //     )
+  //     ?.code.toString() ?? ''
+  // );
 
   function getTotalAmount() {
     return orderFormData?.products?.reduce(
@@ -123,8 +163,6 @@ const Checkout = () => {
     e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    console.log('name:', name);
-    console.log('name:', value);
     formik.setFieldValue(name, value);
   };
 
@@ -138,6 +176,10 @@ const Checkout = () => {
   const handleSelectChange = (e: SelectChangeEvent<string>) => {
     const { value, name } = e.target;
     formik.setFieldValue(name, value);
+  };
+
+  const handleConfirmAddress = () => {
+    setModalOpen(false);
   };
 
   return (
@@ -231,10 +273,10 @@ const Checkout = () => {
                 placeholder='Họ và tên'
                 name='name'
                 onChange={handleChange}
-                value={formik?.values?.name}
+                value={formik?.values?.customer?.name}
                 helperText={
                   <Box component={'span'} sx={helperTextStyle}>
-                    {formik.errors.name}
+                    {formik?.errors?.customer?.name}
                   </Box>
                 }
               />
@@ -244,10 +286,10 @@ const Checkout = () => {
                 placeholder='Số điện thoại'
                 name='phone'
                 onChange={handleChange}
-                value={formik?.values?.phone}
+                value={formik?.values?.customer?.phone}
                 helperText={
                   <Box component={'span'} sx={helperTextStyle}>
-                    {formik.errors.phone}
+                    {formik?.errors?.customer?.phone}
                   </Box>
                 }
               />
@@ -258,156 +300,391 @@ const Checkout = () => {
                 type='email'
                 name='mail'
                 onChange={handleChange}
-                value={formik?.values?.mail}
+                value={formik?.values?.customer?.mail}
                 helperText={
                   <Box component={'span'} sx={helperTextStyle}>
-                    {formik.errors.mail}
+                    {formik?.errors?.customer?.mail}
                   </Box>
                 }
               />
             </Box>
             <Box sx={{ p: 2, mb: 2, bgcolor: '#fff', borderRadius: '4px' }}>
-              <FormControl sx={{ mb: 1 }}>
-                <Typography sx={{ mb: 1, fontWeight: 600 }}>
-                  Hình thức nhận hàng
-                </Typography>
-                <RadioGroup
-                  row
-                  name='receive_option'
-                  onChange={handleChange}
-                  value={formik?.values?.receive_option}>
-                  <FormControlLabel
-                    value='DELIVERY'
-                    control={<Radio size='small' />}
-                    label='Giao hàng tận nơi'
-                  />
-                  <FormControlLabel
-                    value='STORE'
-                    control={<Radio size='small' />}
-                    label='Nhận tại cửa hàng'
-                  />
-                </RadioGroup>
-              </FormControl>
-              {provinces && formik?.values?.receive_option === 'DELIVERY' && (
-                <>
-                  <FormControl
-                    sx={selectStyle}
-                    margin='dense'
-                    variant='filled'
-                    fullWidth>
-                    <InputLabel>Tỉnh/Thành phố</InputLabel>
-                    <Select
-                      disableUnderline
-                      size='small'
-                      name='address.city'
-                      onChange={(e) => {
-                        handleSelectChange(e);
+              <RadioGroup
+                sx={{ mb: 1 }}
+                row
+                name='shipment.method'
+                onChange={handleChange}
+                value={formik?.values?.shipment?.method}>
+                <FormControlLabel
+                  value={1}
+                  control={<Radio size='small' />}
+                  label={
+                    <Typography sx={{ fontSize: 14 }}>
+                      Giao hàng tận nơi
+                    </Typography>
+                  }
+                />
+                <FormControlLabel
+                  value={2}
+                  control={<Radio size='small' />}
+                  label={
+                    <Typography sx={{ fontSize: 14 }}>
+                      Nhận tại cửa hàng
+                    </Typography>
+                  }
+                />
+              </RadioGroup>
+              <Grid2 mb={2} container rowSpacing={2} columnSpacing={4}>
+                {formik?.values?.shipment?.method === 1 ? (
+                  <>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: detailAddress ? 'start' : 'center',
+                        width: '100%',
+                        p: 1.5,
+                        minHeight: 56,
+                        border: '1px solid rgba(0, 0, 0, 0.23)',
+                        borderRadius: 1,
+                        cursor: 'pointer',
                       }}
-                      value={formik?.values?.address?.city ?? ''}>
-                      {provinces &&
-                        provinces?.map((item) => (
-                          <MenuItem key={item?.code} value={item?.name}>
-                            {item?.name}
-                          </MenuItem>
-                        ))}
-                    </Select>
-                    <FormHelperText sx={helperTextStyle}>
-                      {formik?.errors?.address?.city}
-                    </FormHelperText>
-                  </FormControl>
-                  {formik?.values?.address?.city && (
-                    <FormControl
-                      sx={selectStyle}
-                      margin='dense'
-                      variant='filled'
-                      fullWidth>
-                      <InputLabel>Quận/Huyện</InputLabel>
-                      <Select
-                        disableUnderline
-                        size='small'
-                        name='address.district'
-                        onChange={handleSelectChange}
-                        value={formik?.values?.address?.district ?? ''}>
-                        {provinces
-                          ?.find(
-                            (item) =>
-                              item?.name === formik?.values?.address?.city
-                          )
-                          ?.districts?.map((item) => (
+                      // onClick={handleSelectAddress}
+                      onClick={handleModalOpen}>
+                      {detailAddress && !modalOpen ? (
+                        <>
+                          <Box>
+                            <Typography sx={{ color: '#6b7280', fontSize: 13 }}>
+                              Giao tới
+                            </Typography>
+                            <Typography sx={{ fontSize: 15, fontWeight: 600 }}>
+                              {ward}, {district}, {city}
+                            </Typography>
+                            <Typography sx={{ fontSize: 14, fontWeight: 500 }}>
+                              {detailAddress}
+                            </Typography>
+                          </Box>
+                          <Typography
+                            sx={{
+                              color: '#1250dc',
+                              fontSize: 14,
+                              fontWeight: 600,
+                            }}>
+                            Thay đổi
+                          </Typography>
+                        </>
+                      ) : (
+                        <>
+                          <Typography sx={{ color: '#9ca3af' }}>
+                            Tỉnh/Thành Phố, Quận/Huyện, Phường Xã
+                          </Typography>
+                          <ChevronRightIcon />
+                        </>
+                      )}
+                    </Box>
+                    <Modal
+                      open={modalOpen}
+                      onClose={handleModalClose}
+                      aria-labelledby='modal-modal-title'
+                      aria-describedby='modal-modal-description'>
+                      <Box sx={modalStyle}>
+                        <Typography sx={{ mb: 2, textAlign: 'center' }}>
+                          Thêm địa chỉ nhận hàng
+                        </Typography>
+                        <FormControl
+                          sx={selectStyle}
+                          margin='dense'
+                          variant='filled'
+                          fullWidth>
+                          <InputLabel>Tỉnh/Thành phố</InputLabel>
+                          <Select
+                            disableUnderline
+                            size='small'
+                            onChange={(e) => setCity(e?.target?.value)}
+                            value={
+                              province_list?.some((item) => item.name === city)
+                                ? city
+                                : ''
+                            }>
+                            {province_list?.map((item) => (
+                              <MenuItem key={item?.code} value={item?.name}>
+                                {item?.name}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                        {city && (
+                          <FormControl
+                            sx={selectStyle}
+                            margin='dense'
+                            variant='filled'
+                            fullWidth>
+                            <InputLabel>Quận/Huyện</InputLabel>
+                            <Select
+                              disableUnderline
+                              size='small'
+                              onChange={(e) => setDistrict(e?.target?.value)}
+                              value={
+                                // province_list?.districts?.some(
+                                //   (item) => item.name === district
+                                // )
+                                //   ? district
+                                //   : ''
+                                district
+                              }
+                              // disabled={!city}
+                            >
+                              {province?.districts?.map((item: IDistrict) => (
+                                <MenuItem key={item?.code} value={item?.name}>
+                                  {item?.name}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        )}
+                        {district && (
+                          <FormControl
+                            sx={selectStyle}
+                            margin='dense'
+                            variant='filled'
+                            fullWidth>
+                            <InputLabel>Phường/Xã</InputLabel>
+                            <Select
+                              disableUnderline
+                              size='small'
+                              onChange={(e) => setWard(e?.target?.value)}
+                              value={
+                                // districtData?.wards?.some(
+                                //   (item) => item.name === ward
+                                // )
+                                //   ? ward
+                                //   : ''
+                                ward
+                              }
+                              disabled={!district}>
+                              {districtData?.wards?.map((item: IWard) => (
+                                <MenuItem key={item?.code} value={item?.name}>
+                                  {item?.name}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        )}
+                        <FormControl
+                          sx={{
+                            mb: 2.5,
+                            textarea: {
+                              fontFamily: 'Roboto, sans-serif',
+                              '::placeholder': {
+                                fontSize: 16,
+                                color: '#9ca3af',
+                              },
+                            },
+                          }}
+                          margin='dense'
+                          fullWidth>
+                          <textarea
+                            style={{
+                              width: '100%',
+                              padding: '12px 12px',
+                              border: '1px solid rgba(0, 0, 0, 0.23)',
+                              borderRadius: '4px',
+                              fontSize: 16,
+                            }}
+                            name='note'
+                            rows={4}
+                            placeholder='Địa chỉ cụ thể'
+                            onChange={(e) => setDetailAddress(e?.target?.value)}
+                            value={detailAddress}
+                          />
+                        </FormControl>
+                        <Button
+                          sx={{ width: '100%' }}
+                          variant='contained'
+                          disabled={
+                            !city || !district || !ward || !detailAddress
+                          }
+                          onClick={handleConfirmAddress}>
+                          Xác nhận
+                        </Button>
+                      </Box>
+                    </Modal>
+                    {/* <Grid2 size={6}>
+                      <FormControl sx={selectStyle} variant='filled' fullWidth>
+                        <InputLabel>Tỉnh/Thành phố</InputLabel>
+                        <Select
+                          disableUnderline
+                          size='small'
+                          onChange={(e) => setCity(e?.target?.value)}
+                          value={
+                            province_list?.some((item) => item.name === city)
+                              ? city
+                              : ''
+                          }>
+                          {province_list?.map((item) => (
                             <MenuItem key={item?.code} value={item?.name}>
                               {item?.name}
                             </MenuItem>
                           ))}
-                      </Select>
-
-                      <FormHelperText sx={helperTextStyle}>
-                        {formik?.errors?.address?.district}
-                      </FormHelperText>
-                    </FormControl>
-                  )}
-                  {district && formik?.values?.address?.district && (
-                    <FormControl
-                      sx={selectStyle}
-                      margin='dense'
-                      variant='filled'
-                      fullWidth>
-                      <InputLabel>Phường/Xã</InputLabel>
+                        </Select>
+                      </FormControl>
+                    </Grid2>
+                    <Grid2 size={6}>
+                      <FormControl variant='filled' fullWidth sx={selectStyle}>
+                        <InputLabel>Quận/Huyện</InputLabel>
+                        <Select
+                          disableUnderline
+                          size='small'
+                          onChange={(e) => setDistrict(e?.target?.value)}
+                          value={
+                            // province_list?.districts?.some(
+                            //   (item) => item.name === district
+                            // )
+                            //   ? district
+                            //   : ''
+                            district
+                          }
+                          // disabled={!city}
+                        >
+                          {province?.districts?.map((item: IDistrict) => (
+                            <MenuItem key={item?.code} value={item?.name}>
+                              {item?.name}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid2>
+                    <Grid2 size={6}>
+                      <FormControl variant='filled' fullWidth sx={selectStyle}>
+                        <InputLabel>Phường/Xã</InputLabel>
+                        <Select
+                          disableUnderline
+                          size='small'
+                          onChange={(e) => setWard(e?.target?.value)}
+                          value={
+                            // districtData?.wards?.some(
+                            //   (item) => item.name === ward
+                            // )
+                            //   ? ward
+                            //   : ''
+                            ward
+                          }
+                          disabled={!district}>
+                          {districtData?.wards?.map((item: IWard) => (
+                            <MenuItem key={item?.code} value={item?.name}>
+                              {item?.name}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid2>
+                    <Grid2 size={6}>
+                      <FormControl sx={{}} fullWidth>
+                        <TextField
+                          // size='small'
+                          fullWidth
+                          placeholder='Địa chỉ cụ thể'
+                          onChange={(e) => setDetailAddress(e?.target?.value)}
+                          value={detailAddress}
+                        />
+                      </FormControl>
+                    </Grid2> */}
+                    <Grid2 size={6}>
+                      <FormControl
+                        fullWidth
+                        sx={{
+                          '.MuiOutlinedInput-notchedOutline': {
+                            borderColor: 'rgba(0,0,0,0.23) !important',
+                          },
+                        }}>
+                        <LocalizationProvider dateAdapter={AdapterMoment}>
+                          <DateTimePicker
+                            name='shipment.delivery_date'
+                            ampm={false}
+                            shouldDisableTime={(timeValue, clockType) => {
+                              if (clockType === 'hours') {
+                                const hour = timeValue.hour();
+                                return hour < 8 || hour > 23;
+                              }
+                              return false;
+                            }}
+                            minDate={moment()}
+                            onChange={(e) =>
+                              formik.setFieldValue('shipment.delivery_date', e)
+                            }
+                            value={moment(
+                              formik?.values?.shipment?.delivery_date
+                            )}
+                          />
+                        </LocalizationProvider>
+                      </FormControl>
+                    </Grid2>
+                  </>
+                ) : (
+                  <Grid2 size={12}>
+                    <FormControl variant='filled' fullWidth sx={selectStyle}>
+                      <InputLabel>Chọn shop có hàng gần nhất</InputLabel>
                       <Select
                         disableUnderline
                         size='small'
-                        name='address.ward'
-                        onChange={handleSelectChange}
-                        value={formik?.values?.address?.ward ?? ''}>
-                        {district?.wards?.map((item) => (
-                          <MenuItem key={item?.code} value={item?.name}>
-                            {item?.name}
-                          </MenuItem>
-                        ))}
+                        // onChange={(e) => setShopAddress(e?.target?.value)}
+                        // value={shopAddress}
+                      >
+                        <MenuItem
+                          value={
+                            '39/48 Cù Chính Lan, P.Hòa Khê, Q.Thanh Khê, TP.Đà Nẵng'
+                          }>
+                          39/48 Cù Chính Lan, P.Hòa Khê, Q.Thanh Khê, TP.Đà Nẵng
+                        </MenuItem>
+                        <MenuItem
+                          value={
+                            '02 Tô Hiến Thành, P.Phước Mỹ, Q.Sơn Trà, TP.Đà Nẵng'
+                          }>
+                          02 Tô Hiến Thành, P.Phước Mỹ, Q.Sơn Trà, TP.Đà Nẵng
+                        </MenuItem>
                       </Select>
-                      <FormHelperText sx={helperTextStyle}>
-                        {formik?.errors?.address?.ward}
-                      </FormHelperText>
                     </FormControl>
-                  )}
-                  {formik?.values?.address?.ward && (
-                    <FormControl margin='dense' fullWidth variant='standard'>
-                      <TextField
-                        variant='outlined'
-                        size='small'
-                        fullWidth
-                        name='address.detail_address'
-                        placeholder='Địa chỉ cụ thể'
-                        autoFocus
-                        helperText={
-                          <Typography
-                            component={'span'}
-                            sx={{ fontSize: 13, color: 'red' }}>
-                            {formik?.errors?.address?.detail_address}
-                          </Typography>
-                        }
-                        onChange={handleChange}
-                      />
-                    </FormControl>
-                  )}
-                </>
-              )}
-              <Typography mb={1}>Ghi chú yêu cầu</Typography>
-              <textarea
-                placeholder='Nội dung'
-                name='note'
-                rows={3}
-                onChange={handleChange}
-                value={formik?.values?.note}
-                style={{
-                  width: '100%',
-                  padding: '8.5px 14px',
-                  border: '1px solid rgba(0, 0, 0, 0.23)',
-                  borderRadius: '4px',
-                  fontSize: 16,
-                }}
-                onFocus={(e) => (e.target.style.outline = '1px solid #000')}
-                onBlur={(e) => (e.target.style.outline = 'none')}
-              />
+                  </Grid2>
+                )}
+                <Grid2 size={12}>
+                  <FormControl
+                    variant='filled'
+                    fullWidth
+                    sx={{
+                      textarea: {
+                        fontFamily: 'Roboto, sans-serif',
+                        '::placeholder': {
+                          fontSize: 16,
+                          color: '#9ca3af',
+                        },
+                      },
+                    }}>
+                    <textarea
+                      placeholder='Ghi chú (Ví dụ: Hãy gọi cho tôi khi chuẩn bị hàng xong)'
+                      name='note'
+                      rows={4}
+                      onChange={(e) =>
+                        formik.setFieldValue(e.target.name, e.target.value)
+                      }
+                      value={formik?.values?.note}
+                      style={{
+                        width: '100%',
+                        padding: '12px 12px',
+                        border: '1px solid rgba(0, 0, 0, 0.23)',
+                        borderRadius: '4px',
+                        fontSize: 16,
+                      }}
+                      onFocus={(e) =>
+                        (e.target.style.outline = '1px solid #000')
+                      }
+                      onBlur={(e) => (e.target.style.outline = 'none')}
+                    />
+                    <FormHelperText sx={helperTextStyle}>
+                      {formik?.errors?.note}
+                    </FormHelperText>
+                  </FormControl>
+                </Grid2>
+              </Grid2>
             </Box>
             <Box sx={{ p: 3, bgcolor: '#fff', borderRadius: '4px' }}>
               <FormControl>
@@ -415,9 +692,9 @@ const Checkout = () => {
                   Phương thức thanh toán
                 </Typography>
                 <RadioGroup
-                  name='payment_method'
+                  name='payment.method'
                   onChange={handleChange}
-                  value={formik?.values?.payment_method}>
+                  value={formik?.values?.payment?.method}>
                   {paymentMethods?.data?.map((item) => (
                     <FormControlLabel
                       sx={{ my: 1 }}
@@ -452,7 +729,7 @@ const Checkout = () => {
                   ))}
                 </RadioGroup>
                 <FormHelperText sx={helperTextStyle}>
-                  {formik?.errors?.payment_method}
+                  {formik?.errors?.payment?.method}
                 </FormHelperText>
               </FormControl>
             </Box>
@@ -547,4 +824,18 @@ const selectStyle: SxProps<Theme> = {
   '& .MuiInputLabel-asterisk': {
     color: 'red',
   },
+};
+
+const modalStyle: SxProps<Theme> = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 500,
+  height: 444,
+  p: '24px 32px',
+  bgcolor: 'background.paper',
+  borderRadius: 2,
+  boxShadow: 24,
+  outline: 'none',
 };

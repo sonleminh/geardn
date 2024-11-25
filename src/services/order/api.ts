@@ -23,16 +23,16 @@ export interface IProvince {
   districts: IDistrict[];
 }
 
-interface IDistrict {
+export interface IDistrict {
   name: string;
   code: number;
   division_type: string;
   codename: string;
   province_code: number;
-  wards: IWards[];
+  wards: IWard[];
 }
 
-interface IWards {
+export interface IWard {
   name: string;
   code: number;
   division_type: string;
@@ -73,20 +73,30 @@ export const useGetOrderById = (id: string) => {
   };
 };
 
-export const useGetProvinces = () => {
-  const { data, error, isLoading, mutate } = useSWR('https://provinces.open-api.vn/api/?depth=2',  (url) => fetcher(url, false));
+export const useGetProvinceList = () => {
+  const { data, error, isLoading, mutate } = useSWR('https://provinces.open-api.vn/api',  (url) => fetcher(url, false));
   return {
-   provinces: data as IProvince[],
+   province_list: data as IProvince[],
     isLoading,
     isError: error,
     mutate
   };
 };
 
-export const useGetDistrict = (code: string) => {
-  const { data, error, isLoading, mutate } = useSWR(`https://provinces.open-api.vn/api/d/${code}?depth=2`,  (url) => fetcher(url, false));
+export const useGetProvince = (code: number | undefined) => {
+  const { data, error, isLoading, mutate } = useSWR( code ? `https://provinces.open-api.vn/api/p/${code}?depth=2` : null,  (url) => fetcher(url, false));
   return {
-    district: data as IDistrict,
+    province: data as IProvince,
+    isLoading,
+    isError: error,
+    mutate,
+  };
+};
+
+export const useGetDistrict = (code: number | undefined) => {
+  const { data, error, isLoading, mutate } = useSWR(code ? `https://provinces.open-api.vn/api/d/${code}?depth=2` : null,  (url) => fetcher(url, false));
+  return {
+    districtData: data as IDistrict,
     isLoading,
     isError: error,
     mutate
