@@ -61,8 +61,6 @@ export async function middleware(request: NextRequest) {
     {
     user = await whoami(accessToken)
 
-    // console.log('user', user);
-
     if (!user?._id && refreshToken) {
       const response = NextResponse.next();
       const newTokenResponse = await refreshAccessToken(refreshToken);

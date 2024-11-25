@@ -126,6 +126,10 @@ const Checkout = () => {
       const payload = {
         ...values,
         items: orderFormData?.products ?? [],
+        shipment: {
+          ...values?.shipment,
+          method: +values?.payment?.method,
+        },
         totalAmount: 0,
       };
       // try {
@@ -138,15 +142,6 @@ const Checkout = () => {
     },
   });
   console.log('prv:', formik?.values?.shipment?.method);
-
-  // const { district } = useGetDistrict(
-  //   provinces
-  //     ?.find((item) => item?.name === formik?.values?.address?.city)
-  //     ?.districts?.find(
-  //       (item) => item?.name === formik?.values?.address?.district
-  //     )
-  //     ?.code.toString() ?? ''
-  // );
 
   function getTotalAmount() {
     return orderFormData?.products?.reduce(
@@ -271,7 +266,7 @@ const Checkout = () => {
                 fullWidth
                 margin='dense'
                 placeholder='Họ và tên'
-                name='name'
+                name='customer.name'
                 onChange={handleChange}
                 value={formik?.values?.customer?.name}
                 helperText={
@@ -284,7 +279,7 @@ const Checkout = () => {
                 margin='dense'
                 fullWidth
                 placeholder='Số điện thoại'
-                name='phone'
+                name='customer.phone'
                 onChange={handleChange}
                 value={formik?.values?.customer?.phone}
                 helperText={
@@ -298,7 +293,7 @@ const Checkout = () => {
                 fullWidth
                 placeholder='Email (Không bắt buộc)'
                 type='email'
-                name='mail'
+                name='customer.mail'
                 onChange={handleChange}
                 value={formik?.values?.customer?.mail}
                 helperText={
@@ -335,7 +330,7 @@ const Checkout = () => {
                 />
               </RadioGroup>
               <Grid2 mb={2} container rowSpacing={2} columnSpacing={4}>
-                {formik?.values?.shipment?.method === 1 ? (
+                {formik?.values?.shipment?.method == 1 ? (
                   <>
                     <Box
                       sx={{
@@ -509,86 +504,6 @@ const Checkout = () => {
                         </Button>
                       </Box>
                     </Modal>
-                    {/* <Grid2 size={6}>
-                      <FormControl sx={selectStyle} variant='filled' fullWidth>
-                        <InputLabel>Tỉnh/Thành phố</InputLabel>
-                        <Select
-                          disableUnderline
-                          size='small'
-                          onChange={(e) => setCity(e?.target?.value)}
-                          value={
-                            province_list?.some((item) => item.name === city)
-                              ? city
-                              : ''
-                          }>
-                          {province_list?.map((item) => (
-                            <MenuItem key={item?.code} value={item?.name}>
-                              {item?.name}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    </Grid2>
-                    <Grid2 size={6}>
-                      <FormControl variant='filled' fullWidth sx={selectStyle}>
-                        <InputLabel>Quận/Huyện</InputLabel>
-                        <Select
-                          disableUnderline
-                          size='small'
-                          onChange={(e) => setDistrict(e?.target?.value)}
-                          value={
-                            // province_list?.districts?.some(
-                            //   (item) => item.name === district
-                            // )
-                            //   ? district
-                            //   : ''
-                            district
-                          }
-                          // disabled={!city}
-                        >
-                          {province?.districts?.map((item: IDistrict) => (
-                            <MenuItem key={item?.code} value={item?.name}>
-                              {item?.name}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    </Grid2>
-                    <Grid2 size={6}>
-                      <FormControl variant='filled' fullWidth sx={selectStyle}>
-                        <InputLabel>Phường/Xã</InputLabel>
-                        <Select
-                          disableUnderline
-                          size='small'
-                          onChange={(e) => setWard(e?.target?.value)}
-                          value={
-                            // districtData?.wards?.some(
-                            //   (item) => item.name === ward
-                            // )
-                            //   ? ward
-                            //   : ''
-                            ward
-                          }
-                          disabled={!district}>
-                          {districtData?.wards?.map((item: IWard) => (
-                            <MenuItem key={item?.code} value={item?.name}>
-                              {item?.name}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    </Grid2>
-                    <Grid2 size={6}>
-                      <FormControl sx={{}} fullWidth>
-                        <TextField
-                          // size='small'
-                          fullWidth
-                          placeholder='Địa chỉ cụ thể'
-                          onChange={(e) => setDetailAddress(e?.target?.value)}
-                          value={detailAddress}
-                        />
-                      </FormControl>
-                    </Grid2> */}
                     <Grid2 size={6}>
                       <FormControl
                         fullWidth
@@ -627,9 +542,8 @@ const Checkout = () => {
                       <Select
                         disableUnderline
                         size='small'
-                        // onChange={(e) => setShopAddress(e?.target?.value)}
-                        // value={shopAddress}
-                      >
+                        onChange={(e) => setShopAddress(e?.target?.value)}
+                        value={shopAddress}>
                         <MenuItem
                           value={
                             '39/48 Cù Chính Lan, P.Hòa Khê, Q.Thanh Khê, TP.Đà Nẵng'
