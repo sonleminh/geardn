@@ -21,25 +21,40 @@ export interface IOrderItem {
 
 export interface IOrder {
     user_id: string;
-    name: string;
-    phone: string;
-    email: string;
+    customer: {
+        name: string;
+        phone: string;
+        mail?: string;
+    }
     items: IOrderItem[]
-    total_amount: number;
-    status: string;
     address: {
         street: string;
         city: string;
         state: string;
         country: string;
     };
+    shipment?: {
+        method: number;
+        delivery_date: Date;
+        address: string;
+    };
+    payment: {
+        method: string,
+    },
+    flag: {
+        is_online_order: boolean,
+    },
+    note?: string,
+    total_amount: number;
+    status: string;
 }
 
 export interface ICreateOrder {
-    
-    name: string;
-    phone?: string;
-    email?: string;
+    customer: {
+        name: string;
+        phone: string;
+        mail?: string;
+    }
     items: IOrderItem[]
     address?: {
         city: string;
@@ -47,7 +62,16 @@ export interface ICreateOrder {
         ward: string;
         specific_address: string;
     };
-    receive_option: string;
-    note?: string;
-    payment_method: string;
+    shipment?: {
+        method: number;
+        delivery_date: Date;
+        address: string;
+    };
+    payment: {
+        method: string,
+    },
+    flag: {
+        is_online_order: boolean,
+    },
+    note?: string,
 }

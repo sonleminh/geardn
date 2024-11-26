@@ -55,8 +55,11 @@ import moment from 'moment';
 import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import useConfirmModal from '@/hooks/useModalConfirm';
+import { useRouter } from 'next/router';
 
 const Checkout = () => {
+  const router = useRouter();
+
   const breadcrumbsOptions = [
     { href: '/', label: 'Home' },
     { href: ROUTES.CHECKOUT, label: 'Thanh toán' },
@@ -78,6 +81,8 @@ const Checkout = () => {
   const [detailAddress, setDetailAddress] = useState<string>('');
   const [shopAddress, setShopAddress] = useState<string>('');
   const [modalOpen, setModalOpen] = useState(false);
+  const [shipmentError, setShipmentError] = useState(false);
+
   const handleModalOpen = () => setModalOpen(true);
   const handleModalClose = () => {
     setModalOpen(false);
@@ -110,7 +115,7 @@ const Checkout = () => {
       },
       shipment: {
         method: 1,
-        delivery_date: moment(),
+        delivery_date: moment().toDate(),
       },
       payment: {
         method: '673c8947d6a67118f380f4ab',
@@ -123,25 +128,36 @@ const Checkout = () => {
     validationSchema: checkoutSchema,
     validateOnChange: false,
     async onSubmit(values) {
+      if (
+        (values?.shipment?.method === 1 && !detailAddress) ||
+        (values?.shipment?.method === 2 && !shopAddress)
+      ) {
+        return setShipmentError(true);
+      } else {
+        setShipmentError(false);
+      }
       const payload = {
         ...values,
         items: orderFormData?.products ?? [],
         shipment: {
           ...values?.shipment,
-          method: +values?.payment?.method,
+          method: +values?.shipment?.method,
+          address:
+            values?.shipment?.method === 1
+              ? `${detailAddress}, ${ward}, ${district}, ${city}`
+              : shopAddress,
         },
-        totalAmount: 0,
       };
-      // try {
-      //   await createOrder(payload);
-      //   showNotification('Đặt hàng thành công', 'success');
-      //   globalMutate(`${BASE_API_URL}/cart`, undefined, { revalidate: true });
-      // } catch (error: any) {
-      //   showNotification(error?.message, 'error');
-      // }
+      try {
+        const res = await createOrder(payload);
+        showNotification('Đặt hàng thành công', 'success');
+        globalMutate(`${BASE_API_URL}/cart`, undefined, { revalidate: true });
+      } catch (error: any) {
+        showNotification(error?.message, 'error');
+      }
     },
   });
-  console.log('prv:', formik?.values?.shipment?.method);
+  console.log('prv:', shipmentError);
 
   function getTotalAmount() {
     return orderFormData?.products?.reduce(
@@ -331,52 +347,64 @@ const Checkout = () => {
               </RadioGroup>
               <Grid2 mb={2} container rowSpacing={2} columnSpacing={4}>
                 {formik?.values?.shipment?.method == 1 ? (
-                  <>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: detailAddress ? 'start' : 'center',
-                        width: '100%',
-                        p: 1.5,
-                        minHeight: 56,
-                        border: '1px solid rgba(0, 0, 0, 0.23)',
-                        borderRadius: 1,
-                        cursor: 'pointer',
-                      }}
-                      // onClick={handleSelectAddress}
-                      onClick={handleModalOpen}>
-                      {detailAddress && !modalOpen ? (
-                        <>
-                          <Box>
-                            <Typography sx={{ color: '#6b7280', fontSize: 13 }}>
-                              Giao tới
+                  <Grid2 size={12}>
+                    <>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: detailAddress ? 'start' : 'center',
+                          width: '100%',
+                          p: 1.5,
+                          minHeight: 56,
+                          border: '1px solid rgba(0, 0, 0, 0.23)',
+                          borderRadius: 1,
+                          cursor: 'pointer',
+                        }}
+                        // onClick={handleSelectAddress}
+                        onClick={handleModalOpen}>
+                        {detailAddress && !modalOpen ? (
+                          <>
+                            <Box>
+                              <Typography
+                                sx={{ color: '#6b7280', fontSize: 13 }}>
+                                Giao tới
+                              </Typography>
+                              <Typography
+                                sx={{ fontSize: 15, fontWeight: 600 }}>
+                                {ward}, {district}, {city}
+                              </Typography>
+                              <Typography
+                                sx={{ fontSize: 14, fontWeight: 500 }}>
+                                {detailAddress}
+                              </Typography>
+                            </Box>
+                            <Typography
+                              sx={{
+                                color: '#1250dc',
+                                fontSize: 14,
+                                fontWeight: 600,
+                              }}>
+                              Thay đổi
                             </Typography>
-                            <Typography sx={{ fontSize: 15, fontWeight: 600 }}>
-                              {ward}, {district}, {city}
+                          </>
+                        ) : (
+                          <>
+                            <Typography sx={{ color: '#9ca3af' }}>
+                              Tỉnh/Thành Phố, Quận/Huyện, Phường Xã
                             </Typography>
-                            <Typography sx={{ fontSize: 14, fontWeight: 500 }}>
-                              {detailAddress}
-                            </Typography>
+                            <ChevronRightIcon />
+                          </>
+                        )}
+                      </Box>
+                      {shipmentError && (
+                        <FormHelperText sx={{ mx: '14px' }}>
+                          <Box component={'span'} sx={helperTextStyle}>
+                            Vui lòng nhập thông tin nhận hàng
                           </Box>
-                          <Typography
-                            sx={{
-                              color: '#1250dc',
-                              fontSize: 14,
-                              fontWeight: 600,
-                            }}>
-                            Thay đổi
-                          </Typography>
-                        </>
-                      ) : (
-                        <>
-                          <Typography sx={{ color: '#9ca3af' }}>
-                            Tỉnh/Thành Phố, Quận/Huyện, Phường Xã
-                          </Typography>
-                          <ChevronRightIcon />
-                        </>
+                        </FormHelperText>
                       )}
-                    </Box>
+                    </>
                     <Modal
                       open={modalOpen}
                       onClose={handleModalClose}
@@ -504,37 +532,38 @@ const Checkout = () => {
                         </Button>
                       </Box>
                     </Modal>
-                    <Grid2 size={6}>
-                      <FormControl
-                        fullWidth
-                        sx={{
-                          '.MuiOutlinedInput-notchedOutline': {
-                            borderColor: 'rgba(0,0,0,0.23) !important',
-                          },
-                        }}>
-                        <LocalizationProvider dateAdapter={AdapterMoment}>
-                          <DateTimePicker
-                            name='shipment.delivery_date'
-                            ampm={false}
-                            shouldDisableTime={(timeValue, clockType) => {
-                              if (clockType === 'hours') {
-                                const hour = timeValue.hour();
-                                return hour < 8 || hour > 23;
-                              }
-                              return false;
-                            }}
-                            minDate={moment()}
-                            onChange={(e) =>
-                              formik.setFieldValue('shipment.delivery_date', e)
+                    <FormControl
+                      sx={{
+                        '.MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'rgba(0,0,0,0.23) !important',
+                        },
+                      }}
+                      margin='dense'>
+                      <Typography sx={{ mb: 1 }}>
+                        Thời gian nhận hàng:
+                      </Typography>
+                      <LocalizationProvider dateAdapter={AdapterMoment}>
+                        <DateTimePicker
+                          name='shipment.delivery_date'
+                          ampm={false}
+                          shouldDisableTime={(timeValue, clockType) => {
+                            if (clockType === 'hours') {
+                              const hour = timeValue.hour();
+                              return hour < 8 || hour > 23;
                             }
-                            value={moment(
-                              formik?.values?.shipment?.delivery_date
-                            )}
-                          />
-                        </LocalizationProvider>
-                      </FormControl>
-                    </Grid2>
-                  </>
+                            return false;
+                          }}
+                          minDate={moment()}
+                          onChange={(e) =>
+                            formik.setFieldValue('shipment.delivery_date', e)
+                          }
+                          value={moment(
+                            formik?.values?.shipment?.delivery_date
+                          )}
+                        />
+                      </LocalizationProvider>
+                    </FormControl>
+                  </Grid2>
                 ) : (
                   <Grid2 size={12}>
                     <FormControl variant='filled' fullWidth sx={selectStyle}>
@@ -558,8 +587,14 @@ const Checkout = () => {
                         </MenuItem>
                       </Select>
                     </FormControl>
+                    {shipmentError && (
+                      <Typography sx={{ fontSize: 13, color: 'red' }}>
+                        Vui lòng nhập thông tin nhận hàng
+                      </Typography>
+                    )}
                   </Grid2>
                 )}
+
                 <Grid2 size={12}>
                   <FormControl
                     variant='filled'
