@@ -1,14 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
-import AppLink from '../../AppLink';
-import SkeletonImage from '../../SkeletonImage';
-
-import { useAuthStore } from '@/providers/auth-store-provider';
-import { logoutAPI } from '@/services/auth/api';
-
+import Cookies from 'js-cookie';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SearchIcon from '@mui/icons-material/Search';
@@ -23,17 +19,28 @@ import {
   Typography,
 } from '@mui/material';
 
+import { useAuthStore } from '@/providers/auth-store-provider';
+import { useGetCart } from '@/services/cart/api';
+import { logoutAPI } from '@/services/auth/api';
+import { ROUTES } from '@/constants/route';
+
+import SkeletonImage from '../../SkeletonImage';
 import LOGO from '@/assets/geardn-logo.png';
 import { HeaderStyle } from './style';
-import { useGetCart } from '@/services/cart/api';
-import { ROUTES } from '@/constants/route';
-import Link from 'next/link';
 
 const Header = ({ showHeader }: { showHeader: boolean }) => {
   const router = useRouter();
   const { cart, isLoading } = useGetCart();
   const { user, logout } = useAuthStore((state) => state);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  useEffect(() => {
+    const at = Cookies.get('at');
+    if (user?._id && !at) {
+      logout();
+      router.push(ROUTES.LOGIN);
+    }
+  }, [user, logout, router]);
 
   const open = Boolean(anchorEl);
 

@@ -18,13 +18,14 @@ import {
   Typography,
 } from '@mui/material';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import AppLink from '../../AppLink';
 import SkeletonImage from '../../SkeletonImage';
 import LayoutContainer from '../layout-container';
 import { FullWidthHeaderStyle } from './style';
 import { ROUTES } from '@/constants/route';
 import Link from 'next/link';
+import Cookies from 'js-cookie';
 
 const FullWidthHeader = ({
   showFullWidthHeader,
@@ -36,6 +37,14 @@ const FullWidthHeader = ({
   const pathname = usePathname();
   const { user, logout } = useAuthStore((state) => state);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  useEffect(() => {
+    const at = Cookies.get('at');
+    if (user?._id && !at) {
+      logout();
+      router.push(ROUTES.LOGIN);
+    }
+  }, [user, logout, router]);
 
   const open = Boolean(anchorEl);
 

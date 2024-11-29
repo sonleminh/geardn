@@ -207,9 +207,11 @@ const CheckoutSuccess = () => {
                 Thông tin đặt hàng:
               </Typography>
               <Box sx={{ p: 1, border: '1px solid #d1d5db', borderRadius: 2 }}>
-                <Typography>{order?.name}</Typography>
-                <Typography>{order?.phone}</Typography>
-                {order?.email && <Typography>{order?.email}</Typography>}
+                <Typography>{order?.customer?.name}</Typography>
+                <Typography>{order?.customer?.phone}</Typography>
+                {order?.customer?.mail && (
+                  <Typography>{order?.customer?.mail}</Typography>
+                )}
               </Box>
             </Box>
             <Box sx={{ p: 2, mb: 2, bgcolor: '#fff', borderRadius: '4px' }}>
@@ -217,9 +219,31 @@ const CheckoutSuccess = () => {
                 Hình thức nhận hàng:
               </Typography>
               <Box sx={{ p: 1, border: '1px solid #d1d5db', borderRadius: 2 }}>
-                <Typography>{order?.name}</Typography>
-                <Typography>{order?.phone}</Typography>
-                {order?.email && <Typography>{order?.email}</Typography>}
+                <Typography
+                  sx={{
+                    mb: 0.5,
+                    color: '#6b7280',
+                    fontSize: 13,
+                    fontWeight: 600,
+                  }}>
+                  {order?.shipment?.method === 1
+                    ? 'Giao tới:'
+                    : 'Nhận hàng tại:'}
+                </Typography>
+                <Typography sx={{ fontWeight: 500 }}>
+                  {order?.shipment?.address}
+                </Typography>
+              </Box>
+              <Box sx={{ p: 1, border: '1px solid #d1d5db', borderRadius: 2 }}>
+                <Typography
+                  sx={{ color: '#6b7280', fontSize: 13, fontWeight: 600 }}>
+                  {order?.shipment?.method === 1
+                    ? 'Giao tới:'
+                    : 'Nhận hàng tại:'}
+                </Typography>
+                <Typography sx={{ fontWeight: 500 }}>
+                  {order?.shipment?.address}
+                </Typography>
               </Box>
             </Box>
           </Grid2>
@@ -249,7 +273,7 @@ const CheckoutSuccess = () => {
                 className='total-price-cost'>
                 <Typography sx={{ fontSize: 13 }}>Tổng tiền:</Typography>
                 <Typography sx={{ fontSize: 16, fontWeight: 700 }}>
-                  {order?.total_amount ?? 0}
+                  {formatPrice(order?.total_amount) ?? 0}
                 </Typography>
               </Box>
               <Divider sx={{ mt: 2, mb: 1 }} />

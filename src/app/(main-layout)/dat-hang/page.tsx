@@ -55,16 +55,15 @@ import moment from 'moment';
 import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import useConfirmModal from '@/hooks/useModalConfirm';
-import { useRouter } from 'next/router';
 
 const Checkout = () => {
-  const router = useRouter();
-
   const breadcrumbsOptions = [
     { href: '/', label: 'Home' },
     { href: ROUTES.CHECKOUT, label: 'Thanh toán' },
   ];
   const { confirmModal, showConfirmModal } = useConfirmModal();
+
+  const { user } = useAuthStore((state) => state);
 
   const { province_list } = useGetProvinceList();
   const { paymentMethods } = useGetPaymentMethods();
@@ -102,8 +101,6 @@ const Checkout = () => {
     province?.districts?.find?.((item) => item?.name === district)?.code
   );
 
-  const inputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
-
   const { orderFormData, changeCustomer } = useAuthStore((state) => state);
 
   const formik = useFormik({
@@ -115,7 +112,7 @@ const Checkout = () => {
       },
       shipment: {
         method: 1,
-        delivery_date: moment().toDate(),
+        delivery_date: moment().toISOString(),
       },
       payment: {
         method: '673c8947d6a67118f380f4ab',
@@ -125,12 +122,12 @@ const Checkout = () => {
       },
       note: '',
     },
-    validationSchema: checkoutSchema,
+    // validationSchema: checkoutSchema,
     validateOnChange: false,
     async onSubmit(values) {
       if (
-        (values?.shipment?.method === 1 && !detailAddress) ||
-        (values?.shipment?.method === 2 && !shopAddress)
+        (values?.shipment?.method == 1 && !detailAddress) ||
+        (values?.shipment?.method == 2 && !shopAddress)
       ) {
         return setShipmentError(true);
       } else {
@@ -147,17 +144,20 @@ const Checkout = () => {
               ? `${detailAddress}, ${ward}, ${district}, ${city}`
               : shopAddress,
         },
+        user: user?._id ?? '',
       };
-      try {
-        const res = await createOrder(payload);
-        showNotification('Đặt hàng thành công', 'success');
-        globalMutate(`${BASE_API_URL}/cart`, undefined, { revalidate: true });
-      } catch (error: any) {
-        showNotification(error?.message, 'error');
-      }
+      console.log('pl:', payload);
+      // try {
+      //   const res = await createOrder(payload);
+      //   showNotification('Đặt hàng thành công', 'success');
+      //   globalMutate(`${BASE_API_URL}/cart`, undefined, { revalidate: true });
+      // } catch (error: any) {
+      //   showNotification(error?.message, 'error');
+      // }
     },
   });
-  console.log('prv:', shipmentError);
+
+  // console.log('dv:', formik?.values?.shipment?.delivery_date);
 
   function getTotalAmount() {
     return orderFormData?.products?.reduce(
@@ -554,9 +554,13 @@ const Checkout = () => {
                             return false;
                           }}
                           minDate={moment()}
-                          onChange={(e) =>
-                            formik.setFieldValue('shipment.delivery_date', e)
-                          }
+                          onChange={(e) => {
+                            const isoDate = e?.toISOString();
+                            formik.setFieldValue(
+                              'shipment.delivery_date',
+                              isoDate
+                            );
+                          }}
                           value={moment(
                             formik?.values?.shipment?.delivery_date
                           )}
@@ -588,10 +592,44 @@ const Checkout = () => {
                       </Select>
                     </FormControl>
                     {shipmentError && (
-                      <Typography sx={{ fontSize: 13, color: 'red' }}>
-                        Vui lòng nhập thông tin nhận hàng
-                      </Typography>
+                      <FormHelperText sx={{ mx: '14px' }}>
+                        <Box component={'span'} sx={helperTextStyle}>
+                          Vui lòng nhập thông tin nhận hàng
+                        </Box>
+                      </FormHelperText>
                     )}
+                    <FormControl
+                      sx={{
+                        '.MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'rgba(0,0,0,0.23) !important',
+                        },
+                      }}
+                      margin='dense'>
+                      <Typography sx={{ mb: 1 }}>
+                        Thời gian nhận hàng:
+                      </Typography>
+                      <LocalizationProvider dateAdapter={AdapterMoment}>
+                        <DateTimePicker
+                          name='shipment.delivery_date'
+                          ampm={false}
+                          shouldDisableTime={(timeValue, clockType) => {
+                            if (clockType === 'hours') {
+                              const hour = timeValue.hour();
+                              return hour < 8 || hour > 23;
+                            }
+                            return false;
+                          }}
+                          minDate={moment()}
+                          onChange={(e) => {
+                            console.log('e:', e);
+                            formik.setFieldValue('shipment.delivery_date', e);
+                          }}
+                          value={moment(
+                            formik?.values?.shipment?.delivery_date
+                          )}
+                        />
+                      </LocalizationProvider>
+                    </FormControl>
                   </Grid2>
                 )}
 

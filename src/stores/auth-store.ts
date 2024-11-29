@@ -55,11 +55,6 @@ const sessionStorageAdapter: PersistStorage<AuthStore> = {
 export const authStore = (
   initState: AuthState = defaultInitState,
 ) => {
-  // return createStore<AuthStore>()((devtools(persist((set) => ({
-  //   ...initState,
-  //   login: (user) => set(({ user }), false, "login"),
-  //   logout: () => set(() => ({ user: null })),
-  // }), {name: 'store'}))))
   return createStore<AuthStore>()((devtools(persist((set) => ({
     ...initState,
     login: (user) => set({ user }, false, "login"),

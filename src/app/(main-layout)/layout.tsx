@@ -16,7 +16,7 @@ import 'swiper/css';
 import { NotificationContextProvider } from '@/contexts/NotificationContext';
 
 const inter = Inter({
-  weight: ['400', '600', '700', '800', '900'],
+  weight: ['400', '500', '600', '700', '800', '900'],
   subsets: ['latin'],
 });
 
