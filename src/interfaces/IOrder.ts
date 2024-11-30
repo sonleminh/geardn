@@ -39,7 +39,10 @@ export interface IOrder {
         address: string;
     };
     payment: {
-        method: string,
+        _id: string,
+        key: string,
+        name: string,
+        image: string,
     },
     flag: {
         is_online_order: boolean,
@@ -67,9 +70,7 @@ export interface ICreateOrder {
         delivery_date: Date;
         address: string;
     };
-    payment: {
-        method: string,
-    },
+    payment: string,
     flag: {
         is_online_order: boolean,
     },

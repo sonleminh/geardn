@@ -48,6 +48,8 @@ import { BASE_API_URL } from '@/constants/env';
 import BANNER_BG from '@/assets/geardn.jpg';
 import ORDER_SUCCESS from '@/assets/order-success.png';
 import { useParams } from 'next/navigation';
+import moment from 'moment';
+import 'moment/locale/vi';
 
 const CheckoutSuccess = () => {
   const params = useParams();
@@ -206,9 +208,21 @@ const CheckoutSuccess = () => {
               <Typography sx={{ mb: 1, fontWeight: 600 }}>
                 Thông tin đặt hàng:
               </Typography>
-              <Box sx={{ p: 1, border: '1px solid #d1d5db', borderRadius: 2 }}>
-                <Typography>{order?.customer?.name}</Typography>
-                <Typography>{order?.customer?.phone}</Typography>
+              <Box
+                sx={{
+                  p: 1,
+                  border: '1px solid #d1d5db',
+                  borderRadius: 2,
+                  '& p': {
+                    fontSize: 15,
+                  },
+                }}>
+                <Typography sx={{ mb: 0.5, fontWeight: 600 }}>
+                  {order?.customer?.name}
+                </Typography>
+                <Typography sx={{ mb: 0.5 }}>
+                  {order?.customer?.phone}
+                </Typography>
                 {order?.customer?.mail && (
                   <Typography>{order?.customer?.mail}</Typography>
                 )}
@@ -218,7 +232,13 @@ const CheckoutSuccess = () => {
               <Typography sx={{ mb: 1, fontWeight: 600 }}>
                 Hình thức nhận hàng:
               </Typography>
-              <Box sx={{ p: 1, border: '1px solid #d1d5db', borderRadius: 2 }}>
+              <Box
+                sx={{
+                  p: 1,
+                  mb: 1,
+                  border: '1px solid #d1d5db',
+                  borderRadius: 2,
+                }}>
                 <Typography
                   sx={{
                     mb: 0.5,
@@ -236,13 +256,36 @@ const CheckoutSuccess = () => {
               </Box>
               <Box sx={{ p: 1, border: '1px solid #d1d5db', borderRadius: 2 }}>
                 <Typography
-                  sx={{ color: '#6b7280', fontSize: 13, fontWeight: 600 }}>
+                  sx={{
+                    mb: 0.5,
+                    color: '#6b7280',
+                    fontSize: 13,
+                    fontWeight: 600,
+                  }}>
                   {order?.shipment?.method === 1
-                    ? 'Giao tới:'
-                    : 'Nhận hàng tại:'}
+                    ? 'Thời gian giao:'
+                    : 'Thời gian nhận hàng:'}
                 </Typography>
                 <Typography sx={{ fontWeight: 500 }}>
-                  {order?.shipment?.address}
+                  {moment(order?.shipment?.delivery_date).format('LLL')}
+                </Typography>
+              </Box>
+            </Box>
+            <Box sx={{ p: 2, mb: 1, bgcolor: '#fff', borderRadius: '4px' }}>
+              <Typography sx={{ mb: 1, fontWeight: 600 }}>
+                Phương thức thanh toán:
+              </Typography>
+              <Box
+                sx={{
+                  p: 1,
+                  border: '1px solid #d1d5db',
+                  borderRadius: 2,
+                  '& p': {
+                    fontSize: 15,
+                  },
+                }}>
+                <Typography sx={{ mb: 0.5, fontWeight: 600 }}>
+                  {order?.customer?.name}
                 </Typography>
               </Box>
             </Box>

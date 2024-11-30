@@ -112,11 +112,9 @@ const Checkout = () => {
       },
       shipment: {
         method: 1,
-        delivery_date: moment().toISOString(),
+        delivery_date: moment().toDate(),
       },
-      payment: {
-        method: '673c8947d6a67118f380f4ab',
-      },
+      payment: '673c8947d6a67118f380f4ab',
       flag: {
         is_online_order: true,
       },
@@ -147,13 +145,13 @@ const Checkout = () => {
         user: user?._id ?? '',
       };
       console.log('pl:', payload);
-      // try {
-      //   const res = await createOrder(payload);
-      //   showNotification('Đặt hàng thành công', 'success');
-      //   globalMutate(`${BASE_API_URL}/cart`, undefined, { revalidate: true });
-      // } catch (error: any) {
-      //   showNotification(error?.message, 'error');
-      // }
+      try {
+        const res = await createOrder(payload);
+        showNotification('Đặt hàng thành công', 'success');
+        globalMutate(`${BASE_API_URL}/cart`, undefined, { revalidate: true });
+      } catch (error: any) {
+        showNotification(error?.message, 'error');
+      }
     },
   });
 
@@ -621,8 +619,11 @@ const Checkout = () => {
                           }}
                           minDate={moment()}
                           onChange={(e) => {
-                            console.log('e:', e);
-                            formik.setFieldValue('shipment.delivery_date', e);
+                            const isoDate = e?.toISOString();
+                            formik.setFieldValue(
+                              'shipment.delivery_date',
+                              isoDate
+                            );
                           }}
                           value={moment(
                             formik?.values?.shipment?.delivery_date
@@ -681,7 +682,7 @@ const Checkout = () => {
                 <RadioGroup
                   name='payment.method'
                   onChange={handleChange}
-                  value={formik?.values?.payment?.method}>
+                  value={formik?.values?.payment}>
                   {paymentMethods?.data?.map((item) => (
                     <FormControlLabel
                       sx={{ my: 1 }}
@@ -716,7 +717,7 @@ const Checkout = () => {
                   ))}
                 </RadioGroup>
                 <FormHelperText sx={helperTextStyle}>
-                  {formik?.errors?.payment?.method}
+                  {formik?.errors?.payment}
                 </FormHelperText>
               </FormControl>
             </Box>
