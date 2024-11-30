@@ -20,6 +20,7 @@ export interface IOrderItem {
 }
 
 export interface IOrder {
+    _id: string;
     user_id: string;
     customer: {
         name: string;

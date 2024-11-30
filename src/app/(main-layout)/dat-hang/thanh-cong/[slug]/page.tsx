@@ -277,15 +277,28 @@ const CheckoutSuccess = () => {
               </Typography>
               <Box
                 sx={{
-                  p: 1,
-                  border: '1px solid #d1d5db',
+                  display: 'flex',
+                  alignItems: 'center',
+                  p: '16px 16px',
                   borderRadius: 2,
-                  '& p': {
-                    fontSize: 15,
-                  },
+                  bgcolor: '#F3F4F6',
                 }}>
-                <Typography sx={{ mb: 0.5, fontWeight: 600 }}>
-                  {order?.customer?.name}
+                <Box
+                  sx={{
+                    position: 'relative',
+                    width: '40px',
+                    height: { xs: '40px' },
+                    mr: 1.5,
+                    overflow: 'hidden',
+                  }}>
+                  <SkeletonImage
+                    src={order?.payment?.image}
+                    alt='COD - GearDN'
+                    fill
+                  />
+                </Box>
+                <Typography sx={{ fontSize: 13, fontWeight: 500 }}>
+                  {order?.payment?.key} - {order?.payment?.name}
                 </Typography>
               </Box>
             </Box>
@@ -307,6 +320,16 @@ const CheckoutSuccess = () => {
               Thông tin đơn hàng
             </Typography>
             <Box className='total'>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  mb: 1,
+                }}>
+                <Typography sx={{ fontSize: 13 }}>Mã đơn hàng:</Typography>
+                <Typography sx={{ fontSize: 14 }}>{order?._id}</Typography>
+              </Box>
               <Box
                 sx={{
                   display: 'flex',
