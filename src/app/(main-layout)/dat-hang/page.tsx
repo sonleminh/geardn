@@ -55,12 +55,20 @@ import moment from 'moment';
 import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import useConfirmModal from '@/hooks/useModalConfirm';
+import { useRouter } from 'next/navigation';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
+import { postRequest } from '@/utils/fetch-client';
 
 const Checkout = () => {
   const breadcrumbsOptions = [
     { href: '/', label: 'Home' },
     { href: ROUTES.CHECKOUT, label: 'Thanh toán' },
   ];
+  const router = useRouter();
   const { confirmModal, showConfirmModal } = useConfirmModal();
 
   const { user } = useAuthStore((state) => state);
@@ -120,7 +128,7 @@ const Checkout = () => {
       },
       note: '',
     },
-    // validationSchema: checkoutSchema,
+    validationSchema: checkoutSchema,
     validateOnChange: false,
     async onSubmit(values) {
       if (
@@ -144,11 +152,11 @@ const Checkout = () => {
         },
         user: user?._id ?? '',
       };
-      console.log('pl:', payload);
       try {
         const res = await createOrder(payload);
         showNotification('Đặt hàng thành công', 'success');
         globalMutate(`${BASE_API_URL}/cart`, undefined, { revalidate: true });
+        router.push(`/dat-hang/thanh-cong/${res._id}`);
       } catch (error: any) {
         showNotification(error?.message, 'error');
       }
@@ -512,7 +520,6 @@ const Checkout = () => {
                               borderRadius: '4px',
                               fontSize: 16,
                             }}
-                            name='note'
                             rows={4}
                             placeholder='Địa chỉ cụ thể'
                             onChange={(e) => setDetailAddress(e?.target?.value)}
@@ -523,7 +530,10 @@ const Checkout = () => {
                           sx={{ width: '100%' }}
                           variant='contained'
                           disabled={
-                            !city || !district || !ward || !detailAddress
+                            !city ||
+                            !district ||
+                            !ward ||
+                            !Boolean(detailAddress?.length > 3)
                           }
                           onClick={handleConfirmAddress}>
                           Xác nhận
@@ -535,35 +545,39 @@ const Checkout = () => {
                         '.MuiOutlinedInput-notchedOutline': {
                           borderColor: 'rgba(0,0,0,0.23) !important',
                         },
+                        '.date-picker': {
+                          width: '300px',
+                          height: 50,
+                          pl: 5,
+                          fontSize: 15,
+                        },
+                        '.react-datepicker__calendar-icon': {
+                          position: 'absolute',
+                          top: '50%',
+                          transform: 'translateY(-50%)',
+                        },
                       }}
+                      fullWidth
                       margin='dense'>
                       <Typography sx={{ mb: 1 }}>
                         Thời gian nhận hàng:
                       </Typography>
-                      <LocalizationProvider dateAdapter={AdapterMoment}>
-                        <DateTimePicker
-                          name='shipment.delivery_date'
-                          ampm={false}
-                          shouldDisableTime={(timeValue, clockType) => {
-                            if (clockType === 'hours') {
-                              const hour = timeValue.hour();
-                              return hour < 8 || hour > 23;
-                            }
-                            return false;
-                          }}
-                          minDate={moment()}
-                          onChange={(e) => {
-                            const isoDate = e?.toISOString();
-                            formik.setFieldValue(
-                              'shipment.delivery_date',
-                              isoDate
-                            );
-                          }}
-                          value={moment(
-                            formik?.values?.shipment?.delivery_date
-                          )}
-                        />
-                      </LocalizationProvider>
+                      <DatePicker
+                        showTimeSelect
+                        showIcon
+                        icon={<CalendarTodayOutlinedIcon />}
+                        selected={formik?.values?.shipment?.delivery_date}
+                        onChange={(e) =>
+                          formik.setFieldValue('shipment.delivery_date', e)
+                        }
+                        minTime={new Date(new Date().setHours(7, 0, 0, 0))}
+                        maxTime={new Date(new Date().setHours(23, 30, 0, 0))}
+                        minDate={new Date()}
+                        dateFormat='dd/MM/yyyy HH:mm'
+                        // timeFormat='HH:mm'
+                        timeFormat='HH:mm'
+                        className='date-picker'
+                      />
                     </FormControl>
                   </Grid2>
                 ) : (
@@ -601,35 +615,38 @@ const Checkout = () => {
                         '.MuiOutlinedInput-notchedOutline': {
                           borderColor: 'rgba(0,0,0,0.23) !important',
                         },
+                        '.date-picker': {
+                          width: '300px',
+                          height: 50,
+                          pl: 5,
+                          fontSize: 15,
+                        },
+                        '.react-datepicker__calendar-icon': {
+                          position: 'absolute',
+                          top: '50%',
+                          transform: 'translateY(-50%)',
+                        },
                       }}
                       margin='dense'>
                       <Typography sx={{ mb: 1 }}>
                         Thời gian nhận hàng:
                       </Typography>
-                      <LocalizationProvider dateAdapter={AdapterMoment}>
-                        <DateTimePicker
-                          name='shipment.delivery_date'
-                          ampm={false}
-                          shouldDisableTime={(timeValue, clockType) => {
-                            if (clockType === 'hours') {
-                              const hour = timeValue.hour();
-                              return hour < 8 || hour > 23;
-                            }
-                            return false;
-                          }}
-                          minDate={moment()}
-                          onChange={(e) => {
-                            const isoDate = e?.toISOString();
-                            formik.setFieldValue(
-                              'shipment.delivery_date',
-                              isoDate
-                            );
-                          }}
-                          value={moment(
-                            formik?.values?.shipment?.delivery_date
-                          )}
-                        />
-                      </LocalizationProvider>
+                      <DatePicker
+                        showTimeSelect
+                        showIcon
+                        icon={<CalendarTodayOutlinedIcon />}
+                        selected={formik?.values?.shipment?.delivery_date}
+                        onChange={(e) =>
+                          formik.setFieldValue('shipment.delivery_date', e)
+                        }
+                        minTime={new Date(new Date().setHours(7, 0, 0, 0))}
+                        maxTime={new Date(new Date().setHours(23, 30, 0, 0))}
+                        minDate={new Date()}
+                        dateFormat='dd/MM/yyyy HH:mm'
+                        // timeFormat='HH:mm'
+                        timeFormat='HH:mm'
+                        className='date-picker'
+                      />
                     </FormControl>
                   </Grid2>
                 )}

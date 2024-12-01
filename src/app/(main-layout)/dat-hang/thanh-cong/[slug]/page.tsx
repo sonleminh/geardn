@@ -19,7 +19,6 @@ import {
   createOrder,
   useGetDistrict,
   useGetOrderById,
-  useGetProvinces,
 } from '@/services/order/api';
 import ChevronLeftOutlinedIcon from '@mui/icons-material/ChevronLeftOutlined';
 import {
@@ -254,7 +253,13 @@ const CheckoutSuccess = () => {
                   {order?.shipment?.address}
                 </Typography>
               </Box>
-              <Box sx={{ p: 1, border: '1px solid #d1d5db', borderRadius: 2 }}>
+              <Box
+                sx={{
+                  p: 1,
+                  mb: 1,
+                  border: '1px solid #d1d5db',
+                  borderRadius: 2,
+                }}>
                 <Typography
                   sx={{
                     mb: 0.5,
@@ -269,6 +274,24 @@ const CheckoutSuccess = () => {
                 <Typography sx={{ fontWeight: 500 }}>
                   {moment(order?.shipment?.delivery_date).format('LLL')}
                 </Typography>
+              </Box>
+              <Box
+                sx={{
+                  p: 1,
+
+                  border: '1px solid #d1d5db',
+                  borderRadius: 2,
+                }}>
+                <Typography
+                  sx={{
+                    mb: 0.5,
+                    color: '#6b7280',
+                    fontSize: 13,
+                    fontWeight: 600,
+                  }}>
+                  Ghi chú:
+                </Typography>
+                <Typography sx={{ fontWeight: 500 }}>{order?.note}</Typography>
               </Box>
             </Box>
             <Box sx={{ p: 2, mb: 1, bgcolor: '#fff', borderRadius: '4px' }}>

@@ -45,9 +45,9 @@ type TPaymentsRes = {
   data: IPayment[];
 };
 
-export const createOrder = (payload: ICreateOrder) => {
+export const createOrder = async (payload: ICreateOrder) => {
   try {
-    const res: IOrder = postRequest(`${BASE_API_URL}/order`, payload);
+    const res: IOrder = await postRequest(`/order`, payload);
     return res;
   } catch (error) {
     throw error

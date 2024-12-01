@@ -13,7 +13,7 @@ const publicRoute = ['/dang-nhap'];
 
 async function whoami(accessToken: RequestCookie | undefined): Promise<IWhoIAmResponse | null> {
     try {
-      return await getRequest(`${BASE_API_URL}/auth/whoami`, {
+      return await getRequest(`/auth/whoami`, {
         headers: {
           'Content-Type': 'application/json',
           Cookie: `at=${accessToken?.value}`,
@@ -29,7 +29,7 @@ async function whoami(accessToken: RequestCookie | undefined): Promise<IWhoIAmRe
 async function refreshAccessToken(refreshToken: RequestCookie | undefined): Promise<IRefreshTokenResponse | null> {
   if (!refreshToken) return null;
   try {
-      return await getRequest(`${BASE_API_URL}/auth/refresh-token`, {
+      return await getRequest(`/auth/refresh-token`, {
       headers: {
           'Content-Type': 'application/json',
           Cookie: `rt=${refreshToken?.value}`

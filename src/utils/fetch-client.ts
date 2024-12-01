@@ -1,4 +1,4 @@
-const baseURL = process.env.NEXT_PUBLIC_HOST;
+const baseURL = process.env.NEXT_PUBLIC_API;
 
 async function fetchRequest<T>(
   url: string,
@@ -8,7 +8,8 @@ async function fetchRequest<T>(
   errCallback?: () => void
 ): Promise<T> {
   try {
-    const response = await fetch(`${url}`, {
+    // const response = await fetch(`${url}`, {
+    const response = await fetch(`${baseURL}${url}`, {
       next: { revalidate: 3600 },
       method,
       headers: {

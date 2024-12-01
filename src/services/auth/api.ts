@@ -7,7 +7,7 @@ import { getRequest, postRequest } from '@/utils/fetch-client';
 
 export async function loginAPI(payload: {email: string, password: string}) {
   try {
-    const res: ILogInResponse = await postRequest(`${BASE_API_URL}/auth/login`, payload);
+    const res: ILogInResponse = await postRequest(`/auth/login`, payload);
     return res;
   } catch (error) {
     throw error
@@ -16,7 +16,7 @@ export async function loginAPI(payload: {email: string, password: string}) {
 
 export async function signUpAPI(payload: {name: string ,email: string, password: string}) {
   try {
-    const res: ISignUpResponse = await postRequest(`${BASE_API_URL}/auth/signup`, payload);
+    const res: ISignUpResponse = await postRequest(`/auth/signup`, payload);
     return res;
   } catch (error) {
     throw error
@@ -25,7 +25,7 @@ export async function signUpAPI(payload: {name: string ,email: string, password:
 
 export async function logoutAPI() {
   try {
-    const res: ILogoutResponse = await postRequest(`${BASE_API_URL}/auth/logout`, {});
+    const res: ILogoutResponse = await postRequest(`/auth/logout`, {});
     return res;
   } catch (error) {
     throw error
