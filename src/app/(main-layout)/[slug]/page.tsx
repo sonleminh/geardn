@@ -36,7 +36,7 @@ import { ROUTES } from '@/constants/route';
 const ProductDetail = () => {
   const params = useParams();
   const router = useRouter();
-  const { cart } = useGetCart();
+  const { cart, mutate, isLoading } = useGetCart();
 
   const { mutate: globalMutate } = useSWRConfig();
   const { showNotification } = useNotificationContext();
@@ -71,7 +71,7 @@ const ProductDetail = () => {
     } else {
       setMatchedModel(product?.models?.[0]);
     }
-  }, [selectedModel, product]);
+  }, [cart, selectedModel, product]);
 
   useEffect(() => {
     if (
@@ -82,6 +82,8 @@ const ProductDetail = () => {
       setIsOutOfStock(true);
     }
   }, [selectedModel, product]);
+
+  console.log('cart:', cart);
 
   useEffect(() => {
     const variant = product?.tier_variations?.find(
@@ -147,12 +149,14 @@ const ProductDetail = () => {
     }
     try {
       await addCartAPI({
+        user_id: user?._id ? user?._id : null,
         model:
           product?.tier_variations?.length === 0
             ? product?.models[0]?._id ?? ''
             : matchedModel?._id ?? '',
         quantity: count ?? 1,
       });
+      mutate('/cart');
       globalMutate(`/cart`, undefined, { revalidate: true });
       showNotification('Sản phẩm đã dược thêm vào giỏ hàng!', 'success');
       setAddQuantityError(false);
@@ -432,7 +436,8 @@ const ProductDetail = () => {
                     disabled={
                       (product?.tier_variations?.length === 0 &&
                         product?.models?.[0]?.stock === 0) ||
-                      matchedModel?.stock === 0
+                      matchedModel?.stock === 0 ||
+                      isLoading === true
                     }
                     onClick={handleAddCart}>
                     <ShoppingCartOutlinedIcon />

@@ -13,6 +13,7 @@ export interface ICart {
 }
 
 export interface ICartPayload {
+    user_id: string | null;
     model: string;
     quantity: number;
 }
