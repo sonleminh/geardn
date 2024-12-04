@@ -87,8 +87,10 @@ const ProductDetail = () => {
     const variant = product?.tier_variations?.find(
       (variant) => variant?.images
     );
-    if (variant?.images && selectedModel !== undefined) {
+    if (variant?.images?.length && selectedModel !== undefined) {
       setOptionImage(variant?.images[selectedModel[0] as number]);
+    } else {
+      setOptionImage(product?.images?.[0]);
     }
   }, [selectedModel, product]);
 
@@ -127,9 +129,9 @@ const ProductDetail = () => {
   };
 
   const handleAddCart = async () => {
-    if (!user) {
-      router.push('/tai-khoan');
-    }
+    // if (!user) {
+    //   router.push('/tai-khoan');
+    // }
     if (matchedModel === null) {
       return setAddCartError(true);
     }
@@ -151,7 +153,7 @@ const ProductDetail = () => {
             : matchedModel?._id ?? '',
         quantity: count ?? 1,
       });
-      globalMutate(`${BASE_API_URL}/cart`, undefined, { revalidate: true });
+      globalMutate(`/cart`, undefined, { revalidate: true });
       showNotification('Sản phẩm đã dược thêm vào giỏ hàng!', 'success');
       setAddQuantityError(false);
     } catch (error: any) {

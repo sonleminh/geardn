@@ -10,7 +10,7 @@ import { IError } from '@/interfaces/IError';
 
 export const addCartAPI = (payload: ICartPayload) => {
   try {
-    const res = postRequest(`${BASE_API_URL}/cart/add`, payload);
+    const res = postRequest(`/cart/add`, payload);
     return res;
   } catch (error) {
     throw error as IError
@@ -19,7 +19,7 @@ export const addCartAPI = (payload: ICartPayload) => {
 
 export const subtractCartAPI = (payload: ICartPayload) => {
   try {
-    const res = postRequest(`${BASE_API_URL}/cart/subtract`, payload);
+    const res = postRequest(`/cart/subtract`, payload);
     return res;
   } catch (error) {
     throw error
@@ -28,7 +28,7 @@ export const subtractCartAPI = (payload: ICartPayload) => {
 
 export const updateCartQuantityAPI = (payload: ICartPayload) => {
   try {
-    const res = patchRequest(`${BASE_API_URL}/cart`, payload);
+    const res = patchRequest(`/cart`, payload);
     return res;
   } catch (error) {
     throw error
@@ -47,7 +47,7 @@ export const useGetCart = () => {
 
 export const deleteCartItem = (item_id:string) => {
   try {
-    const res = deleteRequest(`${BASE_API_URL}/cart/${item_id}`);
+    const res = deleteRequest(`/cart/${item_id}`);
     return res;
   } catch (error) {
     throw error
