@@ -109,9 +109,10 @@ const FullWidthHeader = ({
               <Button
                 sx={{ position: 'relative', minWidth: 40, height: 40, ml: 2 }}
                 onClick={() => {
-                  user !== null
-                    ? router.push(ROUTES.CART)
-                    : router.push('/tai-khoan');
+                  router.push(ROUTES.CART);
+                  // user !== null
+                  //   ? router.push(ROUTES.CART)
+                  //   : router.push('/tai-khoan');
                 }}>
                 <ShoppingCartOutlinedIcon />
                 <Typography

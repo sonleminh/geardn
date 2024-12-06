@@ -37,10 +37,10 @@ const ProductDetail = () => {
   const params = useParams();
   const router = useRouter();
   const { cart, mutate, isLoading } = useGetCart();
+  const { user, addProducts } = useAuthStore((state) => state);
 
   const { mutate: globalMutate } = useSWRConfig();
   const { showNotification } = useNotificationContext();
-  const { user, addProducts } = useAuthStore((state) => state);
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperClass | null>(null);
   const [count, setCount] = useState<number | null>(1);
 

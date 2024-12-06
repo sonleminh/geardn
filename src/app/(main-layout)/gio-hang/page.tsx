@@ -45,6 +45,7 @@ const Cart = () => {
     { href: ROUTES.CART, label: 'Giỏ hàng' },
   ];
   const { cart, mutate } = useGetCart();
+  const { user } = useAuthStore((state) => state);
   const router = useRouter();
   const { showNotification } = useNotificationContext();
   const { mutate: mutateCart } = useUpsertCart();
@@ -104,6 +105,7 @@ const Cart = () => {
 
     try {
       const updatedCartData = await addCartAPI({
+        user_id: user?._id ? user?._id : null,
         model: item_id,
         quantity: 1,
       });
@@ -140,6 +142,7 @@ const Cart = () => {
 
     try {
       const updatedCartData = await subtractCartAPI({
+        user_id: user?._id ? user?._id : null,
         model: item_id,
         quantity: 1,
       });
@@ -195,6 +198,7 @@ const Cart = () => {
 
     try {
       const updatedCartData = await updateCartQuantityAPI({
+        user_id: user?._id ? user?._id : null,
         model: item_id,
         quantity: newQuantity,
       });
