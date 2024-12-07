@@ -150,20 +150,18 @@ const Checkout = () => {
               ? `${detailAddress}, ${ward}, ${district}, ${city}`
               : shopAddress,
         },
-        user: user?._id ?? '',
+        user_id: user?._id ?? null,
       };
       try {
         const res = await createOrder(payload);
         showNotification('Đặt hàng thành công', 'success');
         globalMutate(`${BASE_API_URL}/cart`, undefined, { revalidate: true });
-        router.push(`/dat-hang/thanh-cong/${res._id}`);
+        // router.push(`/dat-hang/thanh-cong/${res._id}`);
       } catch (error: any) {
         showNotification(error?.message, 'error');
       }
     },
   });
-
-  // console.log('dv:', formik?.values?.shipment?.delivery_date);
 
   function getTotalAmount() {
     return orderFormData?.products?.reduce(

@@ -76,4 +76,5 @@ export interface ICreateOrder {
         is_online_order: boolean,
     },
     note?: string,
+    user_id: string | null;
 }
