@@ -121,12 +121,17 @@ export default function Login() {
             <Box>
               <Box>
                 <Typography
-                  sx={{ mb: 1, textTransform: 'uppercase', fontSize: 20 }}>
-                  Welcome back!
+                  sx={{
+                    mb: 1,
+                    textTransform: 'uppercase',
+                    fontSize: 20,
+                    fontWeight: 600,
+                  }}>
+                  Welcome to GearDN
                 </Typography>
-                <Typography sx={{ fontSize: 12, color: '#ababab' }}>
-                  Access ...
-                </Typography>
+                {/* <Typography sx={{ fontSize: 14, color: '#ababab' }}>
+                  Đăng nhập
+                </Typography> */}
               </Box>
               <Box>
                 <FormControl
@@ -235,10 +240,10 @@ export default function Login() {
               }}
             />
             <Typography sx={{ mb: 2 }}>
-              Don&apos;t you have an account?{' '}
+              Bạn chưa có tài khoản?{' '}
               <Link href={'/signup'}>
                 {' '}
-                <Typography component={'span'}>Sign Up</Typography>
+                <Typography component={'span'}>Đăng ký</Typography>
               </Link>
             </Typography>
           </Grid2>

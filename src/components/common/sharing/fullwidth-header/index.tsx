@@ -46,6 +46,15 @@ const FullWidthHeader = ({
     }
   }, [user, logout, router]);
 
+  const scrollToProductList = () => {
+    const productList = document.getElementById('shop');
+    if (productList) {
+      productList.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      router.push('/#shop');
+    }
+  };
+
   const open = Boolean(anchorEl);
 
   const handleClose = () => {
@@ -71,7 +80,7 @@ const FullWidthHeader = ({
     <Box sx={FullWidthHeaderStyle(pathname, showFullWidthHeader)}>
       <LayoutContainer>
         <Grid2 container height={80} px={3}>
-          <Grid2 size={4.5} sx={{ display: 'flex', alignItems: 'center' }}>
+          <Grid2 size={4} sx={{ display: 'flex', alignItems: 'center' }}>
             <Link href={'/'}>
               <Box className='header-logo'>
                 <SkeletonImage
@@ -83,21 +92,50 @@ const FullWidthHeader = ({
               </Box>
             </Link>
           </Grid2>
-          <Grid2 size={3} sx={{ display: 'flex', alignItems: 'center' }}>
+          <Grid2 size={4} sx={{ display: 'flex', alignItems: 'center' }}>
             <List
               sx={{
                 display: 'flex',
                 width: '100%',
                 '> li': {
                   justifyContent: 'center',
+                  ':hover': {
+                    ' p': {
+                      ':before': {
+                        transform: 'scaleX(1)',
+                      },
+                    },
+                  },
+                  ' p': {
+                    position: 'relative',
+                    cursor: 'pointer',
+                    ':before': {
+                      content: '""',
+                      position: 'absolute',
+                      bottom: '-4px',
+                      left: 0,
+                      width: '100%',
+                      height: '2px',
+                      bgcolor: '#000',
+                      transition: 'transform .2s',
+                      transform: 'scaleX(0)',
+                      transformOrigin: 'top left',
+                    },
+                  },
                 },
               }}>
-              <ListItem>Shop</ListItem>
-              <ListItem>Blog</ListItem>
-              <ListItem>Contact</ListItem>
+              <ListItem>
+                <Typography>Danh mục</Typography>
+              </ListItem>
+              <ListItem>
+                <Typography onClick={scrollToProductList}>Shop</Typography>
+              </ListItem>
+              <ListItem>
+                <Typography>Liên hệ</Typography>
+              </ListItem>
             </List>
           </Grid2>
-          <Grid2 size={4.5} sx={{ display: 'flex', alignItems: 'center' }}>
+          <Grid2 size={4} sx={{ display: 'flex', alignItems: 'center' }}>
             <Box
               sx={{
                 display: 'flex',

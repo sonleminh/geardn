@@ -38,7 +38,9 @@ export default function Homepage() {
           priority
         />
       </Box>
-      <ProductList />
+      <section id='shop'>
+        <ProductList />
+      </section>
       <Explore />
       <LayoutContainer>
         <Box
