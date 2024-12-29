@@ -44,3 +44,12 @@ export const useGetSKUByPrdId = (id: string) => {
     isError: error,
   };
 };
+
+export const useGetCategories = () => {
+  const { data, error, isLoading } = useSWR(`${BASE_API_URL}/product`, fetcher);
+  return {
+    products: data as TProductsRes,
+    isLoading,
+    isError: error,
+  };
+};

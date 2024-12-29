@@ -4,7 +4,7 @@ export const ProductListStyle: SxProps<Theme> = {
     p: '32px 0 40px',
     '.category': {
         '.category-heading': {
-            mb: 2, fontSize: 22, fontWeight: 600
+            mb: 2, fontSize: 20, fontWeight: 600
         },
         '> div': {
             ':hover': {

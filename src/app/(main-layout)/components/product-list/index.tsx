@@ -27,68 +27,6 @@ const ProductList = () => {
         <Grid2 container spacing={4}>
           <Grid2 size={3} className='category'>
             <Typography className='category-heading'>Danh mục</Typography>
-            <Accordion className='category-accordion'>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls='panel1-content'
-                id='panel1-header'
-                sx={{
-                  height: '30px',
-                  '.MuiAccordionSummary-root': {
-                    minHeight: '30px',
-                  },
-                }}>
-                <ShoppingBasketOutlinedIcon sx={{ mr: 1 }} /> Tất cả sản phẩm
-              </AccordionSummary>
-              <AccordionDetails sx={{ py: 0 }}>
-                <List
-                  sx={{
-                    pt: 0,
-                    li: {
-                      ':hover': {
-                        textDecoration: 'underline',
-                      },
-                    },
-                  }}>
-                  <ListItem>Laptop</ListItem>
-                  <ListItem>Laptop</ListItem>
-                  <ListItem>Laptop</ListItem>
-                  <ListItem>Laptop</ListItem>
-                </List>
-              </AccordionDetails>
-            </Accordion>
-            <Accordion className='category-accordion'>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls='panel2-content'
-                id='panel2-header'>
-                Mới nhất
-              </AccordionSummary>
-              <AccordionDetails sx={{ py: 0 }}>
-                <List sx={{ pt: 0 }}>
-                  <ListItem>Laptop</ListItem>
-                  <ListItem>Laptop</ListItem>
-                  <ListItem>Laptop</ListItem>
-                  <ListItem>Laptop</ListItem>
-                </List>
-              </AccordionDetails>
-            </Accordion>
-            <Accordion className='category-accordion'>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls='panel2-content'
-                id='panel2-header'>
-                Khuyến mãi
-              </AccordionSummary>
-              <AccordionDetails sx={{ py: 0 }}>
-                <List sx={{ pt: 0 }}>
-                  <ListItem>Laptop</ListItem>
-                  <ListItem>Laptop</ListItem>
-                  <ListItem>Laptop</ListItem>
-                  <ListItem>Laptop</ListItem>
-                </List>
-              </AccordionDetails>
-            </Accordion>
           </Grid2>
           <Grid2 container size={9} spacing={4}>
             {products?.products?.map((item, index) => (
