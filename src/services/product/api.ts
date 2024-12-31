@@ -18,6 +18,16 @@ type TProductsRes = {
   total: number;
 };
 
+type TCategoriesRes = {
+  categories: {
+    _id: string;
+    name: string;
+    icon: string;
+  }[];
+  total: number;
+};
+
+
 export const useGetProducts = () => {
   const { data, error, isLoading } = useSWR(`${BASE_API_URL}/product`, fetcher);
   return {
@@ -46,9 +56,9 @@ export const useGetSKUByPrdId = (id: string) => {
 };
 
 export const useGetCategories = () => {
-  const { data, error, isLoading } = useSWR(`${BASE_API_URL}/product`, fetcher);
+  const { data, error, isLoading } = useSWR(`${BASE_API_URL}/category`, fetcher);
   return {
-    products: data as TProductsRes,
+    categories: data as TCategoriesRes,
     isLoading,
     isError: error,
   };
