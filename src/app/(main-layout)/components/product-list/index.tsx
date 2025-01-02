@@ -6,9 +6,11 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ShoppingBasketOutlinedIcon from '@mui/icons-material/ShoppingBasketOutlined';
 import {
   Box,
+  FormControl,
   Grid2,
   List,
   ListItem,
+  NativeSelect,
   Pagination,
   Typography,
 } from '@mui/material';
@@ -53,21 +55,59 @@ const ProductList = () => {
               ))}
             </List>
           </Grid2>
-          <Grid2 container size={9} spacing={4}>
-            {products?.products?.map((item, index) => (
-              <Grid2 key={index} size={4}>
-                <ProductCard data={item} />
+          <Grid2 size={9}>
+            <Box>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  width: '100%',
+                  mb: 1,
+                }}>
+                <Typography>Tìm thấy 12 kết quả</Typography>
+                <FormControl sx={{ width: '120px' }} size='small'>
+                  {/* <InputLabel variant='standard' htmlFor='uncontrolled-native'>
+                    Age
+                  </InputLabel> */}
+                  <NativeSelect
+                    defaultValue={30}
+                    // inputProps={{
+                    //   name: 'age',
+                    //   id: 'uncontrolled-native',
+                    // }}
+                    disableUnderline
+                    // variant='filled'
+                    sx={{
+                      p: 0,
+                      border: '1px solid #000',
+                      borderRadius: 2,
+                      '.MuiNativeSelect-select': {
+                        p: '4px 8px',
+                      },
+                    }}>
+                    <option value={10}>Ten</option>
+                    <option value={20}>Twenty</option>
+                    <option value={30}>Thirty</option>
+                  </NativeSelect>
+                </FormControl>
+              </Box>
+              <Grid2 container spacing={4}>
+                {products?.products?.map((item, index) => (
+                  <Grid2 key={index} size={4}>
+                    <ProductCard data={item} />
+                  </Grid2>
+                ))}
               </Grid2>
-            ))}
-            <Pagination
-              count={10}
-              // renderItem={(item) => (
-              //   <PaginationItem
-              //     slots={{ previous: ArrowBackIcon, next: ArrowForwardIcon }}
-              //     {...item}
-              //   />
-              // )}
-            />
+              <Pagination
+                count={10}
+                // renderItem={(item) => (
+                //   <PaginationItem
+                //     slots={{ previous: ArrowBackIcon, next: ArrowForwardIcon }}
+                //     {...item}
+                //   />
+                // )}
+              />
+            </Box>
           </Grid2>
         </Grid2>
       </Box>
