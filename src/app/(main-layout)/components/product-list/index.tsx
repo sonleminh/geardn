@@ -29,31 +29,42 @@ const ProductList = () => {
   return (
     <LayoutContainer>
       <Box sx={ProductListStyle}>
-        <Grid2 container spacing={4}>
-          <Grid2 size={3} className='category'>
-            <Typography className='category-heading'>Danh mục</Typography>
-            <List>
-              {categories?.categories.map((item) => (
-                <ListItem sx={{ display: 'flex' }} key={item._id}>
-                  <Box
-                    sx={{
-                      position: 'relative',
-                      width: '20px',
-                      height: { xs: '20px' },
-                      mr: 1,
-                      overflow: 'hidden',
-                      '& img': {
-                        objectFit: 'cover',
-                      },
-                    }}>
-                    <SkeletonImage src={item.icon} alt={'geardn'} />
-                  </Box>
-                  <Typography sx={{ fontSize: 14, fontWeight: 500 }}>
-                    {item.name}
-                  </Typography>
-                </ListItem>
-              ))}
-            </List>
+        <Grid2 container spacing={4} sx={{}}>
+          <Grid2
+            size={3}
+            className='category'
+            sx={{ position: 'sticky', top: 100, height: '100%' }}>
+            <Box
+              sx={{
+                p: '12px 16px',
+                boxShadow:
+                  '0 1px 2px 0 rgba(60, 64, 67, .1), 0 2px 6px 2px rgba(60, 64, 67, .15)',
+                borderRadius: 1,
+              }}>
+              <Typography className='category-heading'>Danh mục</Typography>
+              <List>
+                {categories?.categories.map((item) => (
+                  <ListItem sx={{ display: 'flex', px: 0 }} key={item._id}>
+                    <Box
+                      sx={{
+                        position: 'relative',
+                        width: '20px',
+                        height: { xs: '20px' },
+                        mr: 1.5,
+                        overflow: 'hidden',
+                        '& img': {
+                          objectFit: 'cover',
+                        },
+                      }}>
+                      <SkeletonImage src={item.icon} alt={'geardn'} />
+                    </Box>
+                    <Typography sx={{ fontSize: 13, fontWeight: 600 }}>
+                      {item.name}
+                    </Typography>
+                  </ListItem>
+                ))}
+              </List>
+            </Box>
           </Grid2>
           <Grid2 size={9}>
             <Box>
@@ -69,7 +80,7 @@ const ProductList = () => {
                   {/* <InputLabel variant='standard' htmlFor='uncontrolled-native'>
                     Age
                   </InputLabel> */}
-                  <NativeSelect
+                  {/* <NativeSelect
                     defaultValue={30}
                     // inputProps={{
                     //   name: 'age',
@@ -80,15 +91,32 @@ const ProductList = () => {
                     sx={{
                       p: 0,
                       border: '1px solid #000',
-                      borderRadius: 2,
+                      borderRadius: 1.5,
+                      fontSize: 14,
                       '.MuiNativeSelect-select': {
                         p: '4px 8px',
                       },
+                      '& select': {
+                        backgroundColor: '#f5f5f5',
+                        color: '#000',
+                        borderRadius: '4px',
+                        padding: '8px',
+                      },
+                      '& option': {
+                        backgroundColor: '#fff',
+                        color: '#333',
+                        padding: '8px',
+                      },
                     }}>
-                    <option value={10}>Ten</option>
-                    <option value={20}>Twenty</option>
-                    <option value={30}>Thirty</option>
-                  </NativeSelect>
+                    <option value={'latest'}>Mới nhất</option>
+                    <option value={'20'}>Giá thấp đến cao</option>
+                    <option value={30}>Giá cao đến thấp</option>
+                  </NativeSelect> */}
+                  <select>
+                    <option>cc</option>
+                    <option>cc</option>
+                    <option>cc</option>
+                  </select>
                 </FormControl>
               </Box>
               <Grid2 container spacing={4}>
