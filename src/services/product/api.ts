@@ -1,7 +1,7 @@
 // import { QueryKeys } from '@/components/constants/query-key';
 // import { useQuery } from '@tanstack/react-query';
 
-import { BASE_API_URL } from '@/constants/env';
+import { BASE_API_URL, SERVER_API_URL } from '@/constants/env';
 import { ILogInResponse, ILogoutResponse, ISignUpPayload, ISignUpResponse } from '@/interfaces/IAuth';
 import { getRequest, postRequest } from '@/utils/fetch-client';
 import useSWR from 'swr';
@@ -23,6 +23,7 @@ type TCategoriesRes = {
     _id: string;
     name: string;
     icon: string;
+    slug: string;
   }[];
   total: number;
 };
@@ -62,4 +63,16 @@ export const useGetCategories = () => {
     isLoading,
     isError: error,
   };
+};
+
+export const getPrdByCateSlug = async (id:string) => {
+  try {
+    const result = await fetch(
+      `${SERVER_API_URL}/${id}/api`
+    ).then((res) => res.json());
+  // return result as IArticleByIdResponse;
+  return result as any;
+} catch (error) {
+   throw new Error('Failed to fetch article list by ID API') 
+  }
 };

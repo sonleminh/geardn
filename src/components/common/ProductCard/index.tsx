@@ -11,42 +11,46 @@ const ProductCard = ({ data }: { data: IProduct }) => {
     <AppLink href={`${data._id}`}>
       <Box
         sx={{
-          position: 'relative',
-          width: '100%',
-          height: { xs: '250px' },
-          mb: 1.5,
-          borderRadius: 3,
+          bgcolor: '#fff',
+          borderRadius: '8px',
           overflow: 'hidden',
-          '& img': {
-            objectFit: 'cover',
+          ':hover': {
+            boxShadow:
+              '0 1px 3px 0 rgba(0, 0, 0, .1), 0 1px 2px -1px rgba(0, 0, 0, .1)',
+            '& img': {
+              transform: 'scale(1.05)',
+            },
           },
-        }}
-        className='product-img'>
-        <SkeletonImage src={data?.images[0]} alt='geardn' fill />
-      </Box>
-      <Typography sx={{ mb: 1, fontSize: 18, fontWeight: 600 }}>
-        {data?.name}
-      </Typography>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <StarRateIcon sx={{ mr: 0.5, color: '#F19B4C', fontSize: 20 }} />
-          <Typography sx={{ fontSize: 14 }}>5.0 (2 reviews)</Typography>
+        }}>
+        <Box
+          sx={{
+            position: 'relative',
+            width: '100%',
+            height: { xs: '250px' },
+            borderRadius: '8px',
+            overflow: 'hidden',
+            '& img': {
+              objectFit: 'cover',
+              transition: 'all 0.5s ease',
+            },
+          }}
+          className='product-img'>
+          <SkeletonImage src={data?.images[0]} alt='geardn' fill />
         </Box>
-        <Typography sx={{ fontSize: 18, fontWeight: 600 }}>
-          {formatPrice(data?.original_price)}
-        </Typography>
-      </Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Button
-          variant='outlined'
-          sx={{ minWidth: '46%', borderRadius: 10, textTransform: 'none' }}>
-          Thêm vào giỏ
-        </Button>
-        <Button
-          variant='contained'
-          sx={{ minWidth: '46%', borderRadius: 10, textTransform: 'none' }}>
-          Mua ngay
-        </Button>
+        <Box sx={{ p: '12px 12px 0' }}>
+          <Typography sx={{ mb: 1, fontSize: 18, fontWeight: 600 }}>
+            {data?.name}
+          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <StarRateIcon sx={{ mr: 0.5, color: '#F19B4C', fontSize: 20 }} />
+              <Typography sx={{ fontSize: 14 }}>5.0 (2 reviews)</Typography>
+            </Box>
+            <Typography sx={{ fontSize: 18, fontWeight: 600 }}>
+              {formatPrice(data?.original_price)}
+            </Typography>
+          </Box>
+        </Box>
       </Box>
     </AppLink>
   );

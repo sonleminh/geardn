@@ -9,7 +9,7 @@ async function fetchRequest<T>(
 ): Promise<T> {
   try {
     // const response = await fetch(`${url}`, {
-    const response = await fetch(`${baseURL}${url}`, {
+    const response = await fetch(`${url}`, {
       next: { revalidate: 3600 },
       method,
       headers: {

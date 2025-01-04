@@ -1,31 +1,24 @@
 'use client';
 
-import { useGetCategories, useGetProducts } from '@/services/product/api';
+import AppLink from '@/components/common/AppLink';
 import ProductCard from '@/components/common/ProductCard';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ShoppingBasketOutlinedIcon from '@mui/icons-material/ShoppingBasketOutlined';
+import SkeletonImage from '@/components/common/SkeletonImage';
+import LayoutContainer from '@/components/common/sharing/layout-container';
+import { useGetCategories, useGetProducts } from '@/services/product/api';
 import {
   Box,
   FormControl,
   Grid2,
   List,
   ListItem,
-  NativeSelect,
   Pagination,
   Typography,
 } from '@mui/material';
-import Accordion from '@mui/material/Accordion';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import AccordionSummary from '@mui/material/AccordionSummary';
 import { ProductListStyle } from './style';
-import { IProduct } from '@/interfaces/IProduct';
-import LayoutContainer from '@/components/common/sharing/layout-container';
-import SkeletonImage from '@/components/common/SkeletonImage';
 
 const ProductList = () => {
   const { products } = useGetProducts();
   const { categories } = useGetCategories();
-  console.log('cate:', categories);
   return (
     <LayoutContainer>
       <Box sx={ProductListStyle}>
@@ -44,24 +37,31 @@ const ProductList = () => {
               <Typography className='category-heading'>Danh mục</Typography>
               <List>
                 {categories?.categories.map((item) => (
-                  <ListItem sx={{ display: 'flex', px: 0 }} key={item._id}>
-                    <Box
-                      sx={{
-                        position: 'relative',
-                        width: '20px',
-                        height: { xs: '20px' },
-                        mr: 1.5,
-                        overflow: 'hidden',
-                        '& img': {
-                          objectFit: 'cover',
-                        },
-                      }}>
-                      <SkeletonImage src={item.icon} alt={'geardn'} />
-                    </Box>
-                    <Typography sx={{ fontSize: 13, fontWeight: 600 }}>
-                      {item.name}
-                    </Typography>
-                  </ListItem>
+                  <AppLink
+                    href={item?.slug}
+                    key={item._id}
+                    sx={{
+                      color: '#000',
+                    }}>
+                    <ListItem sx={{ display: 'flex', px: 0 }}>
+                      <Box
+                        sx={{
+                          position: 'relative',
+                          width: '24px',
+                          height: { xs: '24px' },
+                          mr: 1.5,
+                          overflow: 'hidden',
+                          '& img': {
+                            objectFit: 'cover',
+                          },
+                        }}>
+                        <SkeletonImage src={item.icon} alt={'geardn'} />
+                      </Box>
+                      <Typography sx={{ fontSize: 13, fontWeight: 600 }}>
+                        {item.name}
+                      </Typography>
+                    </ListItem>
+                  </AppLink>
                 ))}
               </List>
             </Box>
@@ -119,7 +119,7 @@ const ProductList = () => {
                   </select>
                 </FormControl>
               </Box>
-              <Grid2 container spacing={4}>
+              <Grid2 container spacing={2} sx={{ mb: 3 }}>
                 {products?.products?.map((item, index) => (
                   <Grid2 key={index} size={4}>
                     <ProductCard data={item} />
@@ -127,6 +127,7 @@ const ProductList = () => {
                 ))}
               </Grid2>
               <Pagination
+                sx={{ display: 'flex', justifyContent: 'center' }}
                 count={10}
                 // renderItem={(item) => (
                 //   <PaginationItem
