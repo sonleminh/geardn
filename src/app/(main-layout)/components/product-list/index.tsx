@@ -15,10 +15,20 @@ import {
   Typography,
 } from '@mui/material';
 import { ProductListStyle } from './style';
+import { useState } from 'react';
+import { IQuery } from '@/interfaces/IQuery';
 
 const ProductList = () => {
-  const { products } = useGetProducts();
+  const [query, setQuery] = useState<IQuery>({
+    limit: 4,
+    page: 1,
+  });
+  const { products } = useGetProducts(query);
   const { categories } = useGetCategories();
+
+  const handleChangeQuery = (object: Partial<IQuery>) => {
+    setQuery((prev) => ({ ...prev, ...object }));
+  };
   return (
     <LayoutContainer>
       <Box sx={ProductListStyle}>
@@ -75,7 +85,7 @@ const ProductList = () => {
                   width: '100%',
                   mb: 1,
                 }}>
-                <Typography>Tìm thấy 12 kết quả</Typography>
+                <Typography>Tìm thấy {products?.total} kết quả</Typography>
                 <FormControl sx={{ width: '120px' }} size='small'>
                   {/* <InputLabel variant='standard' htmlFor='uncontrolled-native'>
                     Age
@@ -128,13 +138,14 @@ const ProductList = () => {
               </Grid2>
               <Pagination
                 sx={{ display: 'flex', justifyContent: 'center' }}
-                count={10}
-                // renderItem={(item) => (
-                //   <PaginationItem
-                //     slots={{ previous: ArrowBackIcon, next: ArrowForwardIcon }}
-                //     {...item}
-                //   />
-                // )}
+                count={Math.ceil((products?.total ?? 0) / query.limit!)}
+                page={query.page ?? 0}
+                onChange={(_: React.ChangeEvent<unknown>, newPage) => {
+                  handleChangeQuery({ page: newPage });
+                }}
+                defaultPage={query.page ?? 1}
+                showFirstButton
+                showLastButton
               />
             </Box>
           </Grid2>

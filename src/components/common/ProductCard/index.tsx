@@ -5,6 +5,7 @@ import StarRateIcon from '@mui/icons-material/StarRate';
 import AppLink from '../AppLink';
 import { IProduct } from '@/interfaces/IProduct';
 import { formatPrice } from '@/utils/format-price';
+import { truncateTextByLine } from '@/utils/css-helper.util';
 
 const ProductCard = ({ data }: { data: IProduct }) => {
   return (
@@ -38,7 +39,13 @@ const ProductCard = ({ data }: { data: IProduct }) => {
           <SkeletonImage src={data?.images[0]} alt='geardn' fill />
         </Box>
         <Box sx={{ p: '12px 12px 0' }}>
-          <Typography sx={{ mb: 1, fontSize: 18, fontWeight: 600 }}>
+          <Typography
+            sx={{
+              mb: 1,
+              fontSize: 16,
+              fontWeight: 500,
+              ...truncateTextByLine(1),
+            }}>
             {data?.name}
           </Typography>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>

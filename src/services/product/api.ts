@@ -8,6 +8,8 @@ import useSWR from 'swr';
 import { fetcher } from '../fetcher';
 import { IProduct } from '@/interfaces/IProduct';
 import { ISku } from '@/interfaces/ISku';
+import { IQuery } from '@/interfaces/IQuery';
+import queryString from 'query-string';
 
 type TProductsRes = {
   products: IProduct[];
@@ -29,8 +31,12 @@ type TCategoriesRes = {
 };
 
 
-export const useGetProducts = () => {
-  const { data, error, isLoading } = useSWR(`${BASE_API_URL}/product`, fetcher);
+export const useGetProducts = (query: IQuery) => {
+  const newParams = { ...query, page: query?.page ?? 1 };
+  const queryParams = queryString.stringify(newParams ?? {});
+  console.log('qr:', queryParams)
+  const { data, error, isLoading } = useSWR(`${BASE_API_URL}/product?${queryParams}`, fetcher);
+  console.log(3)
   return {
     products: data as TProductsRes,
     isLoading,
@@ -65,13 +71,16 @@ export const useGetCategories = () => {
   };
 };
 
-export const getPrdByCateSlug = async (id:string) => {
+export const getPrdByCateSlug = async (slug:string) => {
   try {
-    const result = await fetch(
-      `${SERVER_API_URL}/${id}/api`
-    ).then((res) => res.json());
-  // return result as IArticleByIdResponse;
-  return result as any;
+    console.log(slug)
+    // const result = await fetch(
+    //   `${SERVER_API_URL}/${slug}/api`
+    // ).then((res) => res.json());
+    const result = await getRequest(
+      `${SERVER_API_URL}/${slug}/api`
+    )
+  return result as IProduct[];
 } catch (error) {
    throw new Error('Failed to fetch article list by ID API') 
   }
