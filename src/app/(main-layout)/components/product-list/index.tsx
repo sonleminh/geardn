@@ -23,6 +23,7 @@ const ProductList = () => {
     limit: 4,
     page: 1,
   });
+  console.log('query:', query);
   const { products } = useGetProducts(query);
   const { categories } = useGetCategories();
 

@@ -9,7 +9,7 @@ import { truncateTextByLine } from '@/utils/css-helper.util';
 
 const ProductCard = ({ data }: { data: IProduct }) => {
   return (
-    <AppLink href={`${data._id}`}>
+    <AppLink href={`${data?._id}`}>
       <Box
         sx={{
           bgcolor: '#fff',
@@ -48,13 +48,31 @@ const ProductCard = ({ data }: { data: IProduct }) => {
             }}>
             {data?.name}
           </Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              mb: 1,
+            }}>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <StarRateIcon sx={{ mr: 0.5, color: '#F19B4C', fontSize: 20 }} />
-              <Typography sx={{ fontSize: 14 }}>5.0 (2 reviews)</Typography>
+              <StarRateIcon sx={{ mr: 0.5, color: '#F19B4C', fontSize: 18 }} />
+              <Typography sx={{ fontSize: 13 }}>5.0 (2 reviews)</Typography>
             </Box>
-            <Typography sx={{ fontSize: 18, fontWeight: 600 }}>
-              {formatPrice(data?.original_price)}
+            <Typography sx={{ fontWeight: 600 }}>
+              {data?.original_price ? (
+                formatPrice(data?.original_price)
+              ) : (
+                <Typography
+                  sx={{
+                    height: 24,
+                    fontSize: 14,
+                    fontWeight: 600,
+                    lineHeight: '24px',
+                  }}>
+                  Đang cập nhật
+                </Typography>
+              )}
             </Typography>
           </Box>
         </Box>

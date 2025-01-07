@@ -32,11 +32,11 @@ type TCategoriesRes = {
 
 
 export const useGetProducts = (query: IQuery) => {
-  const newParams = { ...query, page: query?.page ?? 1 };
+  const newParams = { ...query };
+  // const newParams = { ...query, page: query?.page ?? 1 };
   const queryParams = queryString.stringify(newParams ?? {});
   console.log('qr:', queryParams)
   const { data, error, isLoading } = useSWR(`${BASE_API_URL}/product?${queryParams}`, fetcher);
-  console.log(3)
   return {
     products: data as TProductsRes,
     isLoading,

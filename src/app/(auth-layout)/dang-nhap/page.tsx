@@ -40,7 +40,6 @@ export default function Login() {
     async onSubmit(values) {
       const userData = await loginAPI(values);
       // mutate(userData, false);
-      console.log('userData', userData);
       login({
         _id: userData?._id,
         email: userData?.email,
@@ -48,7 +47,6 @@ export default function Login() {
       });
 
       if (userData?._id) {
-        console.log(22);
         router.push('/tai-khoan');
       }
     },

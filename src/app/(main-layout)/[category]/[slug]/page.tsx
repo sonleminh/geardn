@@ -83,8 +83,6 @@ const ProductDetail = () => {
     }
   }, [selectedModel, product]);
 
-  console.log('cart:', cart);
-
   useEffect(() => {
     const variant = product?.tier_variations?.find(
       (variant) => variant?.images

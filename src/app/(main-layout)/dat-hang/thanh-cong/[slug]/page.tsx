@@ -54,8 +54,6 @@ const CheckoutSuccess = () => {
   const params = useParams();
 
   const { order } = useGetOrderById(params?.slug as string);
-  console.log(order);
-
   return (
     <Box pt={2} pb={4} bgcolor={'#eee'}>
       <LayoutContainer>

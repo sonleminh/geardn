@@ -32,7 +32,6 @@ const Header = ({ showHeader }: { showHeader: boolean }) => {
   const router = useRouter();
   const { cart, isLoading } = useGetCart();
   const { user, logout } = useAuthStore((state) => state);
-  console.log('user:', user);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   useEffect(() => {

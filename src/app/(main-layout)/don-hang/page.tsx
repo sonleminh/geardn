@@ -48,8 +48,6 @@ const Purchase = () => {
   const { data } = useGetOrdersByUser();
   const router = useRouter();
 
-  console.log(data);
-
   const inputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
 
   return (
