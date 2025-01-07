@@ -66,16 +66,6 @@ const Category = async ({ params }: { params: { category: string } }) => {
               <ProductCard data={item} />
             </Grid2>
           ))}
-          {data?.map((item) => (
-            <Grid2 size={3} key={item._id}>
-              <ProductCard data={item} />
-            </Grid2>
-          ))}
-          {data?.map((item) => (
-            <Grid2 size={3} key={item._id}>
-              <ProductCard data={item} />
-            </Grid2>
-          ))}
         </Grid2>
       </LayoutContainer>
     </Box>

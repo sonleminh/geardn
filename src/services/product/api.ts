@@ -73,9 +73,10 @@ export const useGetCategories = () => {
 
 export const getPrdByCateSlug = async (slug:string) => {
   try {
-    console.log(slug)
+    // console.log(slug)
     // const result = await fetch(
-    //   `${SERVER_API_URL}/${slug}/api`
+    //   `http://localhost:3000/gia-treo-man-hinh/api`
+    //   // `${SERVER_API_URL}/${slug}/api`
     // ).then((res) => res.json());
     const result = await getRequest(
       `${SERVER_API_URL}/${slug}/api`
