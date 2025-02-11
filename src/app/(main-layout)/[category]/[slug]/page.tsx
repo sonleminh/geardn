@@ -57,7 +57,7 @@ const ProductDetail = () => {
 
   const breadcrumbsOptions = [
     { href: '/', label: 'Home' },
-    { href: `/product/${product?._id}`, label: product?.name as string },
+    { href: `/product/${product?.id}`, label: product?.name as string },
   ];
 
   useEffect(() => {
@@ -136,7 +136,7 @@ const ProductDetail = () => {
       return setAddCartError(true);
     }
     const modelInCart = cart?.items?.find(
-      (item) => item.model_id === matchedModel?._id
+      (item) => item.modelid === matchedModel?.id
     );
 
     if (
@@ -147,11 +147,11 @@ const ProductDetail = () => {
     }
     try {
       await addCartAPI({
-        user_id: user?._id ? user?._id : null,
+        userid: user?.id ? user?.id : null,
         model:
           product?.tier_variations?.length === 0
-            ? product?.models[0]?._id ?? ''
-            : matchedModel?._id ?? '',
+            ? product?.models[0]?.id ?? ''
+            : matchedModel?.id ?? '',
         quantity: count ?? 1,
       });
       mutate('/cart');
@@ -172,7 +172,7 @@ const ProductDetail = () => {
     }
 
     const modelInCart = cart?.items?.find(
-      (item) => item.model_id === matchedModel?._id
+      (item) => item.modelid === matchedModel?.id
     );
 
     // if (
@@ -184,9 +184,9 @@ const ProductDetail = () => {
 
     const currentModel = {
       ...matchedModel,
-      model_id: matchedModel?._id,
+      modelid: matchedModel?.id,
       image: optionImage,
-      product_id: product?._id,
+      productid: product?.id,
       product_name: product?.name,
       quantity: count ?? 1,
     };

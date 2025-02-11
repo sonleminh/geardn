@@ -12,6 +12,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 
 const Explore = () => {
   const { products } = useGetProducts();
+  console.log('products', products);
   return (
     <Box sx={{ mb: 10 }}>
       <LayoutContainer>
@@ -63,7 +64,7 @@ const Explore = () => {
             },
           }}
           className='mySwiper'>
-          {products?.products.map((item, index) => (
+          {products?.products?.map((item, index) => (
             <SwiperSlide key={index}>
               <Box
                 sx={{

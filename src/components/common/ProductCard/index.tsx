@@ -8,8 +8,9 @@ import { formatPrice } from '@/utils/format-price';
 import { truncateTextByLine } from '@/utils/css-helper.util';
 
 const ProductCard = ({ data }: { data: IProduct }) => {
+  console.log('data:', data?.skus?.[0]);
   return (
-    <AppLink href={`${data?._id}`}>
+    <AppLink href={`${data?.category?.slug}/${data?.id}`}>
       <Box
         sx={{
           bgcolor: '#fff',
@@ -60,8 +61,8 @@ const ProductCard = ({ data }: { data: IProduct }) => {
               <Typography sx={{ fontSize: 13 }}>5.0 (2 reviews)</Typography>
             </Box>
             <Typography sx={{ fontWeight: 600 }}>
-              {data?.original_price ? (
-                formatPrice(data?.original_price)
+              {data?.skus?.[0] ? (
+                formatPrice(data?.skus?.[0]?.price)
               ) : (
                 <Typography
                   sx={{

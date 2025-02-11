@@ -1,5 +1,5 @@
 export interface IAttribute {
-    _id: string;
+    id: string;
     name: string;
     value: string;
     atb_sku: string;
@@ -7,8 +7,8 @@ export interface IAttribute {
 }
 
 export interface ISku {
-    _id: string;
-    product_id: string;
+    id: string;
+    productid: string;
     product_name: string;
     product_sku: string;
     attributes: IAttribute[];

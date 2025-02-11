@@ -45,9 +45,9 @@ export const useGetCart = () => {
   };
 };
 
-export const deleteCartItem = (item_id:string) => {
+export const deleteCartItem = (itemid:string) => {
   try {
-    const res = deleteRequest(`/cart/${item_id}`);
+    const res = deleteRequest(`/cart/${itemid}`);
     return res;
   } catch (error) {
     throw error

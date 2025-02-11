@@ -41,12 +41,12 @@ export default function Login() {
       const userData = await loginAPI(values);
       // mutate(userData, false);
       login({
-        _id: userData?._id,
+        id: userData?.id,
         email: userData?.email,
         name: userData?.name,
       });
 
-      if (userData?._id) {
+      if (userData?.id) {
         router.push('/tai-khoan');
       }
     },
@@ -67,7 +67,7 @@ export default function Login() {
         expires: credentialDecoded?.exp,
       });
       login({
-        _id: credentialDecoded?.sub,
+        id: credentialDecoded?.sub,
         email: credentialDecoded?.email as string,
         name: credentialDecoded?.name as string,
         picture: credentialDecoded?.picture,

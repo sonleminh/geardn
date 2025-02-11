@@ -60,7 +60,7 @@ const Cart = () => {
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      const newSelected = cart?.items?.map((n) => n?.model_id);
+      const newSelected = cart?.items?.map((n) => n?.modelid);
       if (newSelected) {
         setSelected(newSelected);
       }
@@ -88,8 +88,8 @@ const Cart = () => {
     setSelected(newSelected);
   };
 
-  const handleAddItem = async (item_id: string) => {
-    const itemToUpdate = cart?.items?.find((item) => item.model_id === item_id);
+  const handleAddItem = async (itemid: string) => {
+    const itemToUpdate = cart?.items?.find((item) => item.modelid === itemid);
 
     if (!itemToUpdate) return;
 
@@ -97,7 +97,7 @@ const Cart = () => {
     const optimisticCart = {
       ...cart,
       items: cart?.items?.map((item) =>
-        item.model_id === item_id ? { ...item, quantity: newQuantity } : item
+        item.modelid === itemid ? { ...item, quantity: newQuantity } : item
       ),
     };
 
@@ -105,8 +105,8 @@ const Cart = () => {
 
     try {
       const updatedCartData = await addCartAPI({
-        user_id: user?._id ? user?._id : null,
-        model: item_id,
+        userid: user?.id ? user?.id : null,
+        model: itemid,
         quantity: 1,
       });
 
@@ -119,8 +119,8 @@ const Cart = () => {
     }
   };
 
-  const handleSubtractItem = async (item_id: string) => {
-    const itemToUpdate = cart?.items?.find((item) => item.model_id === item_id);
+  const handleSubtractItem = async (itemid: string) => {
+    const itemToUpdate = cart?.items?.find((item) => item.modelid === itemid);
     if (!itemToUpdate) return;
 
     const newQuantity = itemToUpdate.quantity - 1;
@@ -130,20 +130,20 @@ const Cart = () => {
       items:
         newQuantity > 0
           ? cart?.items?.map((item) =>
-              item.model_id === item_id
+              item.modelid === itemid
                 ? { ...item, quantity: newQuantity }
                 : item
             )
           : cart?.items?.filter(
-              (item) => item?.model_id !== itemToUpdate?.model_id
+              (item) => item?.modelid !== itemToUpdate?.modelid
             ),
     };
     mutate(optimisticCart, false);
 
     try {
       const updatedCartData = await subtractCartAPI({
-        user_id: user?._id ? user?._id : null,
-        model: item_id,
+        userid: user?.id ? user?.id : null,
+        model: itemid,
         quantity: 1,
       });
 
@@ -157,40 +157,40 @@ const Cart = () => {
 
   const handleQuantityInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-    item_id: string
+    itemid: string
   ) => {
     const newQuantity = e.target.value;
 
     setQuantityInputs((prev) => ({
       ...prev,
-      [item_id]: newQuantity,
+      [itemid]: newQuantity,
     }));
   };
 
-  const handleQuantityInputBlur = async (item_id: string) => {
-    const inputQuantity = quantityInputs[item_id];
+  const handleQuantityInputBlur = async (itemid: string) => {
+    const inputQuantity = quantityInputs[itemid];
     const newQuantity = parseInt(inputQuantity, 10);
 
     // If the input is not a valid number or is empty, reset it to the current cart quantity
     if (isNaN(newQuantity) || newQuantity < 1) {
       const originalQuantity = cart?.items?.find(
-        (item) => item.model_id === item_id
+        (item) => item.modelid === itemid
       )?.quantity;
       setQuantityInputs((prev) => ({
         ...prev,
-        [item_id]: originalQuantity?.toString() ?? '1',
+        [itemid]: originalQuantity?.toString() ?? '1',
       }));
       return;
     }
 
-    const itemToUpdate = cart?.items?.find((item) => item.model_id === item_id);
+    const itemToUpdate = cart?.items?.find((item) => item.modelid === itemid);
 
     if (!itemToUpdate || newQuantity === itemToUpdate.quantity) return;
 
     const optimisticCart = {
       ...cart,
       items: cart?.items?.map((item) =>
-        item.model_id === item_id ? { ...item, quantity: newQuantity } : item
+        item.modelid === itemid ? { ...item, quantity: newQuantity } : item
       ),
     };
 
@@ -198,8 +198,8 @@ const Cart = () => {
 
     try {
       const updatedCartData = await updateCartQuantityAPI({
-        user_id: user?._id ? user?._id : null,
-        model: item_id,
+        userid: user?.id ? user?.id : null,
+        model: itemid,
         quantity: newQuantity,
       });
       mutateCart(updatedCartData, false);
@@ -226,14 +226,14 @@ const Cart = () => {
     }
   };
 
-  const handleDeleteItem = async (item_id: string) => {
+  const handleDeleteItem = async (itemid: string) => {
     const optimisticCart = {
       ...cart,
-      items: cart?.items.filter((item) => item.model_id !== item_id),
+      items: cart?.items.filter((item) => item.modelid !== itemid),
     };
     mutate(optimisticCart, false);
     try {
-      const updatedCartData = await deleteCartItem(item_id);
+      const updatedCartData = await deleteCartItem(itemid);
 
       mutateCart(updatedCartData, false);
       globalMutate('/api/cart');
@@ -245,7 +245,7 @@ const Cart = () => {
 
   const totalAmount = () => {
     const selectedItems = selected
-      .map((item_id) => cart?.items?.find((item) => item.model_id === item_id))
+      .map((itemid) => cart?.items?.find((item) => item.modelid === itemid))
       .filter((item) => item !== undefined);
 
     return selectedItems?.reduce(
@@ -259,7 +259,7 @@ const Cart = () => {
       return showNotification('Vui lòng chọn sản phẩm', 'warning');
     }
     const selectedItems = selected
-      .map((item_id) => cart?.items?.find((item) => item.model_id === item_id))
+      .map((itemid) => cart?.items?.find((item) => item.modelid === itemid))
       .filter((item): item is ICartItem => item !== undefined);
     addProducts(selectedItems);
     router.push(ROUTES.CHECKOUT);
@@ -302,11 +302,11 @@ const Cart = () => {
                     </TableHead>
                     <TableBody>
                       {cart?.items?.map((row) => {
-                        const isItemSelected = selected.includes(row.model_id);
+                        const isItemSelected = selected.includes(row.modelid);
 
                         return (
                           <TableRow
-                            key={row.model_id}
+                            key={row.modelid}
                             sx={{
                               '&:last-child td, &:last-child th': { border: 0 },
                             }}>
@@ -314,7 +314,7 @@ const Cart = () => {
                               <Checkbox
                                 color='primary'
                                 checked={isItemSelected}
-                                onClick={(e) => handleClick(e, row.model_id)}
+                                onClick={(e) => handleClick(e, row.modelid)}
                               />
                             </TableCell>
                             <TableCell
@@ -385,7 +385,7 @@ const Cart = () => {
                                     borderBottomRightRadius: 0,
                                   }}
                                   onClick={() =>
-                                    handleSubtractItem(row?.model_id)
+                                    handleSubtractItem(row?.modelid)
                                   }>
                                   -
                                 </Button>
@@ -423,19 +423,19 @@ const Cart = () => {
                                   type='number'
                                   size='small'
                                   value={
-                                    quantityInputs[row.model_id] ?? row.quantity
+                                    quantityInputs[row.modelid] ?? row.quantity
                                   }
                                   onChange={(e) =>
-                                    handleQuantityInputChange(e, row?.model_id)
+                                    handleQuantityInputChange(e, row?.modelid)
                                   }
                                   onBlur={() =>
-                                    handleQuantityInputBlur(row?.model_id)
+                                    handleQuantityInputBlur(row?.modelid)
                                   }
                                   onKeyDown={(e) =>
-                                    handleKeyDown(e, row?.model_id)
+                                    handleKeyDown(e, row?.modelid)
                                   }
                                   inputRef={(ref) =>
-                                    (inputRefs.current[row.model_id] = ref)
+                                    (inputRefs.current[row.modelid] = ref)
                                   }
                                 />
                                 <Button
@@ -443,7 +443,7 @@ const Cart = () => {
                                     borderTopLeftRadius: 0,
                                     borderBottomLeftRadius: 0,
                                   }}
-                                  onClick={() => handleAddItem(row?.model_id)}>
+                                  onClick={() => handleAddItem(row?.modelid)}>
                                   +
                                 </Button>
                               </Box>
@@ -461,7 +461,7 @@ const Cart = () => {
                                     cursor: 'pointer',
                                   },
                                 }}
-                                onClick={() => handleDeleteItem(row?.model_id)}>
+                                onClick={() => handleDeleteItem(row?.modelid)}>
                                 Xóa
                               </Typography>
                             </TableCell>

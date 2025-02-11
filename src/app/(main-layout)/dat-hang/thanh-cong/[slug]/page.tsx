@@ -148,7 +148,7 @@ const CheckoutSuccess = () => {
                     pb: 3,
                     borderTop: index !== 0 ? '1px solid #f3f4f6' : 'none',
                   }}
-                  key={item.model_id}>
+                  key={item.modelid}>
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <Box
                       sx={{
@@ -349,7 +349,7 @@ const CheckoutSuccess = () => {
                   mb: 1,
                 }}>
                 <Typography sx={{ fontSize: 13 }}>Mã đơn hàng:</Typography>
-                <Typography sx={{ fontSize: 14 }}>{order?._id}</Typography>
+                <Typography sx={{ fontSize: 14 }}>{order?.id}</Typography>
               </Box>
               <Box
                 sx={{

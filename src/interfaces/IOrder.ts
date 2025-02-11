@@ -6,7 +6,7 @@ export interface ICartPayload {
 }
 
 export interface IOrderItem {
-    model_id: string;
+    modelid: string;
     name: string;
     image: string;
     price: number;
@@ -14,14 +14,14 @@ export interface IOrderItem {
         tier_index: number[];
         is_pre_order: boolean;
     };
-    product_id: string;
+    productid: string;
     product_name: string;
     quantity: number;
 }
 
 export interface IOrder {
-    _id: string;
-    user_id: string;
+    id: string;
+    userid: string;
     customer: {
         name: string;
         phone: string;
@@ -40,7 +40,7 @@ export interface IOrder {
         address: string;
     };
     payment: {
-        _id: string,
+        id: string,
         key: string,
         name: string,
         image: string,
@@ -76,5 +76,5 @@ export interface ICreateOrder {
         is_online_order: boolean,
     },
     note?: string,
-    user_id: string | null;
+    userid: string | null;
 }

@@ -1,11 +1,11 @@
 export interface IUser {
-    _id?: string;
+    id?: string;
     email: string;
     name: string;
     picture?: string;
 }
 export interface IWhoIAmResponse {
-    _id?: string;
+    id?: string;
     name?: string;
     email?: string;
     exp?: number;

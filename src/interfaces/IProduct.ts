@@ -24,7 +24,7 @@ export interface IVariant {
 }
 
 export interface IModel {
-    _id: string;
+    id: string;
     name: string;
     price: number;
     stock: number;
@@ -35,18 +35,17 @@ export interface IModel {
 }
 
 export interface IProduct {
-    _id: string;
+    id: number;
     name: string;
-    // discount?: IDiscount;
+    categoryId: number;
     category: ICategory;
-    original_price: number;
     tags: ITagOptions[];
     images: string[];
-    // sku_name: string;
-    tier_variations: IVariant[];
     brand: string;
     details: IDetails;
     description: string;
+    skus: {
+        price: number;
+    }[]
     createdAt: string;
-    models: IModel[]
 }

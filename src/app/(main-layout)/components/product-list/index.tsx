@@ -50,7 +50,7 @@ const ProductList = () => {
                 {categories?.categories.map((item) => (
                   <AppLink
                     href={item?.slug}
-                    key={item._id}
+                    key={item.id}
                     sx={{
                       color: '#000',
                     }}>

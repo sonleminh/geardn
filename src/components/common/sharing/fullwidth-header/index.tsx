@@ -40,7 +40,7 @@ const FullWidthHeader = ({
 
   useEffect(() => {
     const at = Cookies.get('at');
-    if (user?._id && !at) {
+    if (user?.id && !at) {
       logout();
       router.push(ROUTES.LOGIN);
     }

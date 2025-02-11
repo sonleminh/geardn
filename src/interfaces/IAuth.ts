@@ -16,7 +16,7 @@ export interface ILogInResponse {
   email: string;
   name: string;
   role: string;
-  _id: string;
+  id: string;
   statusCode: number;
   message: string;
 }
@@ -27,7 +27,7 @@ export interface ILogoutResponse {
 }
 
 export interface ISignUpResponse {
-  _id: string;
+  id: string;
   email: string;
   name: string;
   role: string;

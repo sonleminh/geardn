@@ -83,11 +83,11 @@ const Purchase = () => {
                     </TableHead>
                     <TableBody>
                       {cart?.items?.map((row) => {
-                        const isItemSelected = selected.includes(row.model_id);
+                        const isItemSelected = selected.includes(row.modelid);
 
                         return (
                           <TableRow
-                            key={row.model_id}
+                            key={row.modelid}
                             sx={{
                               '&:last-child td, &:last-child th': { border: 0 },
                             }}>
@@ -95,7 +95,7 @@ const Purchase = () => {
                               <Checkbox
                                 color='primary'
                                 checked={isItemSelected}
-                                onClick={(e) => handleClick(e, row.model_id)}
+                                onClick={(e) => handleClick(e, row.modelid)}
                               />
                             </TableCell>
                             <TableCell
@@ -162,7 +162,7 @@ const Purchase = () => {
                                     borderBottomRightRadius: 0,
                                   }}
                                   onClick={() =>
-                                    handleSubtractItem(row?.model_id)
+                                    handleSubtractItem(row?.modelid)
                                   }>
                                   -
                                 </Button>
@@ -200,19 +200,19 @@ const Purchase = () => {
                                   type='number'
                                   size='small'
                                   value={
-                                    quantityInputs[row.model_id] ?? row.quantity
+                                    quantityInputs[row.modelid] ?? row.quantity
                                   }
                                   onChange={(e) =>
-                                    handleQuantityInputChange(e, row?.model_id)
+                                    handleQuantityInputChange(e, row?.modelid)
                                   }
                                   onBlur={() =>
-                                    handleQuantityInputBlur(row?.model_id)
+                                    handleQuantityInputBlur(row?.modelid)
                                   }
                                   onKeyDown={(e) =>
-                                    handleKeyDown(e, row?.model_id)
+                                    handleKeyDown(e, row?.modelid)
                                   }
                                   inputRef={(ref) =>
-                                    (inputRefs.current[row.model_id] = ref)
+                                    (inputRefs.current[row.modelid] = ref)
                                   }
                                 />
                                 <Button
@@ -220,7 +220,7 @@ const Purchase = () => {
                                     borderTopLeftRadius: 0,
                                     borderBottomLeftRadius: 0,
                                   }}
-                                  onClick={() => handleAddItem(row?.model_id)}>
+                                  onClick={() => handleAddItem(row?.modelid)}>
                                   +
                                 </Button>
                               </Box>
@@ -237,7 +237,7 @@ const Purchase = () => {
                                     color: 'red',
                                   },
                                 }}
-                                onClick={() => handleDeleteItem(row?.model_id)}>
+                                onClick={() => handleDeleteItem(row?.modelid)}>
                                 Xoá
                               </Typography>
                             </TableCell>

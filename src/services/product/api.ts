@@ -14,7 +14,7 @@ import queryString from 'query-string';
 type TProductsRes = {
   products: IProduct[];
   categories: {
-    _id: string;
+    id: string;
     label: string;
   }[];
   total: number;
@@ -22,7 +22,7 @@ type TProductsRes = {
 
 type TCategoriesRes = {
   categories: {
-    _id: string;
+    id: string;
     name: string;
     icon: string;
     slug: string;
@@ -31,12 +31,11 @@ type TCategoriesRes = {
 };
 
 
-export const useGetProducts = (query: IQuery) => {
+export const useGetProducts = (query?: IQuery) => {
   const newParams = { ...query };
-  // const newParams = { ...query, page: query?.page ?? 1 };
   const queryParams = queryString.stringify(newParams ?? {});
   console.log('qr:', queryParams)
-  const { data, error, isLoading } = useSWR(`${BASE_API_URL}/product?${queryParams}`, fetcher);
+  const { data, error, isLoading } = useSWR(`${BASE_API_URL}/products?${queryParams}`, fetcher);
   return {
     products: data as TProductsRes,
     isLoading,
@@ -44,8 +43,8 @@ export const useGetProducts = (query: IQuery) => {
   };
 };
 
-export const useGetProductById = (id: string) => {
-  const { data, error, isLoading } = useSWR(`${BASE_API_URL}/product/${id}`, fetcher);
+export const useGetProductById = (id: number) => {
+  const { data, error, isLoading } = useSWR(`${BASE_API_URL}/products/${id}`, fetcher);
   return {
     product: data as IProduct,
     isLoading,
@@ -63,7 +62,7 @@ export const useGetSKUByPrdId = (id: string) => {
 };
 
 export const useGetCategories = () => {
-  const { data, error, isLoading } = useSWR(`${BASE_API_URL}/category`, fetcher);
+  const { data, error, isLoading } = useSWR(`${BASE_API_URL}/categories`, fetcher);
   return {
     categories: data as TCategoriesRes,
     isLoading,

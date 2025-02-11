@@ -150,13 +150,13 @@ const Checkout = () => {
               ? `${detailAddress}, ${ward}, ${district}, ${city}`
               : shopAddress,
         },
-        user_id: user?._id ?? null,
+        userid: user?.id ?? null,
       };
       try {
         const res = await createOrder(payload);
         showNotification('Đặt hàng thành công', 'success');
         globalMutate(`${BASE_API_URL}/cart`, undefined, { revalidate: true });
-        // router.push(`/dat-hang/thanh-cong/${res._id}`);
+        // router.push(`/dat-hang/thanh-cong/${res.id}`);
       } catch (error: any) {
         showNotification(error?.message, 'error');
       }
@@ -225,7 +225,7 @@ const Checkout = () => {
                     pb: 3,
                     borderTop: index !== 0 ? '1px solid #f3f4f6' : 'none',
                   }}
-                  key={item.model_id}>
+                  key={item.modelid}>
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <Box
                       sx={{
@@ -702,7 +702,7 @@ const Checkout = () => {
                     <FormControlLabel
                       sx={{ my: 1 }}
                       key={item?.key}
-                      value={item?._id}
+                      value={item?.id}
                       control={<Radio size='small' />}
                       label={
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>

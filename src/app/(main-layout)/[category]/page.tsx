@@ -5,7 +5,7 @@ import { Box, FormControl, Grid2, Typography } from '@mui/material';
 import React from 'react';
 
 const Category = async ({ params }: { params: { category: string } }) => {
-  const { data } = await getPrdByCateSlug(params?.category);
+  // const { data } = await getPrdByCateSlug(params?.category);
   return (
     <Box sx={{ py: 4, bgcolor: '#eee' }}>
       <LayoutContainer>
@@ -61,11 +61,11 @@ const Category = async ({ params }: { params: { category: string } }) => {
           </FormControl>
         </Box>
         <Grid2 container spacing={2}>
-          {data?.map((item) => (
-            <Grid2 size={3} key={item._id}>
+          {/* {data?.map((item) => (
+            <Grid2 size={3} key={item.id}>
               <ProductCard data={item} />
             </Grid2>
-          ))}
+          ))} */}
         </Grid2>
       </LayoutContainer>
     </Box>

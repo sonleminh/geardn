@@ -1,5 +1,5 @@
 export interface IPayment {
-    _id: string;
+    id: string;
     key: string;
     name: string;
     image: string;
@@ -15,7 +15,7 @@ export interface ICreatePayment extends Record<string, unknown>  {
 }
 
 export interface IUpdatePaymentPayload {
-    _id: string;
+    id: string;
     key: string;
     name: string;
     image: string;
