@@ -10,7 +10,7 @@ import { useNotificationContext } from '@/contexts/NotificationContext';
 import { IModel, IVariant } from '@/interfaces/IProduct';
 import { useAuthStore } from '@/providers/auth-store-provider';
 import { addCartAPI, useGetCart } from '@/services/cart/api';
-import { useGetProductById } from '@/services/product/api';
+import { useGetProductById, useGetProductBySlug } from '@/services/product/api';
 import { formatPrice } from '@/utils/format-price';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import StarRateIcon from '@mui/icons-material/StarRate';
@@ -25,7 +25,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Swiper as SwiperClass } from 'swiper';
 import { useSWRConfig } from 'swr';
 import MainSwiper from './components/main-swiper';
@@ -53,151 +53,221 @@ const ProductDetail = () => {
   const [addQuantityError, setAddQuantityError] = useState<boolean>(false);
   const [isOutOfStock, setIsOutOfStock] = useState<boolean>(false);
 
-  const { product } = useGetProductById(params?.slug as string);
+  const { product } = useGetProductBySlug(params?.slug as string);
+  console.log('prduct', product);
 
   const breadcrumbsOptions = [
     { href: '/', label: 'Home' },
     { href: `/product/${product?.id}`, label: product?.name as string },
   ];
 
+  const attributeOptions = useMemo(() => {
+    const options: Record<string, string[]> = {};
+    product?.skus?.forEach((sku) => {
+      sku?.productSkuAttributes?.forEach(({ attribute }) => {
+        if (!options[attribute.type]) {
+          options[attribute.type] = [];
+        }
+        if (!options[attribute.type].includes(attribute.value)) {
+          options[attribute.type].push(attribute.value);
+        }
+      });
+    });
+    return options;
+  }, [product?.skus]);
+
+  console.log('attributeOptions', attributeOptions);
+
+  const [selectedAttributes, setSelectedAttributes] = useState<
+    Record<string, string>
+  >(
+    Object.fromEntries(
+      Object.keys(attributeOptions).map((key) => [
+        key,
+        attributeOptions[key][0],
+      ])
+    )
+  );
+
   useEffect(() => {
-    if (product?.tier_variations?.length) {
-      const matchedModel = product?.models?.find(
-        (model) =>
-          JSON.stringify(model?.extinfo?.tier_index) ===
-          JSON.stringify(selectedModel)
+    setSelectedAttributes((prev) => {
+      const newAttributes = Object.fromEntries(
+        Object.keys(attributeOptions).map((key) => [
+          key,
+          attributeOptions[key][0],
+        ])
       );
-      setMatchedModel(matchedModel ?? null);
-    } else {
-      setMatchedModel(product?.models?.[0]);
-    }
-  }, [cart, selectedModel, product]);
+      return { ...prev, ...newAttributes };
+    });
+  }, [attributeOptions]);
 
-  useEffect(() => {
-    if (
-      (product?.tier_variations?.length === 0 &&
-        product?.models?.[0]?.stock === 0) ||
-      getTotalStock() === 0
-    ) {
-      setIsOutOfStock(true);
-    }
-  }, [selectedModel, product]);
+  console.log('attributeOptions', attributeOptions);
 
-  useEffect(() => {
-    const variant = product?.tier_variations?.find(
-      (variant) => variant?.images
-    );
-    if (variant?.images?.length && selectedModel !== undefined) {
-      setOptionImage(variant?.images[selectedModel[0] as number]);
-    } else {
-      setOptionImage(product?.images?.[0]);
-    }
-  }, [selectedModel, product]);
+  // useEffect(() => {
+  //   if (product?.tier_variations?.length) {
+  //     const matchedModel = product?.models?.find(
+  //       (model) =>
+  //         JSON.stringify(model?.extinfo?.tier_index) ===
+  //         JSON.stringify(selectedModel)
+  //     );
+  //     setMatchedModel(matchedModel ?? null);
+  //   } else {
+  //     setMatchedModel(product?.models?.[0]);
+  //   }
+  // }, [cart, selectedModel, product]);
 
-  const handleToggleChange = (newValue: string, vIndex: number) => {
-    const optionIndex = product?.tier_variations[vIndex]?.options?.indexOf(
-      newValue ?? ''
-    );
-    const updatedSelectedModel = [...selectedModel];
-    if (optionIndex !== -1) {
-      updatedSelectedModel[vIndex] = optionIndex;
-    } else {
-      updatedSelectedModel[vIndex] = undefined;
-    }
-    setSelectedModel(updatedSelectedModel);
-    setAddCartError(false);
-    setAddQuantityError(false);
-  };
+  // useEffect(() => {
+  //   if (
+  //     (product?.tier_variations?.length === 0 &&
+  //       product?.models?.[0]?.stock === 0) ||
+  //     getTotalStock() === 0
+  //   ) {
+  //     setIsOutOfStock(true);
+  //   }
+  // }, [selectedModel, product]);
 
-  const handleDisableOption = (variantIndex: number, optionIndex: number) => {
-    const updatedSelectedModel = [...selectedModel];
-    updatedSelectedModel[variantIndex] = optionIndex;
+  // useEffect(() => {
+  //   const variant = product?.tier_variations?.find(
+  //     (variant) => variant?.images
+  //   );
+  //   if (variant?.images?.length && selectedModel !== undefined) {
+  //     setOptionImage(variant?.images[selectedModel[0] as number]);
+  //   } else {
+  //     setOptionImage(product?.images?.[0]);
+  //   }
+  // }, [selectedModel, product]);
 
-    const validCombination = product?.models?.some((model) =>
-      model.extinfo.tier_index.every(
-        (tierIndex: number, idx: number) =>
-          updatedSelectedModel[idx] === undefined ||
-          updatedSelectedModel[idx] === tierIndex
-      )
-    );
-    return !validCombination;
-  };
+  // const handleToggleChange = (newValue: string, vIndex: number) => {
+  //   const optionIndex = product?.tier_variations[vIndex]?.options?.indexOf(
+  //     newValue ?? ''
+  //   );
+  //   const updatedSelectedModel = [...selectedModel];
+  //   if (optionIndex !== -1) {
+  //     updatedSelectedModel[vIndex] = optionIndex;
+  //   } else {
+  //     updatedSelectedModel[vIndex] = undefined;
+  //   }
+  //   setSelectedModel(updatedSelectedModel);
+  //   setAddCartError(false);
+  //   setAddQuantityError(false);
+  // };
+
+  // const handleDisableOption = (variantIndex: number, optionIndex: number) => {
+  //   const updatedSelectedModel = [...selectedModel];
+  //   updatedSelectedModel[variantIndex] = optionIndex;
+
+  //   const validCombination = product?.models?.some((model) =>
+  //     model.extinfo.tier_index.every(
+  //       (tierIndex: number, idx: number) =>
+  //         updatedSelectedModel[idx] === undefined ||
+  //         updatedSelectedModel[idx] === tierIndex
+  //     )
+  //   );
+  //   return !validCombination;
+  // };
   const handleCountChange = (value: number | null) => {
     if (value && value >= 0) {
       setCount(value);
     }
   };
 
-  const handleAddCart = async () => {
-    // if (!user) {
-    //   router.push('/tai-khoan');
-    // }
-    if (matchedModel === null) {
-      return setAddCartError(true);
-    }
-    const modelInCart = cart?.items?.find(
-      (item) => item.modelid === matchedModel?.id
+  // const handleAddCart = async () => {
+  //   // if (!user) {
+  //   //   router.push('/tai-khoan');
+  //   // }
+  //   if (matchedModel === null) {
+  //     return setAddCartError(true);
+  //   }
+  //   const modelInCart = cart?.items?.find(
+  //     (item) => item.modelid === matchedModel?.id
+  //   );
+
+  //   if (
+  //     modelInCart &&
+  //     (count ?? 1) + modelInCart?.quantity > matchedModel?.stock
+  //   ) {
+  //     return setAddQuantityError(true);
+  //   }
+  //   try {
+  //     await addCartAPI({
+  //       userid: user?.id ? user?.id : null,
+  //       model:
+  //         product?.tier_variations?.length === 0
+  //           ? product?.models[0]?.id ?? ''
+  //           : matchedModel?.id ?? '',
+  //       quantity: count ?? 1,
+  //     });
+  //     mutate('/cart');
+  //     globalMutate(`/cart`, undefined, { revalidate: true });
+  //     showNotification('Sản phẩm đã dược thêm vào giỏ hàng!', 'success');
+  //     setAddQuantityError(false);
+  //   } catch (error: any) {
+  //     showNotification(error?.message, 'error');
+  //   }
+  // };
+
+  // const handleBuyBtn = () => {
+  //   if (!user) {
+  //     router.push('/tai-khoan');
+  //   }
+  //   if (matchedModel === null) {
+  //     return setAddCartError(true);
+  //   }
+
+  //   const modelInCart = cart?.items?.find(
+  //     (item) => item.modelid === matchedModel?.id
+  //   );
+
+  //   // if (
+  //   //   modelInCart &&
+  //   //   (count ?? 1) + modelInCart?.quantity > matchedModel?.stock
+  //   // ) {
+  //   //   return setAddQuantityError(true);
+  //   // }
+
+  //   const currentModel = {
+  //     ...matchedModel,
+  //     modelid: matchedModel?.id,
+  //     image: optionImage,
+  //     productid: product?.id,
+  //     product_name: product?.name,
+  //     quantity: count ?? 1,
+  //   };
+  //   const { stock, ...rest } = currentModel;
+  //   addProducts([rest]);
+  //   router.push(ROUTES.CHECKOUT);
+  // };
+
+  // function getTotalStock() {
+  //   return product?.models?.reduce((sum, model) => sum + model.stock, 0);
+  // }
+
+  const selectedSku = useMemo(() => {
+    return product?.skus?.find((sku) =>
+      Object.entries(selectedAttributes).every(([key, value]) =>
+        sku.productSkuAttributes.some(
+          (attr) =>
+            attr.attribute.type === key && attr.attribute.value === value
+        )
+      )
     );
-
-    if (
-      modelInCart &&
-      (count ?? 1) + modelInCart?.quantity > matchedModel?.stock
-    ) {
-      return setAddQuantityError(true);
-    }
-    try {
-      await addCartAPI({
-        userid: user?.id ? user?.id : null,
-        model:
-          product?.tier_variations?.length === 0
-            ? product?.models[0]?.id ?? ''
-            : matchedModel?.id ?? '',
-        quantity: count ?? 1,
-      });
-      mutate('/cart');
-      globalMutate(`/cart`, undefined, { revalidate: true });
-      showNotification('Sản phẩm đã dược thêm vào giỏ hàng!', 'success');
-      setAddQuantityError(false);
-    } catch (error: any) {
-      showNotification(error?.message, 'error');
-    }
+  }, [selectedAttributes, product?.skus]);
+  console.log(
+    'cc:',
+    Object.entries({ COLOR: 'Xanh trắng', SWITCH: 'Leopog Reaper' })
+  );
+  console.log(
+    'selectedAttributes',
+    Object.fromEntries(
+      Object.keys(attributeOptions).map((key) => [
+        key,
+        attributeOptions[key][0],
+      ])
+    )
+  );
+  const handleAttributeChange = (type: string, value: string) => {
+    setSelectedAttributes((prev) => ({ ...prev, [type]: value }));
   };
-
-  const handleBuyBtn = () => {
-    if (!user) {
-      router.push('/tai-khoan');
-    }
-    if (matchedModel === null) {
-      return setAddCartError(true);
-    }
-
-    const modelInCart = cart?.items?.find(
-      (item) => item.modelid === matchedModel?.id
-    );
-
-    // if (
-    //   modelInCart &&
-    //   (count ?? 1) + modelInCart?.quantity > matchedModel?.stock
-    // ) {
-    //   return setAddQuantityError(true);
-    // }
-
-    const currentModel = {
-      ...matchedModel,
-      modelid: matchedModel?.id,
-      image: optionImage,
-      productid: product?.id,
-      product_name: product?.name,
-      quantity: count ?? 1,
-    };
-    const { stock, ...rest } = currentModel;
-    addProducts([rest]);
-    router.push(ROUTES.CHECKOUT);
-  };
-
-  function getTotalStock() {
-    return product?.models?.reduce((sum, model) => sum + model.stock, 0);
-  }
 
   return (
     <Box pt={2} pb={4} bgcolor={'#eee'}>
@@ -265,11 +335,27 @@ const ProductDetail = () => {
                     Xem đánh giá
                   </AppLink>
                 </Box>
+                {Object.entries(attributeOptions).map(([type, values]) => (
+                  <div key={type}>
+                    <h4>Choose {type}:</h4>
+                    <ToggleButtonGroup
+                      value={selectedAttributes[type]}
+                      exclusive
+                      onChange={(e, newValue) =>
+                        newValue && handleAttributeChange(type, newValue)
+                      }>
+                      {values.map((value) => (
+                        <ToggleButton key={value} value={value}>
+                          {value}
+                        </ToggleButton>
+                      ))}
+                    </ToggleButtonGroup>
+                  </div>
+                ))}
                 <Typography sx={{ mb: 2, fontSize: 24, fontWeight: 600 }}>
-                  {formatPrice(
-                    matchedModel?.price || product?.original_price
-                  ) ?? formatPrice(product?.original_price)}
+                  {selectedSku ? formatPrice(selectedSku?.price) : 0}
                 </Typography>
+                {/* 
                 {product?.tier_variations?.map((variant: IVariant, vIndex) => (
                   <Grid2
                     container
@@ -352,7 +438,7 @@ const ProductDetail = () => {
                       </ToggleButtonGroup>
                     </Grid2>
                   </Grid2>
-                ))}
+                ))} */}
                 <Grid2 container mt={3} mb={3}>
                   <Grid2 size={2}>Số lượng:</Grid2>
                   <Grid2 size={10} display={'flex'}>
@@ -411,8 +497,8 @@ const ProductDetail = () => {
                       </Button>
                     </ButtonGroup>
                     <Typography sx={{ fontSize: 14, lineHeight: '32px' }}>
-                      {matchedModel ? matchedModel?.stock : getTotalStock()} sản
-                      phẩm có sẵn
+                      {/* {matchedModel ? matchedModel?.stock : getTotalStock()} sản
+                      phẩm có sẵn */}
                     </Typography>
                   </Grid2>
                   {addCartError && (
@@ -427,7 +513,7 @@ const ProductDetail = () => {
                   )}
                 </Grid2>
                 <Box>
-                  <Button
+                  {/* <Button
                     sx={{ mr: 2, bgcolor: '#f0f0f0' }}
                     variant='outlined'
                     size='large'
@@ -449,7 +535,7 @@ const ProductDetail = () => {
                     {isOutOfStock || matchedModel?.stock === 0
                       ? 'Hết hàng'
                       : 'Mua ngay'}
-                  </Button>
+                  </Button> */}
                 </Box>
               </Box>
             </Grid2>

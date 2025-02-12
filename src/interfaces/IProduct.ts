@@ -1,4 +1,5 @@
 import { ICategory } from "./ICategory";
+import { IAttribute } from "./ISku";
 
 export interface ITagOptions {
     value: string;
@@ -44,8 +45,15 @@ export interface IProduct {
     brand: string;
     details: IDetails;
     description: string;
+    slug: string;
     skus: {
+        sku: string;
         price: number;
+        quantity: number;
+        productSkuAttributes: {
+            id: number;
+            attribute: IAttribute
+        }[]
     }[]
     createdAt: string;
 }

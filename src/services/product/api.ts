@@ -43,8 +43,8 @@ export const useGetProducts = (query?: IQuery) => {
   };
 };
 
-export const useGetProductById = (id: number) => {
-  const { data, error, isLoading } = useSWR(`${BASE_API_URL}/products/${id}`, fetcher);
+export const useGetProductBySlug = (slug: string) => {
+  const { data, error, isLoading } = useSWR(`${BASE_API_URL}/products/slug/${slug}`, fetcher);
   return {
     product: data as IProduct,
     isLoading,
