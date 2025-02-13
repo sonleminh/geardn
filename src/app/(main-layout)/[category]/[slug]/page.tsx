@@ -44,9 +44,6 @@ const ProductDetail = () => {
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperClass | null>(null);
   const [count, setCount] = useState<number | null>(1);
 
-  const [selectedModel, setSelectedModel] = useState<(number | undefined)[]>(
-    []
-  );
   const [optionImage, setOptionImage] = useState<string>('');
   const [matchedModel, setMatchedModel] = useState<IModel | null>(null);
   const [addCartError, setAddCartError] = useState<boolean>(false);
@@ -165,82 +162,75 @@ const ProductDetail = () => {
   //   );
   //   return !validCombination;
   // };
+
+  const generateCombinations = (
+    options: Record<string, string[]>
+  ): Record<string, string>[] => {
+    const keys = Object.keys(options);
+    if (keys.length === 0) return [];
+
+    const combinations: Record<string, string>[] = [];
+
+    const backtrack = (index: number, current: Record<string, string>) => {
+      if (index === keys.length) {
+        combinations.push({ ...current });
+        return;
+      }
+
+      const key = keys[index];
+      for (const value of options[key]) {
+        current[key] = value;
+        backtrack(index + 1, current);
+        delete current[key]; // Quay lui để thử giá trị khác
+      }
+    };
+
+    backtrack(0, {});
+    return combinations;
+  };
+
+  console.log('obj:', generateCombinations(attributeOptions));
+
+  const handleDisableAttribute = useMemo(() => {
+    // Tạo tất cả tổ hợp từ attributeOptions
+    const combinations = generateCombinations(attributeOptions);
+
+    // Tạo tập hợp các tổ hợp hợp lệ từ SKU
+    const validCombinations = new Set(
+      product?.skus.map((sku) =>
+        JSON.stringify(
+          Object.fromEntries(
+            sku.productSkuAttributes.map(({ attribute }) => [
+              attribute.type,
+              attribute.value,
+            ])
+          )
+        )
+      )
+    );
+
+    // Trả về một hàm nhận type và value của toggle button hiện tại
+    return (type: string, value: string) => {
+      // Duyệt qua tất cả các tổ hợp được tạo ra
+      for (const combination of combinations) {
+        // Nếu tổ hợp có thuộc tính type bằng value
+        // và tổ hợp đó nằm trong tập hợp các tổ hợp hợp lệ
+        if (
+          combination[type] === value &&
+          validCombinations.has(JSON.stringify(combination))
+        ) {
+          return false; // Không disable (cho phép chọn)
+        }
+      }
+      return true; // Disable nếu không tìm thấy tổ hợp hợp lệ nào
+    };
+  }, [attributeOptions, product?.skus]);
+
   const handleCountChange = (value: number | null) => {
     if (value && value >= 0) {
       setCount(value);
     }
   };
-
-  // const handleAddCart = async () => {
-  //   // if (!user) {
-  //   //   router.push('/tai-khoan');
-  //   // }
-  //   if (matchedModel === null) {
-  //     return setAddCartError(true);
-  //   }
-  //   const modelInCart = cart?.items?.find(
-  //     (item) => item.modelid === matchedModel?.id
-  //   );
-
-  //   if (
-  //     modelInCart &&
-  //     (count ?? 1) + modelInCart?.quantity > matchedModel?.stock
-  //   ) {
-  //     return setAddQuantityError(true);
-  //   }
-  //   try {
-  //     await addCartAPI({
-  //       userid: user?.id ? user?.id : null,
-  //       model:
-  //         product?.tier_variations?.length === 0
-  //           ? product?.models[0]?.id ?? ''
-  //           : matchedModel?.id ?? '',
-  //       quantity: count ?? 1,
-  //     });
-  //     mutate('/cart');
-  //     globalMutate(`/cart`, undefined, { revalidate: true });
-  //     showNotification('Sản phẩm đã dược thêm vào giỏ hàng!', 'success');
-  //     setAddQuantityError(false);
-  //   } catch (error: any) {
-  //     showNotification(error?.message, 'error');
-  //   }
-  // };
-
-  // const handleBuyBtn = () => {
-  //   if (!user) {
-  //     router.push('/tai-khoan');
-  //   }
-  //   if (matchedModel === null) {
-  //     return setAddCartError(true);
-  //   }
-
-  //   const modelInCart = cart?.items?.find(
-  //     (item) => item.modelid === matchedModel?.id
-  //   );
-
-  //   // if (
-  //   //   modelInCart &&
-  //   //   (count ?? 1) + modelInCart?.quantity > matchedModel?.stock
-  //   // ) {
-  //   //   return setAddQuantityError(true);
-  //   // }
-
-  //   const currentModel = {
-  //     ...matchedModel,
-  //     modelid: matchedModel?.id,
-  //     image: optionImage,
-  //     productid: product?.id,
-  //     product_name: product?.name,
-  //     quantity: count ?? 1,
-  //   };
-  //   const { stock, ...rest } = currentModel;
-  //   addProducts([rest]);
-  //   router.push(ROUTES.CHECKOUT);
-  // };
-
-  // function getTotalStock() {
-  //   return product?.models?.reduce((sum, model) => sum + model.stock, 0);
-  // }
 
   const selectedSku = useMemo(() => {
     return product?.skus?.find((sku) =>
@@ -256,15 +246,7 @@ const ProductDetail = () => {
     'cc:',
     Object.entries({ COLOR: 'Xanh trắng', SWITCH: 'Leopog Reaper' })
   );
-  console.log(
-    'selectedAttributes',
-    Object.fromEntries(
-      Object.keys(attributeOptions).map((key) => [
-        key,
-        attributeOptions[key][0],
-      ])
-    )
-  );
+  console.log('selectedAttributes', selectedAttributes);
   const handleAttributeChange = (type: string, value: string) => {
     setSelectedAttributes((prev) => ({ ...prev, [type]: value }));
   };
@@ -345,7 +327,10 @@ const ProductDetail = () => {
                         newValue && handleAttributeChange(type, newValue)
                       }>
                       {values.map((value) => (
-                        <ToggleButton key={value} value={value}>
+                        <ToggleButton
+                          key={value}
+                          value={value}
+                          disabled={handleDisableAttribute(type, value)}>
                           {value}
                         </ToggleButton>
                       ))}
