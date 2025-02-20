@@ -24,7 +24,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useParams, useRouter } from 'next/navigation';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Swiper as SwiperClass } from 'swiper';
 import { useSWRConfig } from 'swr';
 import MainSwiper from './components/main-swiper';
@@ -35,11 +35,13 @@ const ProductDetail = () => {
   const router = useRouter();
   const { cart, mutate, isLoading } = useGetCart();
   const { user, addProducts } = useAuthStore((state) => state);
+  const mainSwiperRef = useRef<SwiperClass | null>(null);
 
   const { mutate: globalMutate } = useSWRConfig();
   const { showNotification } = useNotificationContext();
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperClass | null>(null);
   const [count, setCount] = useState<number | null>(1);
+  console.log('count:', count);
 
   const [optionImage, setOptionImage] = useState<string>('');
   const [matchedModel, setMatchedModel] = useState<IModel | null>(null);
@@ -122,7 +124,12 @@ const ProductDetail = () => {
       (value) => value === null
     );
 
-    if (hasNullValue) return null;
+    if (
+      hasNullValue ||
+      Object.keys(selectedAttributes).length !==
+        Object.keys(attributeOptions).length
+    )
+      return null;
     return Object.keys(selectedAttributes).length > 0
       ? product?.skus?.find((sku) =>
           Object.entries(selectedAttributes).every(([key, value]) =>
@@ -155,6 +162,34 @@ const ProductDetail = () => {
     });
   };
 
+  const productImageList = useMemo(() => {
+    return [
+      ...(product?.images || []),
+      ...(product?.skus.map((sku) => sku.imageUrl) || []),
+    ];
+  }, [product?.images, product?.skus]);
+
+  console.log('selected:', selectedAttributes);
+  console.log('slt:', selectedSku);
+  console.log('attributeOptions:', attributeOptions);
+
+  useEffect(() => {
+    if (selectedSku && mainSwiperRef.current) {
+      const imageIndex = productImageList.findIndex(
+        (img) => img === selectedSku.imageUrl
+      );
+
+      if (imageIndex !== -1) {
+        mainSwiperRef.current.slideTo(imageIndex);
+      }
+    }
+  }, [selectedSku, productImageList]);
+
+  const totalStock = product?.skus?.reduce(
+    (acc, sku) => acc + (sku.quantity || 0),
+    0
+  );
+
   return (
     <Box pt={2} pb={4} bgcolor={'#eee'}>
       <LayoutContainer>
@@ -171,9 +206,9 @@ const ProductDetail = () => {
                     width: '100%',
                     height: '100%',
                   }}>
-                  {optionImage ? (
+                  {/* {selectedSku ? (
                     <SkeletonImage
-                      src={optionImage}
+                      src={selectedSku?.imageUrl}
                       alt='Selected Option'
                       style={{
                         position: 'absolute',
@@ -183,26 +218,27 @@ const ProductDetail = () => {
                         objectFit: 'contain',
                       }}
                     />
-                  ) : null}
+                  ) : null} */}
                   <Box
                     sx={{
                       position: 'absolute',
                       top: 0,
                       width: '100%',
                       height: '400px',
-                      display: optionImage ? 'none' : 'block',
+                      // display: selectedSku?.imageUrl ? 'none' : 'block',
                     }}>
                     <MainSwiper
-                      data={product?.images}
+                      data={productImageList}
                       thumbsSwiper={thumbsSwiper}
+                      setMainSwiper={mainSwiperRef}
                     />
                   </Box>
                 </Box>
               </Box>
               <Box mb={1} />
-              <Box onClick={() => setOptionImage('')}>
+              <Box>
                 <ThumbSwiper
-                  images={product?.images}
+                  images={productImageList}
                   setThumbsSwiper={setThumbsSwiper}
                 />
               </Box>
@@ -280,7 +316,7 @@ const ProductDetail = () => {
                     <ButtonGroup
                       variant='outlined'
                       size='small'
-                      disabled={isOutOfStock || matchedModel === null}
+                      disabled={isOutOfStock || selectedSku === null}
                       sx={{ mr: 2, height: 32 }}>
                       <Button
                         onClick={() => handleCountChange((count ?? 0) - 1)}>
@@ -303,12 +339,12 @@ const ProductDetail = () => {
                           },
                         }}
                         type='number'
-                        disabled={isOutOfStock || matchedModel === null}
+                        disabled={isOutOfStock || selectedSku === null}
                         value={count ?? ''}
                         onChange={(e) => {
                           const value = e.target.value;
-                          if (matchedModel && +value > matchedModel?.stock) {
-                            setCount(matchedModel?.stock);
+                          if (selectedSku && +value > selectedSku?.quantity) {
+                            setCount(selectedSku?.quantity);
                           } else {
                             setCount(value ? parseInt(value, 10) : null);
                           }
@@ -327,13 +363,16 @@ const ProductDetail = () => {
                         size='small'
                       />
                       <Button
-                        onClick={() => handleCountChange((count ?? 0) + 1)}>
+                        onClick={() => handleCountChange((count ?? 0) + 1)}
+                        disabled={count === selectedSku?.quantity}
+                        // disabled={isOutOfStock || selectedSku === null}
+                      >
                         +
                       </Button>
                     </ButtonGroup>
                     <Typography sx={{ fontSize: 14, lineHeight: '32px' }}>
-                      {/* {matchedModel ? matchedModel?.stock : getTotalStock()} sản
-                      phẩm có sẵn */}
+                      {selectedSku ? selectedSku?.quantity : totalStock} sản
+                      phẩm có sẵn
                     </Typography>
                   </Grid2>
                   {addCartError && (

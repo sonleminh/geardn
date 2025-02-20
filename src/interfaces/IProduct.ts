@@ -50,6 +50,7 @@ export interface IProduct {
         sku: string;
         price: number;
         quantity: number;
+        imageUrl: string;
         productSkuAttributes: {
             id: number;
             attribute: IAttribute

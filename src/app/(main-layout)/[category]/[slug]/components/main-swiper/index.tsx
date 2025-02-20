@@ -1,26 +1,31 @@
 'use client';
 
 import React from 'react';
-import { Swiper, SwiperSlide } from 'swiper/react';
+import { Swiper, SwiperClass, SwiperSlide } from 'swiper/react';
 import { FreeMode, Navigation, Thumbs } from 'swiper/modules';
 import { Box, SxProps, Theme } from '@mui/material';
 import SkeletonImage from '@/components/common/SkeletonImage';
 
-const MainSwiper = (props: any) => {
+interface IProps {
+  data: string[];
+  thumbsSwiper: SwiperClass | null;
+  setMainSwiper: React.MutableRefObject<SwiperClass | null>;
+}
+
+const MainSwiper = ({ data, thumbsSwiper, setMainSwiper }: IProps) => {
   return (
     <Box sx={SwiperStyle}>
       <Swiper
+        onSwiper={(swiper) => (setMainSwiper.current = swiper)}
         spaceBetween={10}
         thumbs={{
           swiper:
-            props?.thumbsSwiper && !props?.thumbsSwiper?.destroyed
-              ? props?.thumbsSwiper
-              : null,
+            thumbsSwiper && !thumbsSwiper?.destroyed ? thumbsSwiper : null,
         }}
         modules={[FreeMode, Navigation, Thumbs]}
         navigation={true}
         className='mainSwiper'>
-        {props?.data?.map((item: any) => (
+        {data?.map((item: any) => (
           <SwiperSlide key={item}>
             <Box
               sx={{

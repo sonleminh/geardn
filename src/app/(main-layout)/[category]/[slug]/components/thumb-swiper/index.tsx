@@ -20,9 +20,10 @@ const ThumbSwiper = ({ images, setThumbsSwiper }: IProps) => {
         direction={'horizontal'}
         spaceBetween={20}
         slidesPerView={images?.length ?? 3}
-        freeMode={true}
+        // freeMode={true}
         watchSlidesProgress={true}
         modules={[FreeMode, Navigation, Thumbs]}
+        navigation={true}
         className='thumbSwiper'>
         {images?.map((item: any) => (
           <SwiperSlide key={item}>
@@ -69,5 +70,19 @@ const SwiperStyle: SxProps<Theme> = {
   },
   '.swiper-slide-thumb-active': {
     borderColor: '#696969',
+  },
+  '.swiper-button-prev, .swiper-button-next': {
+    width: 36,
+    height: 36,
+    border: '1px solid #696969',
+    borderRadius: '50%',
+    bgcolor: 'rgba(24, 24, 24, 0.7)',
+    color: '#fff',
+    ':after': {
+      fontSize: 12,
+    },
+    ':hover': {
+      bgcolor: 'rgba(24, 24, 24, 0.3)',
+    },
   },
 };
