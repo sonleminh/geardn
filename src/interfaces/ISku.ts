@@ -8,12 +8,13 @@ export interface IAttribute {
 export interface ISku {
     id: string;
     productid: string;
-    product_name: string;
-    product_sku: string;
-    attributes: IAttribute[];
     sku: string;
     price: number;
     quantity: number;
-    status: string;
+    imageUrl: string;
+    productSkuAttributes: {
+        id: number;
+        attribute: IAttribute
+    }[]
     createdAt: Date;
 }

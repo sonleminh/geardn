@@ -45,7 +45,7 @@ export default function Login() {
         email: userData?.email,
         name: userData?.name,
       });
-
+      console.log('userData', userData);
       if (userData?.id) {
         router.push('/tai-khoan');
       }
@@ -239,7 +239,7 @@ export default function Login() {
             />
             <Typography sx={{ mb: 2 }}>
               Bạn chưa có tài khoản?{' '}
-              <Link href={'/signup'}>
+              <Link href={'/dang-ky'}>
                 {' '}
                 <Typography component={'span'}>Đăng ký</Typography>
               </Link>

@@ -6,7 +6,7 @@ import { ICartItem } from '@/interfaces/ICart';
 import { IOrderItem } from '@/interfaces/IOrder';
 
 export type AuthState = {
-  user?: IUser | null;
+  user: IUser | null;
   orderFormData?: 
     {
       customer: {
@@ -39,19 +39,6 @@ export const defaultInitState: AuthState = {
   }
 }
 
-const sessionStorageAdapter: PersistStorage<AuthStore> = {
-  getItem: (name) => {
-    const item = sessionStorage.getItem(name)
-    return item ? JSON.parse(item) : [];
-  },
-  setItem: (name, value) => {
-    sessionStorage.setItem(name, JSON.stringify(value));
-  },
-  removeItem: (name) => {
-    sessionStorage.removeItem(name);
-  },
-}
-
 export const authStore = (
   initState: AuthState = defaultInitState,
 ) => {
@@ -69,7 +56,7 @@ export const authStore = (
       set(
         (state) => ({
           orderFormData: {
-            customer: customerData,
+            customer: customerData, 
             products: state.orderFormData?.products || [], // Ensure products field is included
           },
         }),
@@ -78,7 +65,5 @@ export const authStore = (
       ),
   }), {
     name: 'store',
-    // storage: sessionStorageAdapter,
-    // storage: sessionStorage,  // Use sessionStorage to persist checkoutData
   }))))
 }

@@ -37,6 +37,7 @@ export default function SignUp() {
     async onSubmit(values) {
       // signInMutation.mutate(values);
       const result = await signUpAPI(values);
+      console.log('result', result);
       if (result.id) {
         router.push('/tai-khoan');
       }

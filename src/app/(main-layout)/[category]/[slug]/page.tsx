@@ -29,6 +29,9 @@ import { Swiper as SwiperClass } from 'swiper';
 import { useSWRConfig } from 'swr';
 import MainSwiper from './components/main-swiper';
 import ThumbSwiper from './components/thumb-swiper';
+import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
+import { useCartStore } from '@/stores/cart-store';
+import { ISku } from '@/interfaces/ISku';
 
 const ProductDetail = () => {
   const params = useParams();
@@ -41,7 +44,6 @@ const ProductDetail = () => {
   const { showNotification } = useNotificationContext();
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperClass | null>(null);
   const [count, setCount] = useState<number | null>(1);
-  console.log('count:', count);
 
   const [optionImage, setOptionImage] = useState<string>('');
   const [matchedModel, setMatchedModel] = useState<IModel | null>(null);
@@ -50,6 +52,8 @@ const ProductDetail = () => {
   const [isOutOfStock, setIsOutOfStock] = useState<boolean>(false);
 
   const { product } = useGetProductBySlug(params?.slug as string);
+
+  const addToCart = useCartStore((state) => state.addToCart);
 
   const breadcrumbsOptions = [
     { href: '/', label: 'Home' },
@@ -119,7 +123,7 @@ const ProductDetail = () => {
     }
   };
 
-  const selectedSku = useMemo(() => {
+  const selectedSku = useMemo<ISku | null>(() => {
     const hasNullValue = Object.values(selectedAttributes).some(
       (value) => value === null
     );
@@ -130,16 +134,17 @@ const ProductDetail = () => {
         Object.keys(attributeOptions).length
     )
       return null;
-    return Object.keys(selectedAttributes).length > 0
-      ? product?.skus?.find((sku) =>
-          Object.entries(selectedAttributes).every(([key, value]) =>
-            sku.productSkuAttributes.some(
-              (attr) =>
-                attr.attribute.type === key && attr.attribute.value === value
-            )
+
+    return (
+      product?.skus?.find((sku) =>
+        Object.entries(selectedAttributes).every(([key, value]) =>
+          sku.productSkuAttributes.some(
+            (attr) =>
+              attr.attribute.type === key && attr.attribute.value === value
           )
         )
-      : null;
+      ) ?? null
+    );
   }, [selectedAttributes, product?.skus]);
 
   const getLowestPrice = () => {
@@ -169,9 +174,48 @@ const ProductDetail = () => {
     ];
   }, [product?.images, product?.skus]);
 
-  console.log('selected:', selectedAttributes);
-  console.log('slt:', selectedSku);
-  console.log('attributeOptions:', attributeOptions);
+  const handleAddCart = async () => {
+    if (selectedSku === null) {
+      return showNotification('Vui lý chọn sản phẩm', 'error');
+    }
+
+    addToCart({
+      productId: selectedSku?.id,
+      skuId: selectedSku?.sku,
+      price: selectedSku?.price,
+      quantity: count ?? 1,
+      imageUrl: selectedSku?.imageUrl,
+    });
+
+    const existingCart = JSON.parse(localStorage.getItem('cart') ?? '[]');
+
+    const modelInCart = cart?.items?.find(
+      (item) => item.modelid === matchedModel?.id
+    );
+
+    // if (
+    //   modelInCart &&
+    //   (count ?? 1) + modelInCart?.quantity > matchedModel?.stock
+    // ) {
+    //   return setAddQuantityError(true);
+    // }
+    // try {
+    //   await addCartAPI({
+    //     userid: user?.id ? user?.id : null,
+    //     model:
+    //       product?.tier_variations?.length === 0
+    //         ? product?.models[0]?.id ?? ''
+    //         : matchedModel?.id ?? '',
+    //     quantity: count ?? 1,
+    //   });
+    //   mutate('/cart');
+    //   globalMutate(`/cart`, undefined, { revalidate: true });
+    //   showNotification('Sản phẩm đã dược thêm vào giỏ hàng!', 'success');
+    //   setAddQuantityError(false);
+    // } catch (error: any) {
+    //   showNotification(error?.message, 'error');
+    // }
+  };
 
   useEffect(() => {
     if (selectedSku && mainSwiperRef.current) {
@@ -387,16 +431,16 @@ const ProductDetail = () => {
                   )}
                 </Grid2>
                 <Box>
-                  {/* <Button
+                  <Button
                     sx={{ mr: 2, bgcolor: '#f0f0f0' }}
                     variant='outlined'
                     size='large'
-                    disabled={
-                      (product?.tier_variations?.length === 0 &&
-                        product?.models?.[0]?.stock === 0) ||
-                      matchedModel?.stock === 0 ||
-                      isLoading === true
-                    }
+                    // disabled={
+                    //   (product?.tier_variations?.length === 0 &&
+                    //     product?.models?.[0]?.stock === 0) ||
+                    //   matchedModel?.stock === 0 ||
+                    //   isLoading === true
+                    // }
                     onClick={handleAddCart}>
                     <ShoppingCartOutlinedIcon />
                   </Button>
@@ -405,11 +449,12 @@ const ProductDetail = () => {
                     variant='contained'
                     size='large'
                     disabled={isOutOfStock || matchedModel?.stock === 0}
-                    onClick={handleBuyBtn}>
+                    // onClick={handleBuyBtn}
+                  >
                     {isOutOfStock || matchedModel?.stock === 0
                       ? 'Hết hàng'
                       : 'Mua ngay'}
-                  </Button> */}
+                  </Button>
                 </Box>
               </Box>
             </Grid2>
