@@ -2,15 +2,16 @@
 // import { useQuery } from '@tanstack/react-query';
 
 import { BASE_API_URL } from '@/constants/env';
-import { ICart, ICartPayload } from '@/interfaces/ICart';
+import { IAddCartItem, ICart, ICartPayload } from '@/interfaces/ICart';
 import { deleteRequest, patchRequest, postRequest } from '@/utils/fetch-client';
 import useSWR from 'swr';
 import { fetcher } from '../fetcher';
 import { IError } from '@/interfaces/IError';
 
-export const addCartAPI = (payload: ICartPayload) => {
+export const addCartItemAPI = (payload: IAddCartItem) => {
   try {
-    const res = postRequest(`/cart/add`, payload);
+    console.log('payload', payload)
+    const res = postRequest(`/carts/add`, payload);
     return res;
   } catch (error) {
     throw error as IError

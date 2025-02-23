@@ -6,8 +6,8 @@ export interface IAttribute {
 }
 
 export interface ISku {
-    id: string;
-    productid: string;
+    id: number;
+    productId: number;
     sku: string;
     price: number;
     quantity: number;

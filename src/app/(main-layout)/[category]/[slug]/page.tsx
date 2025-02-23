@@ -9,7 +9,7 @@ import { attributeLabels } from '@/constants/attributeLabels';
 import { useNotificationContext } from '@/contexts/NotificationContext';
 import { IModel } from '@/interfaces/IProduct';
 import { useAuthStore } from '@/providers/auth-store-provider';
-import { useGetCart } from '@/services/cart/api';
+import { addCartItemAPI, useGetCart } from '@/services/cart/api';
 import { useGetProductBySlug } from '@/services/product/api';
 import { formatPrice } from '@/utils/format-price';
 import StarRateIcon from '@mui/icons-material/StarRate';
@@ -52,6 +52,7 @@ const ProductDetail = () => {
   const [isOutOfStock, setIsOutOfStock] = useState<boolean>(false);
 
   const { product } = useGetProductBySlug(params?.slug as string);
+  // const userData = await addCartItemAPI(values);
 
   const addToCart = useCartStore((state) => state.addToCart);
 
@@ -146,7 +147,7 @@ const ProductDetail = () => {
       ) ?? null
     );
   }, [selectedAttributes, product?.skus]);
-
+  console.log('selectedSku', selectedSku);
   const getLowestPrice = () => {
     if (!product?.skus || product?.skus.length === 0) return null;
 
@@ -174,24 +175,22 @@ const ProductDetail = () => {
     ];
   }, [product?.images, product?.skus]);
 
-  const handleAddCart = async () => {
+  const handleAddCartItem = async () => {
     if (selectedSku === null) {
       return showNotification('Vui lý chọn sản phẩm', 'error');
     }
 
-    addToCart({
-      productId: selectedSku?.id,
-      skuId: selectedSku?.sku,
-      price: selectedSku?.price,
+    await addCartItemAPI({
+      productId: selectedSku?.productId,
+      skuId: selectedSku?.id,
       quantity: count ?? 1,
-      imageUrl: selectedSku?.imageUrl,
     });
 
-    const existingCart = JSON.parse(localStorage.getItem('cart') ?? '[]');
+    // const existingCart = JSON.parse(localStorage.getItem('cart') ?? '[]');
 
-    const modelInCart = cart?.items?.find(
-      (item) => item.modelid === matchedModel?.id
-    );
+    // const modelInCart = cart?.items?.find(
+    //   (item) => item.modelid === matchedModel?.id
+    // );
 
     // if (
     //   modelInCart &&
@@ -441,7 +440,7 @@ const ProductDetail = () => {
                     //   matchedModel?.stock === 0 ||
                     //   isLoading === true
                     // }
-                    onClick={handleAddCart}>
+                    onClick={handleAddCartItem}>
                     <ShoppingCartOutlinedIcon />
                   </Button>
                   <Button

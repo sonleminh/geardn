@@ -6,10 +6,10 @@ export interface ICart {
     items: ICartItem[]
 }
 
-export interface ICart {
-    id: string;
-    userid: string;
-    items: ICartItem[]
+export interface IAddCartItem {
+    productId: number;
+    skuId: number;
+    quantity: number
 }
 
 export interface ICartPayload {
