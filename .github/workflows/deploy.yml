@@ -2,9 +2,10 @@ name: Deploy Backend to VPS
 
 on:
   push:
-    branches: ['main']
+    branches:
+      - main
     paths:
-      - 'geardn-server/**' # Chỉ chạy khi sửa code backend
+      - 'geardn-server/**'
 
 jobs:
   build-and-push:
@@ -22,7 +23,7 @@ jobs:
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v5
         with:
-          context: ./geardn-server # Trỏ đúng vào thư mục backend
+          context: ./geardn-server
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/geardn-server:latest
 
@@ -40,8 +41,7 @@ jobs:
           username: ${{ secrets.HOST_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: './geardn-server/docker-compose.yml'
-          target: '/var/www/geardn-server/' # Đã sửa target cho đúng
-          # strip_components: 1 # Bỏ cái này đi để nó copy đúng đường dẫn
+          target: '/var/www/geardn-server/'
 
       - name: SSH into VPS and Deploy
         uses: appleboy/ssh-action@master
@@ -51,11 +51,6 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /var/www/geardn-server
-            # Pull image mới nhất về
             docker pull ${{ secrets.DOCKER_USERNAME }}/geardn-server:latest
-
-            # Restart lại container với image mới
             docker compose up -d --remove-orphans
-
-            # Xóa các image rác cũ cho sạch ổ cứng
             docker image prune -f
