@@ -31,7 +31,7 @@ import { FindSkusByProductDto } from '../product-sku/dto/find-skus-by-product.dt
 import { ProductListByCateQueryDto } from './dto/product-list-by-cate.dto';
 import { SearchProductsDto } from './dto/search-product.dto';
 
-@Controller('productsc')
+@Controller('products')
 @ApiTags('products')
 export class ProductController {
   constructor(
