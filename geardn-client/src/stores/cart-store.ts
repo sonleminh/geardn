@@ -9,6 +9,8 @@ export type CartState = {
   removeItem: (skuId: number) => void;
   clearCart: () => void;
   syncCart: (cartItems: ICartStoreItem[]) => void;
+  lastBuyNowItemId: number | null;
+  setLastBuyNowItemId: (id: number | null) => void;
 }
 
 export type CartStore = CartState
@@ -47,6 +49,8 @@ export const useCartStore = create<CartState>()(
           })),
         clearCart: () => set({ cartItems: [] }),
         syncCart: (cartItems) => set({ cartItems: cartItems }),
+        lastBuyNowItemId: null,
+        setLastBuyNowItemId: (id) => set({ lastBuyNowItemId: id }),
     }),
     { name: 'cart-storage' } // 🛒 Persists cart for guest users
   )

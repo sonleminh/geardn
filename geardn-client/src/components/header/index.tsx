@@ -156,7 +156,7 @@ const Header = ({ initialUser }: { initialUser?: IUser | null }) => {
               }}>
               <SearchIconExpand
                 onSearch={(q) =>
-                  router.replace(`search?keyword=${q.toString()}`)
+                  router.replace(`/search?keyword=${q.toString()}`)
                 }
                 placeholder='Tìm sản phẩm…'
                 maxWidth={150}

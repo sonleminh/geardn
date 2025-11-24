@@ -41,4 +41,4 @@ export const getProductsByCategory = (slug: string, opts:{ sortBy:'createdAt'|'p
   );
 }
 
-export const getProduct = (slug: string) => bff<BaseResponse<IProduct>>(`/api/bff/products/${slug}`);
+export const getProduct = (slug: string) => bff<BaseResponse<IProduct>>(`/api/bff/products/slug/${slug}`);

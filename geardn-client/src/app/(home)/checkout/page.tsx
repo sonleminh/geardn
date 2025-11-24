@@ -54,8 +54,11 @@ import { useProvince, useProvinces } from '@/queries/location';
 import { useSession } from '@/hooks/useSession';
 import { checkoutSchema } from '@/features/orders/schemas/checkout.schema';
 import { toFormikValidationSchema } from 'zod-formik-adapter';
+import { useQueryClient } from '@tanstack/react-query';
 
 const Checkout = () => {
+  const router = useRouter();
+  const queryClient = useQueryClient();
   const { checkoutCart } = useAuthStore();
   const { showNotification } = useNotificationStore();
   const { data: userSession } = useSession();
@@ -65,8 +68,6 @@ const Checkout = () => {
     { href: '/', label: 'Trang chủ' },
     { href: ROUTES.CHECKOUT, label: 'Thanh toán' },
   ];
-
-  const router = useRouter();
 
   const [province, setProvince] = useState<ILocationOption | null>(null);
   const [ward, setWard] = useState<ILocationOption | null>(null);
@@ -147,6 +148,9 @@ const Checkout = () => {
             removeItem(item?.skuId);
           });
           router.push(`${ROUTES.ORDER_CONFIRMATION}/${data?.data?.orderCode}`);
+          queryClient.invalidateQueries({
+            queryKey: ['user-purchases'],
+          });
         },
         onError: () => {
           showNotification('Đã có lỗi xảy ra', 'error');

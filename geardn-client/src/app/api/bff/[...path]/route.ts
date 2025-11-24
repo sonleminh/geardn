@@ -8,7 +8,6 @@ export const runtime = 'nodejs';
 function getBackendBaseUrl() {
   const envUrl = process.env.BACKEND_API_URL;
   if (envUrl && envUrl.length > 0) return envUrl;
-
   if (process.env.NODE_ENV === 'production') {
     return 'http://geardn-server:8080/api'; // gọi service trong docker network
   }
@@ -72,7 +71,6 @@ if (ALLOWED !== null && !ALLOWED.has(k)) continue;
 qs.set(k, v);
 }
   const BE = getBackendBaseUrl();
-  console.log('BFF → target BE:', BE, 'NODE_ENV:', process.env.NODE_ENV, 'BACKEND_API_URL:', process.env.BACKEND_API_URL);
 
   const target = `${BE}/${path}${qs.size ? `?${qs}` : ''}`;
 

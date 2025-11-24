@@ -37,6 +37,7 @@ import { useCartStore } from '@/stores/cart-store';
 import { useNotificationStore } from '@/stores/notification-store';
 import { useGetProduct } from '@/queries/product';
 import { BaseResponse } from '@/types/response.type';
+import { useRouter } from 'next/navigation';
 
 const ProductDetailClient = ({
   initialProduct,
@@ -44,7 +45,9 @@ const ProductDetailClient = ({
   initialProduct: BaseResponse<IProduct>;
 }) => {
   const { data: user } = useSession();
-  const { cartItems, addToCart, syncCart } = useCartStore();
+  const router = useRouter();
+  const { cartItems, addToCart, syncCart, setLastBuyNowItemId } =
+    useCartStore();
   const { mutateAsync: onAddToCart } = useAddCartItem();
   const { showNotification } = useNotificationStore();
   const { data } = useGetProduct(initialProduct);
@@ -156,7 +159,7 @@ const ProductDetailClient = ({
     });
   };
 
-  const handleAddCartItem = async () => {
+  const addCartCore = async () => {
     if (selectedSku === null) {
       return showNotification('Vui lòng chọn phân loại hàng', 'error');
     }
@@ -173,7 +176,7 @@ const ProductDetailClient = ({
         );
       }
 
-      return addToCart({
+      addToCart({
         productId: selectedSku?.productId,
         skuId: selectedSku?.id,
         productName: product?.name,
@@ -189,6 +192,8 @@ const ProductDetailClient = ({
           })
         ),
       });
+
+      return selectedSku.id;
     }
 
     if (user && product) {
@@ -216,12 +221,28 @@ const ProductDetailClient = ({
           skuId: selectedSku?.id,
           quantity: count ?? 1,
         });
+
+        return selectedSku.id;
       } catch (error) {
         const e = AppError.fromUnknown(error);
         syncCart(oldCartItems);
         showNotification(e?.message, 'error');
       }
     }
+  };
+
+  const handleAddCartItem = async () => {
+    await addCartCore();
+  };
+
+  const handleBuyBtn = async () => {
+    console.log(1);
+    const skuId = await addCartCore();
+    if (!skuId) return; // add thất bại hoặc đã báo lỗi
+    console.log(2);
+
+    setLastBuyNowItemId(skuId);
+    router.push('/cart');
   };
 
   const handleCountChange = (value: number | null) => {
@@ -516,8 +537,7 @@ const ProductDetailClient = ({
                   variant='contained'
                   size='large'
                   disabled={!selectedSku}
-                  // onClick={handleBuyBtn}
-                >
+                  onClick={handleBuyBtn}>
                   {totalStock > 0 ? 'Mua ngay' : 'Hết hàng'}
                 </Button>
               </Box>

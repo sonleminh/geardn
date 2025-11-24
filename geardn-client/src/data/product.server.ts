@@ -28,8 +28,6 @@ export async function searchProducts(qs: URLSearchParams) {
   return r.json() as Promise<SearchProductsResponse<IProduct>>; 
 }
 
-
-
 export async function getProductsByCategory(slug: string, qs?: URLSearchParams) {
   const h = await headers();
   const origin = `${h.get('x-forwarded-proto') ?? 'http'}://${h.get('x-forwarded-host') ?? h.get('host')}`;

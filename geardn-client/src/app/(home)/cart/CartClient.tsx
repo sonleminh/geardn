@@ -55,7 +55,14 @@ const CartClient = ({
   initialCart: BaseResponse<ICartResponse>;
 }) => {
   const { setCheckoutCart } = useAuthStore((state) => state);
-  const { cartItems, updateQuantity, removeItem, syncCart } = useCartStore();
+  const {
+    cartItems,
+    updateQuantity,
+    removeItem,
+    syncCart,
+    lastBuyNowItemId,
+    setLastBuyNowItemId,
+  } = useCartStore();
   const router = useRouter();
 
   const breadcrumbsOptions = [
@@ -159,6 +166,13 @@ const CartClient = ({
     }
   }, [cartServer, userSession?.data, syncCart]);
 
+  useEffect(() => {
+    if (lastBuyNowItemId) {
+      setSelected([lastBuyNowItemId]);
+      setLastBuyNowItemId(null);
+    }
+  }, [lastBuyNowItemId, setLastBuyNowItemId]);
+
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
       const newSelected = cartItems?.map((n) => n?.skuId);
@@ -170,7 +184,7 @@ const CartClient = ({
     setSelected([]);
   };
 
-  const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
+  const handleSelectClick = (event: React.MouseEvent<unknown>, id: number) => {
     const selectedIndex = selected.indexOf(id);
     let newSelected: number[] = [];
 
@@ -413,7 +427,7 @@ const CartClient = ({
                               <Checkbox
                                 color='primary'
                                 checked={isItemSelected}
-                                onClick={(e) => handleClick(e, row.skuId)}
+                                onClick={(e) => handleSelectClick(e, row.skuId)}
                               />
                             </TableCell>
                             <TableCell
