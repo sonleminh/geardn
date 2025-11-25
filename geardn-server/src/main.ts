@@ -31,6 +31,8 @@ async function bootstrap() {
     .split(',')
     .map((val) => val.trim());
 
+    console.log('whiteList', whiteList);
+
   app.enableCors({
     origin: (origin, callback) => {
       if (!origin || whiteList.includes(origin)) {

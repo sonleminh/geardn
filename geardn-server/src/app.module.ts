@@ -38,7 +38,7 @@ import { NotificationsModule } from './modules/notification/notification.module'
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
-      envFilePath: ['.env.production', '.env.local'],
+      envFilePath: ['.env.local', '.env.production'],
     }),
     BullModule.forRootAsync({
       inject: [ConfigService],
