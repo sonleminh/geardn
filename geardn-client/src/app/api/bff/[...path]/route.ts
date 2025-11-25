@@ -1,18 +1,10 @@
+import { getBackendBaseUrl } from '@/lib/backend-config';
 import { NextRequest, NextResponse } from 'next/server';
 import { splitCookiesString } from 'set-cookie-parser';
 
 type NodeReadable = ReadableStream<Uint8Array>;
 
 export const runtime = 'nodejs';
-
-function getBackendBaseUrl() {
-  const envUrl = process.env.BACKEND_API_URL;
-  if (envUrl && envUrl.length > 0) return envUrl;
-  if (process.env.NODE_ENV === 'production') {
-    return 'http://geardn-server:8080/api'; // gọi service trong docker network
-  }
-  return 'http://localhost:8080/api';        // chạy dev ngoài docker
-}
 
 const FETCH_TIMEOUT_MS = Number(process.env.FETCH_TIMEOUT_MS ?? 8000);
 
