@@ -5,7 +5,7 @@ interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
 }
 
-const baseURL = import.meta.env.VITE_APP_HOST;
+const baseURL = import.meta.env.VITE_API_URL;
 
 let isRefreshing = false;
 let failedQueue: any[] = [];
