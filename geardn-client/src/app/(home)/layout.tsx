@@ -24,8 +24,8 @@ export default async function RootLayout({
 }>) {
   const user = await getUserOnServer();
   return (
-    <Layout initialUser={user?.data}>
-      <Suspense fallback={<LoadingCircle />}>{children}</Suspense>
-    </Layout>
+    //   <Layout initialUser={user?.data}>
+    // </Layout>
+    <Suspense fallback={<LoadingCircle />}>{children}</Suspense>
   );
 }

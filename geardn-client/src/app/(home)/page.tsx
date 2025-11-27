@@ -17,9 +17,12 @@ export default async function Homepage({
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+  // await new Promise((resolve) => setTimeout(resolve, 3000));
   const resolvedParams = await searchParams;
+  console.log('resolvedParams', resolvedParams);
   const parsed = parseProductListParams(resolvedParams);
   const qs = toURLSearchParams(parsed);
+
   const productPage = await getProducts(qs);
   const categoryPage = await getCategories();
   if (!productPage?.success && !categoryPage?.success) {
