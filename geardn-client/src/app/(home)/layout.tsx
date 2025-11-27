@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import Layout from '@/components/layout';
+// import Layout from '@/components/layout';
 
 import 'swiper/css';
 import 'swiper/css/effect-fade';
@@ -10,7 +10,7 @@ import 'swiper/css/scrollbar';
 import 'swiper/css/thumbs';
 import { Suspense } from 'react';
 import { LoadingCircle } from '@/components/common/LoadingCircle';
-import { getUserOnServer } from '@/data/profile.server';
+// import { getUserOnServer } from '@/data/profile.server';
 
 export const metadata: Metadata = {
   title: 'GearDN | Build Your Dream Setup',
@@ -22,7 +22,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const user = await getUserOnServer();
+  // const user = await getUserOnServer();
   return (
     //   <Layout initialUser={user?.data}>
     // </Layout>
