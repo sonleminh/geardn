@@ -5,9 +5,15 @@ import { headers } from "next/headers";
 
 export async function getUserOnServer() {
   const h = await headers();
+  console.log('User Agent:', h.get('user-agent'));
+
   const cookie = h.get('cookie') ?? '';
 
   const backendBaseUrl = getBackendBaseUrl();
+
+  console.log('cookie', cookie)
+  console.log('backendBaseUrl', backendBaseUrl)
+
 
   try {
     const res = await fetch(`${backendBaseUrl}/auth/whoami`, {
@@ -19,6 +25,8 @@ export async function getUserOnServer() {
       },
       cache: 'no-store',
     });
+
+    console.log('res', res)
 
     if (!res.ok) {
         return null;
