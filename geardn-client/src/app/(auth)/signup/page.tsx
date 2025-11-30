@@ -227,7 +227,7 @@ export default function SignUp() {
                     !formik.values.password
                   }
                   onClick={() => formik.handleSubmit()}>
-                  Đăng nhập
+                  Đăng ký
                 </Button>
               </Box>
             </Box>
