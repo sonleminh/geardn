@@ -1,0 +1,3 @@
+node_modules.next.git.gitignore;
+Dockerfile;
+npm - debug.log.vscode.idea.env.local;

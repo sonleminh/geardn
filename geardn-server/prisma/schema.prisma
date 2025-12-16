@@ -1,0 +1,575 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+//
+// ==== PRODUCT DOMAIN ====
+//
+
+model Product {
+  id          Int           @id @default(autoincrement())
+  name        String        @unique
+  slug        String        @unique
+  description String?
+  brand       String        @default("Không")
+  images      String[]
+  tags        Json
+  details     Json?
+  status      ProductStatus @default(ACTIVE)
+  isVisible   Boolean       @default(true)
+  isDeleted   Boolean       @default(false)
+  categoryId  Int
+  priceMin    Decimal?
+  priceMax    Decimal?
+  priority    Int
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  category  Category     @relation(fields: [categoryId], references: [id])
+  skus      ProductSKU[] @relation("ProductToSKU")
+  CartItem  CartItem[]
+  OrderItem OrderItem[]
+
+  @@index([categoryId])
+  @@index([slug])
+  @@index([priceMin])
+  @@index([priceMax])
+  @@index([priority])
+}
+
+model ProductSKU {
+  id           Int       @id @default(autoincrement())
+  productId    Int
+  sku          String    @unique
+  sellingPrice Decimal
+  imageUrl     String?
+  status       SKUStatus @default(ACTIVE)
+  isDeleted    Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  product              Product               @relation("ProductToSKU", fields: [productId], references: [id])
+  productSkuAttributes ProductSKUAttribute[] @relation("SkuToAttribute")
+  CartItem             CartItem[]
+  OrderItem            OrderItem[]
+  ImportLogItem        ImportLogItem[]
+  stocks               Stock[]
+  ExportLogItem        ExportLogItem[]
+  AdjustmentLogItem    AdjustmentLogItem[]
+
+  @@index([productId])
+}
+
+model Attribute {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  label     String
+  isDeleted Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  values AttributeValue[]
+}
+
+model AttributeValue {
+  id          Int      @id @default(autoincrement())
+  value       String
+  attributeId Int
+  isDeleted   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  attribute           Attribute             @relation(fields: [attributeId], references: [id])
+  productSkuAttribute ProductSKUAttribute[]
+
+  @@index([attributeId])
+}
+
+model ProductSKUAttribute {
+  id               Int @id @default(autoincrement())
+  skuId            Int
+  attributeValueId Int
+
+  productSku     ProductSKU     @relation("SkuToAttribute", fields: [skuId], references: [id])
+  attributeValue AttributeValue @relation(fields: [attributeValueId], references: [id])
+
+  @@unique([skuId, attributeValueId])
+  @@index([skuId])
+  @@index([attributeValueId])
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  slug      String   @unique
+  icon      String
+  isDeleted Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  products Product[]
+}
+
+//
+// ==== ORDER & CART ====
+//
+
+model Order {
+  id              Int         @id @default(autoincrement())
+  userId          Int?
+  orderCode       String      @unique
+  totalPrice      Decimal
+  status          OrderStatus @default(PENDING)
+  fullName        String
+  phoneNumber     String?
+  email           String?
+  note            String?
+  flag            Json        @default("{}")
+  shipment        Json        @default("{}")
+  paymentMethodId Int
+
+  cancelReason     String?
+  cancelReasonCode OrderReasonCode?
+
+  isDeleted   Boolean   @default(false)
+  confirmedAt DateTime?
+  completedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user               User?                @relation(fields: [userId], references: [id])
+  paymentMethod      PaymentMethod        @relation(fields: [paymentMethodId], references: [id])
+  orderItems         OrderItem[]
+  ExportLog          ExportLog[]
+  statusHistory      OrderStatusHistory[]
+  orderReturnRequest OrderReturnRequest?  @relation("OrderToReturnRequest")
+  ImportLog          ImportLog[]
+}
+
+model OrderItem {
+  id           Int      @id @default(autoincrement())
+  orderId      Int
+  productId    Int
+  skuId        Int
+  quantity     Int
+  sellingPrice Decimal
+  unitCost     Decimal?
+  imageUrl     String
+
+  productName String
+  productSlug String
+
+  skuCode       String
+  skuAttributes Json
+
+  warehouseId Int?
+
+  order           Order            @relation(fields: [orderId], references: [id])
+  product         Product          @relation(fields: [productId], references: [id])
+  sku             ProductSKU       @relation(fields: [skuId], references: [id])
+  warehouse       Warehouse?       @relation(fields: [warehouseId], references: [id])
+  OrderReturnItem OrderReturnItem? @relation("OrderToReturnItem")
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model OrderStatusHistory {
+  id        Int         @id @default(autoincrement())
+  orderId   Int
+  oldStatus OrderStatus
+  newStatus OrderStatus
+  changedBy Int
+  note      String?
+  createdAt DateTime    @default(now())
+
+  order Order @relation(fields: [orderId], references: [id])
+  user  User  @relation(fields: [changedBy], references: [id])
+
+  @@index([orderId])
+  @@index([changedBy])
+}
+
+model OrderReturnRequest {
+  id           Int               @id @default(autoincrement())
+  orderId      Int               @unique
+  status       ReturnStatus
+  type         ReturnRequestType
+  reasonCode   OrderReasonCode
+  reasonNote   String?
+  createdById  Int
+  approvedById Int?
+
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  order Order @relation("OrderToReturnRequest", fields: [orderId], references: [id])
+
+  createdBy  User  @relation("ReturnRequestCreatedBy", fields: [createdById], references: [id])
+  approvedBy User? @relation("ReturnRequestApprovedBy", fields: [approvedById], references: [id])
+
+  orderReturnItems OrderReturnItem[]
+}
+
+model OrderReturnItem {
+  id              Int @id @default(autoincrement())
+  returnRequestId Int
+  orderItemId     Int @unique
+  quantity        Int
+
+  returnRequest OrderReturnRequest @relation(fields: [returnRequestId], references: [id])
+  orderItem     OrderItem          @relation("OrderToReturnItem", fields: [orderItemId], references: [id])
+}
+
+model Cart {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User       @relation(fields: [userId], references: [id])
+  items CartItem[]
+}
+
+model CartItem {
+  id        Int      @id @default(autoincrement())
+  cartId    Int
+  productId Int
+  skuId     Int
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cart    Cart       @relation(fields: [cartId], references: [id])
+  product Product    @relation(fields: [productId], references: [id])
+  sku     ProductSKU @relation(fields: [skuId], references: [id])
+
+  @@unique([cartId, productId, skuId])
+  @@index([cartId])
+  @@index([skuId])
+  @@index([productId])
+}
+
+//
+// ==== STOCK & IMPORT ====
+//
+
+model Warehouse {
+  id        Int      @id @default(autoincrement())
+  name      String
+  address   String
+  isDeleted Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  importLogs    ImportLog[]
+  Stock         Stock[]
+  ExportLog     ExportLog[]
+  AdjustmentLog AdjustmentLog[]
+  OrderItem     OrderItem[]
+}
+
+model Stock {
+  id          Int      @id @default(autoincrement())
+  skuId       Int
+  warehouseId Int
+  quantity    Int      @default(0)
+  unitCost    Decimal  @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  sku       ProductSKU @relation(fields: [skuId], references: [id])
+  warehouse Warehouse  @relation(fields: [warehouseId], references: [id])
+
+  @@unique([skuId, warehouseId])
+  @@index([skuId])
+  @@index([warehouseId])
+}
+
+model ImportLog {
+  id            Int        @id @default(autoincrement())
+  warehouseId   Int
+  type          ImportType
+  orderId       Int?
+  note          String?
+  createdBy     Int
+  referenceCode String     @unique
+  importDate    DateTime
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  warehouse Warehouse       @relation(fields: [warehouseId], references: [id])
+  user      User            @relation(fields: [createdBy], references: [id])
+  order     Order?          @relation(fields: [orderId], references: [id])
+  items     ImportLogItem[]
+}
+
+model ImportLogItem {
+  id          Int      @id @default(autoincrement())
+  importLogId Int
+  skuId       Int
+  quantity    Int
+  unitCost    Decimal?
+  note        String?
+
+  importLog ImportLog  @relation(fields: [importLogId], references: [id])
+  sku       ProductSKU @relation(fields: [skuId], references: [id])
+}
+
+model ExportLog {
+  id            Int        @id @default(autoincrement())
+  warehouseId   Int
+  type          ExportType
+  orderId       Int?
+  note          String?
+  referenceCode String     @unique
+  createdBy     Int
+  exportDate    DateTime
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  warehouse Warehouse       @relation(fields: [warehouseId], references: [id])
+  user      User            @relation(fields: [createdBy], references: [id])
+  order     Order?          @relation(fields: [orderId], references: [id])
+  items     ExportLogItem[]
+}
+
+model ExportLogItem {
+  id          Int      @id @default(autoincrement())
+  exportLogId Int
+  skuId       Int
+  quantity    Int
+  unitCost    Decimal?
+  note        String?
+
+  exportLog ExportLog  @relation(fields: [exportLogId], references: [id])
+  sku       ProductSKU @relation(fields: [skuId], references: [id])
+}
+
+model AdjustmentLog {
+  id             Int              @id @default(autoincrement())
+  warehouseId    Int
+  reason         AdjustmentReason
+  type           AdjustmentType
+  note           String?
+  referenceCode  String           @unique
+  createdBy      Int
+  adjustmentDate DateTime
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  warehouse Warehouse           @relation(fields: [warehouseId], references: [id])
+  user      User                @relation(fields: [createdBy], references: [id])
+  items     AdjustmentLogItem[]
+}
+
+model AdjustmentLogItem {
+  id              Int @id @default(autoincrement())
+  adjustmentLogId Int
+  skuId           Int
+  warehouseId     Int
+
+  quantityBefore Int
+  quantityChange Int
+  // unitCostBefore Decimal?
+
+  adjustmentLog AdjustmentLog @relation(fields: [adjustmentLogId], references: [id])
+  sku           ProductSKU    @relation(fields: [skuId], references: [id])
+}
+
+//
+// ==== USER & PAYMENT ====
+//
+
+enum AuthProvider {
+  LOCAL
+  GOOGLE
+}
+
+model User {
+  id       Int          @id @default(autoincrement())
+  email    String       @unique
+  googleId String?      @unique
+  name     String
+  password String?
+  role     UserRole     @default(USER)
+  provider AuthProvider @default(LOCAL)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  lastSeenNotificationsAt DateTime? // để tính badge
+  lastReadNotificationsAt DateTime? // optional, tối ưu query
+
+  Cart               Cart?
+  Order              Order[]
+  ImportLog          ImportLog[]
+  ExportLog          ExportLog[]
+  AdjustmentLog      AdjustmentLog[]
+  OrderStatusHistory OrderStatusHistory[]
+
+  returnRequestsCreated  OrderReturnRequest[]    @relation("ReturnRequestCreatedBy")
+  returnRequestsApproved OrderReturnRequest[]    @relation("ReturnRequestApprovedBy")
+  NotificationRecipient  NotificationRecipient[]
+}
+
+model PaymentMethod {
+  id         Int      @id @default(autoincrement())
+  key        String   @unique
+  name       String   @unique
+  image      String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  isDisabled Boolean  @default(false)
+
+  Order Order[]
+}
+
+//
+// ==== NOTIFICATION ====
+//
+
+model Outbox {
+  id          String       @id @default(cuid())
+  eventType   String
+  payload     Json
+  status      OutboxStatus @default(PENDING)
+  createdAt   DateTime     @default(now())
+  processedAt DateTime?
+
+  @@index([status, createdAt])
+}
+
+enum OutboxStatus {
+  PENDING
+  PROCESSED
+  FAILED
+}
+
+// ==== NOTIFICATION CORE ====
+model Notification {
+  id           String                  @id @default(cuid())
+  type         NotificationType
+  title        String
+  data         Json?
+  resourceType String?
+  resourceId   Int?
+  createdAt    DateTime                @default(now())
+  recipients   NotificationRecipient[]
+
+  @@index([type, createdAt])
+}
+
+enum NotificationType {
+  ORDER_CREATED
+  RETURN_REQUEST_CREATED
+  STOCK_LOW
+  PAYMENT_FAILED
+}
+
+model NotificationRecipient {
+  id             String       @id @default(cuid())
+  notificationId String
+  userId         Int
+  isRead         Boolean      @default(false)
+  readAt         DateTime?
+  createdAt      DateTime     @default(now())
+  notification   Notification @relation(fields: [notificationId], references: [id])
+  User           User         @relation(fields: [userId], references: [id])
+
+  @@index([userId, isRead, createdAt])
+  @@index([userId, createdAt])
+}
+
+//
+// ==== ENUMS ====
+//
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum SKUStatus {
+  ACTIVE
+  INACTIVE
+  OUT_OF_STOCK
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  DELIVERY_FAILED
+  CANCELED
+}
+
+enum ImportType {
+  NEW
+  RETURN
+  ADJUSTMENT
+  TRANSFER
+  OTHER
+}
+
+enum ExportType {
+  CUSTOMER_ORDER // xuất cho đơn hàng khách
+  RETURN_TO_SUPPLIER // trả hàng về nhà cung cấp
+  TRANSFER // chuyển kho nội bộ
+  DAMAGE_LOSS // hỏng, mất mát
+  MANUAL // ghi tay, điều chỉnh thủ công
+}
+
+enum AdjustmentType {
+  INCREASE
+  DECREASE
+}
+
+enum AdjustmentReason {
+  INVENTORY_AUDIT
+  DAMAGED
+  LOST
+  FOUND
+  CUSTOMER_RETURN
+  DATA_CORRECTION
+}
+
+enum ProductStatus {
+  DRAFT
+  ACTIVE
+  OUT_OF_STOCK
+  DISCONTINUED
+}
+
+enum OrderReasonCode {
+  CUSTOMER_CHANGED_MIND // Khách đổi ý
+  OUT_OF_STOCK // Hết hàng
+  DUPLICATE_ORDER // Trùng đơn
+  PAYMENT_FAILED // Lỗi thanh toán
+  REFUSED_ON_DELIVERY // Từ chối nhận khi giao
+  DEFECTIVE // Hàng lỗi
+  WRONG_ITEM // Giao sai sản phẩm
+  BETTER_PRICE_FOUND // Tìm được chỗ khác rẻ hơn
+  OTHER // Lý do khác
+}
+
+enum ReturnStatus {
+  AWAITING_APPROVAL // Khách gửi yêu cầu
+  APPROVED // Admin duyệt hoàn hàng
+  REJECTED // Admin từ chối
+  COMPLETED // Đã hoàn hàng thành công
+  CANCELED // Khách rút lại / hệ thống huỷ
+}
+
+enum ReturnRequestType {
+  CANCEL // yêu cầu hủy đơn (có thể chưa giao)
+  RETURN // hoàn hàng sau giao
+  DELIVERY_FAIL // giao thất bại, hoàn về kho
+}
