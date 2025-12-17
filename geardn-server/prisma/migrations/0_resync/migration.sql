@@ -1,11 +1,20 @@
 -- CreateEnum
+CREATE TYPE "AuthProvider" AS ENUM ('LOCAL', 'GOOGLE');
+
+-- CreateEnum
+CREATE TYPE "OutboxStatus" AS ENUM ('PENDING', 'PROCESSED', 'FAILED');
+
+-- CreateEnum
+CREATE TYPE "NotificationType" AS ENUM ('ORDER_CREATED', 'RETURN_REQUEST_CREATED', 'STOCK_LOW', 'PAYMENT_FAILED');
+
+-- CreateEnum
 CREATE TYPE "UserRole" AS ENUM ('USER', 'ADMIN');
 
 -- CreateEnum
 CREATE TYPE "SKUStatus" AS ENUM ('ACTIVE', 'INACTIVE', 'OUT_OF_STOCK');
 
 -- CreateEnum
-CREATE TYPE "OrderStatus" AS ENUM ('PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELED');
+CREATE TYPE "OrderStatus" AS ENUM ('PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELED', 'DELIVERY_FAILED');
 
 -- CreateEnum
 CREATE TYPE "ImportType" AS ENUM ('NEW', 'RETURN', 'ADJUSTMENT', 'TRANSFER', 'OTHER');
@@ -21,6 +30,15 @@ CREATE TYPE "AdjustmentReason" AS ENUM ('INVENTORY_AUDIT', 'DAMAGED', 'LOST', 'F
 
 -- CreateEnum
 CREATE TYPE "ProductStatus" AS ENUM ('DRAFT', 'ACTIVE', 'OUT_OF_STOCK', 'DISCONTINUED');
+
+-- CreateEnum
+CREATE TYPE "OrderReasonCode" AS ENUM ('CUSTOMER_CHANGED_MIND', 'OUT_OF_STOCK', 'DUPLICATE_ORDER', 'PAYMENT_FAILED', 'REFUSED_ON_DELIVERY', 'DEFECTIVE', 'WRONG_ITEM', 'BETTER_PRICE_FOUND', 'OTHER');
+
+-- CreateEnum
+CREATE TYPE "ReturnStatus" AS ENUM ('AWAITING_APPROVAL', 'APPROVED', 'REJECTED', 'COMPLETED', 'CANCELED');
+
+-- CreateEnum
+CREATE TYPE "ReturnRequestType" AS ENUM ('CANCEL', 'RETURN', 'DELIVERY_FAIL');
 
 -- CreateTable
 CREATE TABLE "Product" (
@@ -38,6 +56,8 @@ CREATE TABLE "Product" (
     "categoryId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "priceMax" DECIMAL(65,30),
+    "priceMin" DECIMAL(65,30),
 
     CONSTRAINT "Product_pkey" PRIMARY KEY ("id")
 );
@@ -111,7 +131,7 @@ CREATE TABLE "Order" (
     "totalPrice" DECIMAL(65,30) NOT NULL,
     "status" "OrderStatus" NOT NULL DEFAULT 'PENDING',
     "fullName" TEXT NOT NULL,
-    "phoneNumber" TEXT NOT NULL,
+    "phoneNumber" TEXT,
     "email" TEXT,
     "note" TEXT,
     "flag" JSONB NOT NULL DEFAULT '{}',
@@ -122,6 +142,8 @@ CREATE TABLE "Order" (
     "completedAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "cancelReason" TEXT,
+    "cancelReasonCode" "OrderReasonCode",
 
     CONSTRAINT "Order_pkey" PRIMARY KEY ("id")
 );
@@ -133,9 +155,9 @@ CREATE TABLE "OrderItem" (
     "productId" INTEGER NOT NULL,
     "skuId" INTEGER NOT NULL,
     "quantity" INTEGER NOT NULL,
-    "sellingPrice" DECIMAL(65,30),
+    "sellingPrice" DECIMAL(65,30) NOT NULL,
     "unitCost" DECIMAL(65,30),
-    "imageUrl" TEXT,
+    "imageUrl" TEXT NOT NULL,
     "productName" TEXT NOT NULL,
     "productSlug" TEXT NOT NULL,
     "skuCode" TEXT NOT NULL,
@@ -153,8 +175,35 @@ CREATE TABLE "OrderStatusHistory" (
     "newStatus" "OrderStatus" NOT NULL,
     "changedBy" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "note" TEXT,
 
     CONSTRAINT "OrderStatusHistory_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "OrderReturnRequest" (
+    "id" SERIAL NOT NULL,
+    "orderId" INTEGER NOT NULL,
+    "status" "ReturnStatus" NOT NULL,
+    "reasonNote" TEXT,
+    "createdById" INTEGER NOT NULL,
+    "approvedById" INTEGER,
+    "completedAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "type" "ReturnRequestType" NOT NULL,
+    "reasonCode" "OrderReasonCode" NOT NULL,
+
+    CONSTRAINT "OrderReturnRequest_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "OrderReturnItem" (
+    "id" SERIAL NOT NULL,
+    "returnRequestId" INTEGER NOT NULL,
+    "orderItemId" INTEGER NOT NULL,
+    "quantity" INTEGER NOT NULL,
+
+    CONSTRAINT "OrderReturnItem_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -215,6 +264,8 @@ CREATE TABLE "ImportLog" (
     "referenceCode" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "importDate" TIMESTAMP(3) NOT NULL,
+    "orderId" INTEGER,
 
     CONSTRAINT "ImportLog_pkey" PRIMARY KEY ("id")
 );
@@ -242,6 +293,7 @@ CREATE TABLE "ExportLog" (
     "createdBy" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "exportDate" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "ExportLog_pkey" PRIMARY KEY ("id")
 );
@@ -269,6 +321,7 @@ CREATE TABLE "AdjustmentLog" (
     "createdBy" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "adjustmentDate" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "AdjustmentLog_pkey" PRIMARY KEY ("id")
 );
@@ -281,7 +334,6 @@ CREATE TABLE "AdjustmentLogItem" (
     "warehouseId" INTEGER NOT NULL,
     "quantityBefore" INTEGER NOT NULL,
     "quantityChange" INTEGER NOT NULL,
-    "unitCostBefore" DECIMAL(65,30),
 
     CONSTRAINT "AdjustmentLogItem_pkey" PRIMARY KEY ("id")
 );
@@ -291,10 +343,14 @@ CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
     "email" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "password" TEXT NOT NULL,
+    "password" TEXT,
     "role" "UserRole" NOT NULL DEFAULT 'USER',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "lastReadNotificationsAt" TIMESTAMP(3),
+    "lastSeenNotificationsAt" TIMESTAMP(3),
+    "googleId" TEXT,
+    "provider" "AuthProvider" NOT NULL DEFAULT 'LOCAL',
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -312,6 +368,43 @@ CREATE TABLE "PaymentMethod" (
     CONSTRAINT "PaymentMethod_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "Outbox" (
+    "id" TEXT NOT NULL,
+    "eventType" TEXT NOT NULL,
+    "payload" JSONB NOT NULL,
+    "status" "OutboxStatus" NOT NULL DEFAULT 'PENDING',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "processedAt" TIMESTAMP(3),
+
+    CONSTRAINT "Outbox_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Notification" (
+    "type" "NotificationType" NOT NULL,
+    "title" TEXT NOT NULL,
+    "data" JSONB,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "id" TEXT NOT NULL,
+    "resourceId" INTEGER,
+    "resourceType" TEXT,
+
+    CONSTRAINT "Notification_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "NotificationRecipient" (
+    "id" TEXT NOT NULL,
+    "notificationId" TEXT NOT NULL,
+    "userId" INTEGER NOT NULL,
+    "isRead" BOOLEAN NOT NULL DEFAULT false,
+    "readAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "NotificationRecipient_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Product_name_key" ON "Product"("name");
 
@@ -323,6 +416,12 @@ CREATE INDEX "Product_categoryId_idx" ON "Product"("categoryId");
 
 -- CreateIndex
 CREATE INDEX "Product_slug_idx" ON "Product"("slug");
+
+-- CreateIndex
+CREATE INDEX "Product_priceMin_idx" ON "Product"("priceMin");
+
+-- CreateIndex
+CREATE INDEX "Product_priceMax_idx" ON "Product"("priceMax");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "ProductSKU_sku_key" ON "ProductSKU"("sku");
@@ -367,6 +466,12 @@ CREATE INDEX "OrderStatusHistory_orderId_idx" ON "OrderStatusHistory"("orderId")
 CREATE INDEX "OrderStatusHistory_changedBy_idx" ON "OrderStatusHistory"("changedBy");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "OrderReturnRequest_orderId_key" ON "OrderReturnRequest"("orderId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "OrderReturnItem_orderItemId_key" ON "OrderReturnItem"("orderItemId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Cart_userId_key" ON "Cart"("userId");
 
 -- CreateIndex
@@ -403,10 +508,25 @@ CREATE UNIQUE INDEX "AdjustmentLog_referenceCode_key" ON "AdjustmentLog"("refere
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "User_googleId_key" ON "User"("googleId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "PaymentMethod_key_key" ON "PaymentMethod"("key");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "PaymentMethod_name_key" ON "PaymentMethod"("name");
+
+-- CreateIndex
+CREATE INDEX "Outbox_status_createdAt_idx" ON "Outbox"("status", "createdAt");
+
+-- CreateIndex
+CREATE INDEX "Notification_type_createdAt_idx" ON "Notification"("type", "createdAt");
+
+-- CreateIndex
+CREATE INDEX "NotificationRecipient_userId_isRead_createdAt_idx" ON "NotificationRecipient"("userId", "isRead", "createdAt");
+
+-- CreateIndex
+CREATE INDEX "NotificationRecipient_userId_createdAt_idx" ON "NotificationRecipient"("userId", "createdAt");
 
 -- AddForeignKey
 ALTER TABLE "Product" ADD CONSTRAINT "Product_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "Category"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -418,16 +538,16 @@ ALTER TABLE "ProductSKU" ADD CONSTRAINT "ProductSKU_productId_fkey" FOREIGN KEY 
 ALTER TABLE "AttributeValue" ADD CONSTRAINT "AttributeValue_attributeId_fkey" FOREIGN KEY ("attributeId") REFERENCES "Attribute"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ProductSKUAttribute" ADD CONSTRAINT "ProductSKUAttribute_skuId_fkey" FOREIGN KEY ("skuId") REFERENCES "ProductSKU"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "ProductSKUAttribute" ADD CONSTRAINT "ProductSKUAttribute_attributeValueId_fkey" FOREIGN KEY ("attributeValueId") REFERENCES "AttributeValue"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Order" ADD CONSTRAINT "Order_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "ProductSKUAttribute" ADD CONSTRAINT "ProductSKUAttribute_skuId_fkey" FOREIGN KEY ("skuId") REFERENCES "ProductSKU"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Order" ADD CONSTRAINT "Order_paymentMethodId_fkey" FOREIGN KEY ("paymentMethodId") REFERENCES "PaymentMethod"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Order" ADD CONSTRAINT "Order_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -442,10 +562,25 @@ ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_skuId_fkey" FOREIGN KEY ("skuI
 ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_warehouseId_fkey" FOREIGN KEY ("warehouseId") REFERENCES "Warehouse"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "OrderStatusHistory" ADD CONSTRAINT "OrderStatusHistory_changedBy_fkey" FOREIGN KEY ("changedBy") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "OrderStatusHistory" ADD CONSTRAINT "OrderStatusHistory_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "OrderStatusHistory" ADD CONSTRAINT "OrderStatusHistory_changedBy_fkey" FOREIGN KEY ("changedBy") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "OrderReturnRequest" ADD CONSTRAINT "OrderReturnRequest_approvedById_fkey" FOREIGN KEY ("approvedById") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "OrderReturnRequest" ADD CONSTRAINT "OrderReturnRequest_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "OrderReturnRequest" ADD CONSTRAINT "OrderReturnRequest_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "OrderReturnItem" ADD CONSTRAINT "OrderReturnItem_orderItemId_fkey" FOREIGN KEY ("orderItemId") REFERENCES "OrderItem"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "OrderReturnItem" ADD CONSTRAINT "OrderReturnItem_returnRequestId_fkey" FOREIGN KEY ("returnRequestId") REFERENCES "OrderReturnRequest"("id") ON DELETE RESTRICT ON UPDATE CASCADE;     
 
 -- AddForeignKey
 ALTER TABLE "Cart" ADD CONSTRAINT "Cart_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -466,10 +601,13 @@ ALTER TABLE "Stock" ADD CONSTRAINT "Stock_skuId_fkey" FOREIGN KEY ("skuId") REFE
 ALTER TABLE "Stock" ADD CONSTRAINT "Stock_warehouseId_fkey" FOREIGN KEY ("warehouseId") REFERENCES "Warehouse"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ImportLog" ADD CONSTRAINT "ImportLog_warehouseId_fkey" FOREIGN KEY ("warehouseId") REFERENCES "Warehouse"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ImportLog" ADD CONSTRAINT "ImportLog_createdBy_fkey" FOREIGN KEY ("createdBy") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ImportLog" ADD CONSTRAINT "ImportLog_createdBy_fkey" FOREIGN KEY ("createdBy") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ImportLog" ADD CONSTRAINT "ImportLog_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ImportLog" ADD CONSTRAINT "ImportLog_warehouseId_fkey" FOREIGN KEY ("warehouseId") REFERENCES "Warehouse"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ImportLogItem" ADD CONSTRAINT "ImportLogItem_importLogId_fkey" FOREIGN KEY ("importLogId") REFERENCES "ImportLog"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -478,13 +616,13 @@ ALTER TABLE "ImportLogItem" ADD CONSTRAINT "ImportLogItem_importLogId_fkey" FORE
 ALTER TABLE "ImportLogItem" ADD CONSTRAINT "ImportLogItem_skuId_fkey" FOREIGN KEY ("skuId") REFERENCES "ProductSKU"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ExportLog" ADD CONSTRAINT "ExportLog_warehouseId_fkey" FOREIGN KEY ("warehouseId") REFERENCES "Warehouse"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "ExportLog" ADD CONSTRAINT "ExportLog_createdBy_fkey" FOREIGN KEY ("createdBy") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ExportLog" ADD CONSTRAINT "ExportLog_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ExportLog" ADD CONSTRAINT "ExportLog_warehouseId_fkey" FOREIGN KEY ("warehouseId") REFERENCES "Warehouse"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ExportLogItem" ADD CONSTRAINT "ExportLogItem_exportLogId_fkey" FOREIGN KEY ("exportLogId") REFERENCES "ExportLog"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -493,13 +631,19 @@ ALTER TABLE "ExportLogItem" ADD CONSTRAINT "ExportLogItem_exportLogId_fkey" FORE
 ALTER TABLE "ExportLogItem" ADD CONSTRAINT "ExportLogItem_skuId_fkey" FOREIGN KEY ("skuId") REFERENCES "ProductSKU"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "AdjustmentLog" ADD CONSTRAINT "AdjustmentLog_warehouseId_fkey" FOREIGN KEY ("warehouseId") REFERENCES "Warehouse"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "AdjustmentLog" ADD CONSTRAINT "AdjustmentLog_createdBy_fkey" FOREIGN KEY ("createdBy") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "AdjustmentLogItem" ADD CONSTRAINT "AdjustmentLogItem_adjustmentLogId_fkey" FOREIGN KEY ("adjustmentLogId") REFERENCES "AdjustmentLog"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "AdjustmentLog" ADD CONSTRAINT "AdjustmentLog_warehouseId_fkey" FOREIGN KEY ("warehouseId") REFERENCES "Warehouse"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "AdjustmentLogItem" ADD CONSTRAINT "AdjustmentLogItem_adjustmentLogId_fkey" FOREIGN KEY ("adjustmentLogId") REFERENCES "AdjustmentLog"("id") ON DELETE RESTRICT ON UPDATE CASCADE;      
 
 -- AddForeignKey
 ALTER TABLE "AdjustmentLogItem" ADD CONSTRAINT "AdjustmentLogItem_skuId_fkey" FOREIGN KEY ("skuId") REFERENCES "ProductSKU"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "NotificationRecipient" ADD CONSTRAINT "NotificationRecipient_notificationId_fkey" FOREIGN KEY ("notificationId") REFERENCES "Notification"("id") ON DELETE RESTRICT ON UPDATE CASCADE; 
+
+-- AddForeignKey
+ALTER TABLE "NotificationRecipient" ADD CONSTRAINT "NotificationRecipient_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
