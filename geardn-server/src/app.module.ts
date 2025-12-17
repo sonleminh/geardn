@@ -77,7 +77,7 @@ import { NotificationsModule } from './modules/notification/notification.module'
     StockModule,
     ProvinceModule,
     StatisticsModule,
-    // GoogleAnalyticsModule,.
+    // GoogleAnalyticsModule,
     DiagModule,
     RealtimegModule,
     NotificationsModule,
