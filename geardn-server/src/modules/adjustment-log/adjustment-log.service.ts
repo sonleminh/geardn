@@ -85,7 +85,7 @@ export class AdjustmentLogService {
         const localToday = today
           .toLocaleDateString('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' }) // YYYY-MM-DD
           .replace(/-/g, '');
-        const countToday = await tx.exportLog.count({
+        const countToday = await tx.adjustmentLog.count({
           where: {
             createdAt: {
               gte: new Date(new Date().setHours(0, 0, 0, 0)),
@@ -95,6 +95,7 @@ export class AdjustmentLogService {
         });
 
         const referenceCode = `ADJ-${localToday}-${String(countToday + 1).padStart(4, '0')}`;
+        
         // Tạo adjustment log
         const adjustmentLog = await tx.adjustmentLog.create({
           data: {
