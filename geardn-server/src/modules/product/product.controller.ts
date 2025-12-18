@@ -70,11 +70,11 @@ export class ProductController {
     return this.productService.search(dto);
   }
 
-  // @Get(':id')
-  // @ApiCreatedResponse({ type: ProductEntity })
-  // findOne(@Param('id') id: number) {
-  //   return this.productService.findOne(+id);
-  // }
+  @Get(':id')
+  @ApiCreatedResponse({ type: ProductEntity })
+  findOne(@Param('id') id: number) {
+    return this.productService.findOne(+id);
+  }
 
   @Get('slug/:slug')
   @ApiCreatedResponse({ type: ProductEntity })
