@@ -7,7 +7,7 @@ export type PageMeta = { total: number; page: number; pageSize: number }
 export async function getProducts(qs: URLSearchParams) {
  const h = await headers();
   const origin = `${h.get('x-forwarded-proto') ?? 'http'}://${h.get('x-forwarded-host') ?? h.get('host')}`;
-  const r = await fetch(`${origin}/api/bff/products?${qs.toString()}`, {
+  const r = await fetch(`${origin}/api/bff/products/homepage?${qs.toString()}`, {
     headers: { cookie: h.get('cookie') ?? '', accept: 'application/json' },
     next: { revalidate: 60 }             // ISR 60s             
   });

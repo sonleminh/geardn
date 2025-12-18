@@ -14,7 +14,7 @@ export class BaseQueryDto {
   /** field sắp xếp. Hỗ trợ alias: sortBy (Shopee) */
   @IsOptional()
   @Transform(({ obj, value }) => obj.sortBy ?? value ?? 'createdAt')
-  sortBy?: SortBy = 'createdAt';
+  sortBy?: SortBy;
 
   /** page 1-based nội bộ. Hỗ trợ Shopee page=0-based */
   @IsOptional()

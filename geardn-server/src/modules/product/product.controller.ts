@@ -46,7 +46,7 @@ export class ProductController {
     return this.productService.create(createProductDto);
   }
 
-  @Get()
+  @Get('homepage')
   @ApiCreatedResponse({ type: ProductEntity, isArray: true })
   getHomepageProducts(@Query() dto: ProductListQueryDto) {
     return this.productService.getHomepageProducts(dto);
@@ -70,13 +70,11 @@ export class ProductController {
     return this.productService.search(dto);
   }
 
-  @Get(':id')
-  @ApiCreatedResponse({ type: ProductEntity })
-  findOne(@Param('id') id: number) {
-    return this.productService.findOne(+id);
-  }
-
- 
+  // @Get(':id')
+  // @ApiCreatedResponse({ type: ProductEntity })
+  // findOne(@Param('id') id: number) {
+  //   return this.productService.findOne(+id);
+  // }
 
   @Get('slug/:slug')
   @ApiCreatedResponse({ type: ProductEntity })
