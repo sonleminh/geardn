@@ -24,6 +24,7 @@ model Product {
   updatedAt   DateTime      @updatedAt
   priceMax    Decimal?
   priceMin    Decimal?
+  priority    Int           @default(0)
   CartItem    CartItem[]
   OrderItem   OrderItem[]
   category    Category      @relation(fields: [categoryId], references: [id])
@@ -33,6 +34,7 @@ model Product {
   @@index([slug])
   @@index([priceMin])
   @@index([priceMax])
+  @@index([priority, createdAt])
 }
 
 model ProductSKU {

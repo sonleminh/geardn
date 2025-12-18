@@ -48,6 +48,9 @@ export class ProductEntity implements Product {
   @ApiProperty()
   priceMax: Decimal;
 
+  @ApiProperty()
+  priority: number;
+
   @ApiProperty({ required: true })
   isDeleted: boolean;
 

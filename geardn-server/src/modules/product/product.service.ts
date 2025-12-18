@@ -57,25 +57,33 @@ export class ProductService {
     };
   }
 
-  async findAll(dto: ProductListQueryDto) {
-    const { page = 1, limit: rawLimit = 9, sortBy, order } = dto;
+  async getHomepageProducts(dto: ProductListQueryDto) {
+    const { page = 1, limit: rawLimit = 9, sortBy, order = 'desc' } = dto;
 
     const limit = Math.min(Math.max(rawLimit, 1), 100);
     const skip = (page - 1) * limit;
 
-    const sortFieldMap: Record<
-      string,
-      keyof Prisma.ProductOrderByWithRelationInput
-    > = {
-      createdAt: 'createdAt',
-      price: 'priceMin',
-    };
-    const orderByField = sortFieldMap[sortBy] ?? 'createdAt';
+    let orderBy: Prisma.ProductOrderByWithRelationInput[];
 
-    const orderBy: Prisma.ProductOrderByWithRelationInput[] = [
-      { [orderByField]: order },
-      { id: 'desc' },
-    ];
+    if (!sortBy) {
+      orderBy = [{ priority: 'desc' }, { createdAt: 'desc' }, { id: 'desc' }];
+    } else {
+      const sortFieldMap: Record<
+        string,
+        keyof Prisma.ProductOrderByWithRelationInput
+      > = {
+        createdAt: 'createdAt',
+        price: 'priceMin',
+        name: 'name', // Ví dụ thêm sort theo tên
+      };
+
+      const orderByField = sortFieldMap[sortBy] || 'createdAt';
+
+      orderBy = [
+        { [orderByField]: order }, // Sort theo user yêu cầu
+        { id: 'desc' }, // Tie-breaker
+      ];
+    }
 
     const where: Prisma.ProductWhereInput = {
       AND: [{ isDeleted: false }],

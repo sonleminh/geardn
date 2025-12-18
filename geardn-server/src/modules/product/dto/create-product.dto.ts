@@ -67,4 +67,9 @@ export class CreateProductDto {
   @IsOptional()
   @IsBoolean()
   isVisible: boolean;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsNotEmpty()
+  priority: number;
 }

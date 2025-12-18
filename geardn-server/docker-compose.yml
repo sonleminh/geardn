@@ -5,7 +5,8 @@ services:
   api:
     # Thay bằng 'image' để VPS tải từ Docker Hub về
     # (Mình lấy theo username 'sonleminh' trong log cũ của bạn, nếu sai hãy sửa lại)
-    image: sonlele/geardn-server:latest
+    # image: sonlele/geardn-server:latest
+    build: .
     # -----------------------------
 
     container_name: geardn_api

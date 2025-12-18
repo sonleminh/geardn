@@ -48,8 +48,8 @@ export class ProductController {
 
   @Get()
   @ApiCreatedResponse({ type: ProductEntity, isArray: true })
-  findAll(@Query() dto: ProductListQueryDto) {
-    return this.productService.findAll(dto);
+  getHomepageProducts(@Query() dto: ProductListQueryDto) {
+    return this.productService.getHomepageProducts(dto);
   }
 
   @UseGuards(JwtAdminAuthGuard)
