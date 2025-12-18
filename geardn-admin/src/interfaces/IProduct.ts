@@ -31,6 +31,7 @@ export interface IProduct {
     totalStock: number;
     status:  'DRAFT' | 'ACTIVE' | 'OUT_OF_STOCK' | 'DISCONTINUED';
     isVisible: boolean;
+    priority: number;
     isDeleted: boolean;
     createdAt: string;
 }
@@ -60,6 +61,12 @@ export interface IUpdateProductIsVisiblePayload {
     id: number;
     isVisible: boolean;
 }
+
+export interface IUpdateProductPriorityPayload {
+    id: number;
+    priority: number;
+}
+
 
 export interface IProductPayload extends Record<string, unknown>  {
     name: string;

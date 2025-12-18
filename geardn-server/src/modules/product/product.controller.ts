@@ -142,6 +142,16 @@ export class ProductController {
   }
 
   @UseGuards(JwtAdminAuthGuard)
+  @Patch(':id/priority')
+  @ApiCreatedResponse({ type: ProductEntity })
+  updatePriority(
+    @Param('id') id: string,
+    @Body() { priority }: { priority: number },
+  ) {
+    return this.productService.updatePriority(+id, priority);
+  }
+
+  @UseGuards(JwtAdminAuthGuard)
   @Delete(':id')
   @ApiCreatedResponse({ type: ProductEntity })
   remove(@Param('id') id: string) {

@@ -9,6 +9,7 @@ import {
   IProduct,
   IUpdateProductIsVisiblePayload,
   IUpdateProductPayload,
+  IUpdateProductPriorityPayload,
 } from '@/interfaces/IProduct';
 import { ErrorResponse } from '@/interfaces/IError';
 import { TBaseResponse, TPaginatedResponse } from '@/types/response.type';
@@ -185,6 +186,68 @@ export const useUpdateProductIsVisible = () => {
               const items = old.data.map((it: IProduct) => {
                 if (it.id === payload.id) {
                   return { ...it, isVisible: payload.isVisible };
+                }
+                return it;
+              });
+              return { ...old, data: items };
+            }
+          );
+        }
+      });
+      return { prevData };
+    },
+    onError: (_err, _payload, ctx) => {
+      if (!ctx?.prevData) return;
+      // Rollback all affected queries to their previous values
+      (ctx.prevData as Array<[unknown, unknown]>).forEach(
+        ([queryKey, data]) => {
+          queryClient.setQueryData(queryKey as any, data);
+        }
+      );
+    },
+    onSettled: () => {
+      // Ensure server state sync after success or error
+      queryClient.invalidateQueries({ queryKey: [QueryKeys.Product] });
+    },
+  });
+};
+
+const updateProductPriority = async (
+  payload: IUpdateProductPriorityPayload
+) => {
+  const { id, ...rest } = payload;
+  const result = await axiosInstance.patch(
+    `${productUrl}/${id}/priority`,
+    rest
+  );
+  return result.data as TBaseResponse<IProduct>;
+};
+
+export const useUpdateProductPriority = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updateProductPriority,
+    onMutate: async (payload: IUpdateProductPriorityPayload) => {
+      queryClient.cancelQueries({ queryKey: [QueryKeys.Product] });
+
+      const allProductQueries = queryClient.getQueriesData({
+        queryKey: [QueryKeys.Product],
+      });
+
+      const prevData = allProductQueries.map(([queryKey, data]) => [
+        queryKey,
+        data ? JSON.parse(JSON.stringify(data)) : data, // Deep clone
+      ]);
+
+      allProductQueries.forEach(([queryKey, data]) => {
+        if (data) {
+          queryClient.setQueryData(
+            queryKey,
+            (old: TPaginatedResponse<IProduct> | undefined) => {
+              if (!old) return old;
+              const items = old.data.map((it: IProduct) => {
+                if (it.id === payload.id) {
+                  return { ...it, priority: payload.priority };
                 }
                 return it;
               });

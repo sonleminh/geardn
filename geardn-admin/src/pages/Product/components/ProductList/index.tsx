@@ -26,6 +26,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useMemo, useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 
+import Input from '@/components/Input';
 import ActionButton from '@/components/ActionButton';
 import ButtonWithTooltip from '@/components/ButtonWithTooltip';
 import ExcelUpload from '@/components/ExcelUpload';
@@ -60,6 +61,7 @@ import {
   useDeleteProduct,
   useGetProductList,
   useUpdateProductIsVisible,
+  useUpdateProductPriority,
 } from '@/services/product';
 import { truncateTextByLine } from '@/utils/css-helper.util';
 
@@ -73,6 +75,7 @@ interface Data {
   stock: number;
   status: string;
   isVisible: boolean;
+  priority: number;
   createdAt: string;
   isDeleted: string;
   action: string;
@@ -104,28 +107,28 @@ const headCells: readonly HeadCell[] = [
     disablePadding: false,
     label: 'STT',
     isFilter: false,
-    width: '5%',
+    width: '4%',
   },
   {
     id: 'name',
     disablePadding: false,
     label: 'Tên sản phẩm',
     isFilter: false,
-    width: '26%',
+    width: '27%',
   },
   {
     align: 'center',
     id: 'image',
     disablePadding: false,
     label: 'Ảnh',
-    width: '8%',
+    width: '7%',
   },
   {
     id: 'variation',
     disablePadding: false,
     align: 'center',
     label: 'Biến thế',
-    width: '10%',
+    width: '7%',
   },
   {
     id: 'category',
@@ -133,21 +136,21 @@ const headCells: readonly HeadCell[] = [
     align: 'center',
     label: 'Danh mục',
     isFilter: true,
-    width: '13%',
+    width: '12%',
   },
   {
     id: 'stock',
     disablePadding: false,
     align: 'center',
     label: 'Tồn kho',
-    width: '8%',
+    width: '7%',
   },
   {
     align: 'center',
     id: 'status',
     disablePadding: false,
     label: 'Trạng thái',
-    width: '14%',
+    width: '13%',
     isFilter: true,
   },
   {
@@ -155,6 +158,13 @@ const headCells: readonly HeadCell[] = [
     id: 'isVisible',
     disablePadding: false,
     label: 'Hiển thị',
+    width: '7%',
+  },
+   {
+    align: 'center',
+    id: 'priority',
+    disablePadding: false,
+    label: 'Ưu tiên',
     width: '8%',
   },
   {
@@ -171,6 +181,7 @@ const columns: TableColumn[] = [
   { width: '280px', type: 'text' },
   { width: '100px', align: 'center', type: 'image' },
   { width: '130px', type: 'text' },
+  { width: '100px', align: 'center', type: 'text' },
   { width: '100px', align: 'center', type: 'text' },
   { width: '100px', align: 'center', type: 'text' },
   { width: '100px', align: 'center', type: 'text' },
@@ -321,6 +332,10 @@ export default function ProductList() {
   const [updateIsVisibleId, setUpdateIsVisibleId] = useState<number | null>(
     null
   );
+    const [updatePriorityId, setUpdatePriorityId] = useState<number | null>(
+    null
+  );
+  const [updatingPriorityValue, setUpdatingPriorityValue] = useState<number | string | null>(null);
 
   const {
     filterAnchorEl,
@@ -347,6 +362,12 @@ export default function ProductList() {
     mutate: updateProductIsVisibleMutate,
     isPending: isUpdatingIsVisible,
   } = useUpdateProductIsVisible();
+
+    const {
+    mutate: updateProductPriorityMutate,
+    isPending: isUpdatingPriority,
+  } = useUpdateProductPriority();
+
   const { mutate: deleteProductMutate, isPending: isDeleting } =
     useDeleteProduct();
   const { data: productStatusEnumData } = useGetEnumByContext('product-status');
@@ -375,6 +396,29 @@ export default function ProductList() {
         },
         onError: () => {
           showAlert('Cập nhật trạng thái hiển thị thất bại', 'error');
+        },
+      }
+    );
+  };
+
+  const handleUpdatePriority = (id: number, priority: string | number | null) => {
+    console.log('priority', priority);
+    
+    if( updatingPriorityValue === null ||
+      priority === null || priority === '') return;
+    updateProductPriorityMutate(
+      { id, priority: +priority },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: [QueryKeys.Product] });
+          showAlert('Cập nhật độ ưu tiên thành công', 'success');
+          setUpdatePriorityId(null);
+          setUpdatingPriorityValue(null);
+        },
+        onError: () => {
+          showAlert('Cập nhật độ ưu tiên thất bại', 'error');
+          setUpdatePriorityId(null);
+          setUpdatingPriorityValue(null);
         },
       }
     );
@@ -626,7 +670,7 @@ export default function ProductList() {
                               bgcolor: '#eeeeee',
                             },
                           }}>
-                          {product.skus.length} biến thể
+                          {product.skus.length} SKU
                         </Link>
                       </TableCell>
 
@@ -694,6 +738,46 @@ export default function ProductList() {
                             product.id === updateIsVisibleId
                           }
                         />
+                      </TableCell>
+                       <TableCell align='center'>
+                          <Input size='small' type='number'
+                           value={updatePriorityId === product.id ? updatingPriorityValue : product?.priority}
+                            onChange={(e) => 
+                              setUpdatingPriorityValue((e.target.value))
+                            } 
+                            onFocus={()=> {setUpdatePriorityId(product?.id); setUpdatingPriorityValue(product?.priority)}}
+                            onBlur={(e)=> {
+                              if(updatePriorityId !== product?.id) return;
+                              
+
+                              const currentValue = e.target.value;
+                             if (
+                                currentValue !== '' && 
+                                currentValue !== null && 
+                                Number(currentValue) !== product.priority
+                              ) {
+                                handleUpdatePriority(product.id, Number(currentValue));
+                              }
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                (e.target as HTMLInputElement).blur();
+                              }
+                              else if (e.key === 'Escape') {
+                                const input = e.target as HTMLInputElement;
+                                input.value = String(product.priority);
+
+                                setUpdatePriorityId(null);
+                                setUpdatingPriorityValue(null);
+
+                                input.blur();
+                              }
+                            }}
+                            disabled={
+                              isUpdatingPriority &&
+                              product.id === updatePriorityId
+                            }
+                          />
                       </TableCell>
                       <TableCell align='center'>
                         <ActionButton>

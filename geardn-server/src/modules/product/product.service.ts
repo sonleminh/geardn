@@ -595,19 +595,20 @@ export class ProductService {
         where: { id: productId },
         data: { isVisible },
       });
-
-      // await tx.productLog.create({
-      //   data: {
-      //     productId,
-      //     field: 'isVisible',
-      //     oldValue: isVisible.toString(),
-      //     newValue: isVisible.toString(),
-      //     changedBy: userId,
-      //   },
-      // });
     });
 
     return { message: 'Product isVisible updated successfully' };
+  }
+
+  async updatePriority(productId: number, priority: number) {
+    await this.prisma.$transaction(async (tx) => {
+      await tx.product.update({
+        where: { id: productId },
+        data: { priority },
+      });
+    });
+
+    return { message: 'Product priority updated successfully' };
   }
 
   async softDelete(id: number): Promise<{ deleteCount: number }> {
