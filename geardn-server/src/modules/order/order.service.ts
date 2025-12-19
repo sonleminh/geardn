@@ -63,7 +63,7 @@ export class OrderService {
       flag,
       completedAt,
     } = createOrderDto;
-
+    
     let orderItemsData = [];
 
     const order = await this.prisma.$transaction(async (tx) => {

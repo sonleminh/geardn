@@ -140,22 +140,13 @@ export interface IProvince {
     division_type: string;
     codename: string;
     phone_code: number;
-    districts: IDistrict[];
-}
-  
-export interface IDistrict {
-    name: string;
-    code: number;
-    division_type: string;
-    codename: string;
-    province_code: number;
-    wards: IWards[];
+    wards: IWard[];
 }
 
-export interface IWards {
+export interface IWard {
     name: string;
     code: number;
     division_type: string;
     codename: string;
-    short_codename: string;
+    province_code: string;
 }

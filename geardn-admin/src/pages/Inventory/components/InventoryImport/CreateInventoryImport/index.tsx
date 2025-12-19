@@ -91,7 +91,7 @@ const CreateInventoryImportPage = () => {
   const { data: warehousesData } = useGetWarehouseList();
   const { data: enumData } = useGetEnumByContext('import-type');
 
-  const { data: productsData } = useGetProductList();
+  const { data: productsData } = useGetProductList({limit: 100});
   const { data: skusData } = useGetSkusByProductId({
     id: productId,
     state: 'active',

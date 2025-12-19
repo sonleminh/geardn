@@ -18,9 +18,8 @@ import {
 import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
 
 import Input from '@/components/Input';
-import { IDistrict, IWards, IProvince } from '@/interfaces/IOrder';
+import { IProvince, IWard } from '@/interfaces/IOrder';
 import {
-  useGetDistrict,
   useGetProvince,
   useGetProvinceList,
 } from '@/services/order';
@@ -46,12 +45,10 @@ interface FormValues {
 interface ShipmentFormProps {
   formik: FormikProps<FormValues>;
   city: string;
-  district: string;
   ward: string;
   detailAddress: string;
   shopAddress: string;
   setCity: React.Dispatch<React.SetStateAction<string>>;
-  setDistrict: React.Dispatch<React.SetStateAction<string>>;
   setWard: React.Dispatch<React.SetStateAction<string>>;
   setDetailAddress: React.Dispatch<React.SetStateAction<string>>;
   setShopAddress: (shopAddress: string) => void;
@@ -61,12 +58,10 @@ interface ShipmentFormProps {
 const ShipmentForm: React.FC<ShipmentFormProps> = ({
   formik,
   city,
-  district,
   ward,
   detailAddress,
   shopAddress,
   setCity,
-  setDistrict,
   setWard,
   setDetailAddress,
   setShopAddress,
@@ -75,9 +70,6 @@ const ShipmentForm: React.FC<ShipmentFormProps> = ({
   const { data: provinceList } = useGetProvinceList();
   const { data: province } = useGetProvince(
     provinceList?.data?.find((item: IProvince) => item?.name === city)?.code
-  );
-  const { data: districtData } = useGetDistrict(
-    province?.data?.districts?.find?.((item) => item?.name === district)?.code
   );
   const { data: warehouseData } = useGetWarehouseList();
   return (
@@ -149,51 +141,15 @@ const ShipmentForm: React.FC<ShipmentFormProps> = ({
             }}>
             <Autocomplete
               size='small'
-              options={province?.data?.districts || []}
-              getOptionLabel={(option: IDistrict) => option.name}
+              options={province?.data?.wards || []}
+              getOptionLabel={(option: IWard) => option.name}
               value={
-                province?.data?.districts?.find(
-                  (item: IDistrict) => item.name === district
-                ) || null
-              }
-              onChange={(_, newValue) => setDistrict(newValue?.name || '')}
-              disabled={!city}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label='Quận/Huyện'
-                  variant='filled'
-                  sx={{
-                    '& .MuiFilledInput-root': {
-                      borderRadius: '4px',
-                    },
-                  }}
-                  InputProps={{
-                    ...params.InputProps,
-                    disableUnderline: true,
-                  }}
-                />
-              )}
-            />
-          </FormControl>
-          <FormControl
-            variant='filled'
-            fullWidth
-            margin='dense'
-            sx={{
-              ...selectStyle,
-            }}>
-            <Autocomplete
-              size='small'
-              options={districtData?.data?.wards || []}
-              getOptionLabel={(option: IWards) => option.name}
-              value={
-                districtData?.data?.wards?.find(
-                  (item: IWards) => item.name === ward
+                province?.data?.wards?.find(
+                  (item: IWard) => item.name === ward
                 ) || null
               }
               onChange={(_, newValue) => setWard(newValue?.name || '')}
-              disabled={!district}
+              disabled={!province?.data?.wards?.length}
               renderInput={(params) => (
                 <TextField
                   {...params}

@@ -37,15 +37,6 @@ interface IProvince {
   division_type: string;
   codename: string;
   phone_code: number;
-  districts: IDistrict[];
-}
-
-interface IDistrict {
-  name: string;
-  code: number;
-  division_type: string;
-  codename: string;
-  province_code: number;
   wards: IWard[];
 }
 
@@ -54,7 +45,7 @@ interface IWard {
   code: number;
   division_type: string;
   codename: string;
-  short_codename: string;
+  province_code: string;
 }
 
 const orderUrl = '/orders';
@@ -232,17 +223,17 @@ export const useGetProvince = (code: number | undefined) => {
   });
 };
 
-const getDistrict = async (code: number | undefined) => {
+const getWards = async (code: number | undefined) => {
   const result = await axiosInstance.get(`${provinceUrl}/d/${code}`, {
     withCredentials: false,
   });
-  return result.data as TBaseResponse<IDistrict>;
+  return result.data as TBaseResponse<IWard>;
 };
 
-export const useGetDistrict = (code: number | undefined) => {
+export const useGetWard = (code: number | undefined) => {
   return useQuery({
-    queryKey: ['district'],
-    queryFn: () => getDistrict(code),
+    queryKey: ['ward'],
+    queryFn: () => getWards(code),
     refetchOnWindowFocus: false,
     refetchInterval: false,
     enabled: !!code,

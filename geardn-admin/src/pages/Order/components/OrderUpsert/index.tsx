@@ -41,7 +41,6 @@ import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 
 interface AddressState {
   city: string;
-  district: string;
   ward: string;
   detailAddress: string;
   shopAddress: string;
@@ -67,7 +66,6 @@ const useOrderForm = (orderData: { data: IOrder } | undefined) => {
   const [orderItems, setOrderItems] = useState<ICheckoutItem[]>([]);
   const [address, setAddress] = useState<AddressState>({
     city: '',
-    district: '',
     ward: '',
     detailAddress: '',
     shopAddress: '',
@@ -102,8 +100,7 @@ const useOrderForm = (orderData: { data: IOrder } | undefined) => {
       if (orderData.data.shipment?.method === 1) {
         const addressArr = orderData.data.shipment?.address?.split(', ');
         setAddress({
-          city: addressArr[3] || '',
-          district: addressArr[2] || '',
+          city: addressArr[2] || '',
           ward: addressArr[1] || '',
           detailAddress: addressArr[0] || '',
           shopAddress: '',
@@ -165,7 +162,7 @@ const OrderUpsert = () => {
         return showAlert('Không có sản phẩm nào để tạo đơn hàng', 'error');
       }
 
-      const { city, district, ward, detailAddress, shopAddress } = address;
+      const { city, ward, detailAddress, shopAddress } = address;
       if (
         (values.shipment.method === 1 && !ward && !detailAddress) ||
         (values.shipment.method === 2 && !shopAddress)
@@ -198,7 +195,7 @@ const OrderUpsert = () => {
           ...processedValues.shipment,
           address:
             values.shipment.method == 1
-              ? `${detailAddress}, ${ward}, ${district}, ${city}`
+              ? `${detailAddress}, ${ward}, ${city}`
               : shopAddress,
           deliveryDate: values.shipment.deliveryDate,
         },
@@ -286,20 +283,6 @@ const OrderUpsert = () => {
         }));
       } else {
         handleAddressChange('city', value);
-      }
-    },
-    [handleAddressChange]
-  );
-
-  const handleDistrictChange = useCallback(
-    (value: React.SetStateAction<string>) => {
-      if (typeof value === 'function') {
-        setAddress((prev) => ({
-          ...prev,
-          district: value(prev.district),
-        }));
-      } else {
-        handleAddressChange('district', value);
       }
     },
     [handleAddressChange]
@@ -468,12 +451,10 @@ const OrderUpsert = () => {
                 formik={formik}
                 handleChange={handleChange}
                 city={address.city}
-                district={address.district}
                 ward={address.ward}
                 detailAddress={address.detailAddress}
                 shopAddress={address.shopAddress}
                 setCity={handleCityChange}
-                setDistrict={handleDistrictChange}
                 setWard={handleWardChange}
                 setDetailAddress={handleDetailAddressChange}
                 setShopAddress={handleShopAddressChange}

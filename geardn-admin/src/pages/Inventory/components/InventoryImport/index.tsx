@@ -493,7 +493,7 @@ const InventoryImportList = () => {
     usePagination();
 
   const { data: warehousesData } = useGetWarehouseList();
-  const { data: productsData } = useGetProductList();
+  const { data: productsData } = useGetProductList({limit: 100});
   const { data: enumData } = useGetEnumByContext('import-type');
 
   const {

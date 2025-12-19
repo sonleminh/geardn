@@ -345,7 +345,7 @@ const OrderReturnRequestList = () => {
     handleColumnFilterChange,
   } = useFilterState();
 
-  const { data: productsData } = useGetProductList();
+  const { data: productsData } = useGetProductList({limit: 100});
   const { data: orderReturnTypeEnumData } = useGetEnumByContext('return-type');
   const { data: orderReturnStatusEnumData } =
     useGetEnumByContext('return-status');

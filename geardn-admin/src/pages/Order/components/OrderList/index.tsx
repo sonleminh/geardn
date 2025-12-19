@@ -94,7 +94,7 @@ const OrderList = () => {
   const { page, rowsPerPage, handleChangePage, handleChangeRowsPerPage } =
     usePagination();
 
-  const { data: productsData } = useGetProductList();
+  const { data: productsData } = useGetProductList({limit: 100});
   const { data: orderStatusEnumData } = useGetEnumByContext('order-status');
   const { data: orderReasonCodeEnumData } =
     useGetEnumByContext('order-reason-code');
