@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import * as React from 'react';
 import Image, { ImageProps } from 'next/image';
 import { Box, Skeleton } from '@mui/material';
 
 const SkeletonImage: React.FC<ImageProps> = (props) => {
-  const [isError, setIsError] = useState(false);
+  const [isError, setIsError] = React.useState(false);
   const srcImg = props?.src;
   return (
     <Box sx={{ position: 'relative', width: '100%', height: '100%' }}>

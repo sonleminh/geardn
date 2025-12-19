@@ -1,38 +1,41 @@
-'use client';
+"use client";
 
-import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import { Box, Typography } from '@mui/material';
+import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import { Box, Typography } from "@mui/material";
 
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation } from 'swiper/modules';
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation } from "swiper/modules";
 
-import LayoutContainer from '@/components/layout-container';
-import ProductCard from '@/components/common/ProductCard';
-import { IProduct } from '@/interfaces/IProduct';
+import LayoutContainer from "@/components/layout-container";
+import ProductCard from "@/components/common/ProductCard";
+import { IProduct } from "@/interfaces/IProduct";
 
 const Explore = ({ exploreData }: { exploreData: IProduct[] | undefined }) => {
   return (
     <Box sx={{ mb: 10 }}>
       <LayoutContainer>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Typography sx={{ mb: 4, fontSize: 36, fontWeight: 700 }}>
+        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+          <Typography
+            sx={{ mb: 4, fontSize: { xs: 24, md: 36 }, fontWeight: 700 }}
+          >
             Khám phá sản phẩm
           </Typography>
           <Box
             sx={{
-              display: 'flex',
-              alignItems: 'center',
-              '> div > svg': {
+              display: "flex",
+              alignItems: "center",
+              "> div > svg": {
                 fontSize: 30,
-                ':hover': {
-                  bgcolor: '#222',
-                  color: '#fff',
+                ":hover": {
+                  bgcolor: "#222",
+                  color: "#fff",
                   borderRadius: 2,
-                  cursor: 'pointer',
+                  cursor: "pointer",
                 },
               },
-            }}>
+            }}
+          >
             <Box className={`arrow-left`} sx={{ mr: 1 }}>
               <KeyboardArrowLeftIcon />
             </Box>
@@ -62,17 +65,19 @@ const Explore = ({ exploreData }: { exploreData: IProduct[] | undefined }) => {
               spaceBetween: 30,
             },
           }}
-          className='mySwiper'>
+          className="mySwiper"
+        >
           {exploreData?.map((item, index) => (
             <SwiperSlide key={index}>
               <Box
                 sx={{
-                  '.product-img': {
-                    '& img': {
-                      height: '250px !important',
+                  ".product-img": {
+                    "& img": {
+                      height: "250px !important",
                     },
                   },
-                }}>
+                }}
+              >
                 <ProductCard data={item} />
               </Box>
             </SwiperSlide>

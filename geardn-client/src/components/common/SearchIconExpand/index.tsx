@@ -16,7 +16,6 @@ export default function SearchIconExpand({
   onSearch,
   placeholder = 'Tìm kiếm…',
   initialValue = '',
-  maxWidth = 280,
   debounceMs = 300,
 }: Props) {
   const [expanded, setExpanded] = React.useState(false);
@@ -64,7 +63,7 @@ export default function SearchIconExpand({
         sx={{
           display: 'inline-flex',
           alignItems: 'center',
-          gap: 1,
+          gap: { xs: 0, sm: 1 },
           px: 0.5,
           py: 0.25,
           borderRadius: 2,
@@ -84,7 +83,7 @@ export default function SearchIconExpand({
             aria-label='Search input'
             inputProps={{ 'data-qa': 'search-input' }}
             sx={{
-              width: expanded ? maxWidth : 0,
+              width: expanded ? { xs: 120, md: 150 } : 0,
               opacity: expanded ? 1 : 0,
               transition: (t) =>
                 t.transitions.create(['width', 'opacity'], {
