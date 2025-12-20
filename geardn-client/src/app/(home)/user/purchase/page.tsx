@@ -53,9 +53,12 @@ const Purchase = () => {
               bgcolor: "#fff",
               borderTopLeftRadius: "12px",
               borderTopRightRadius: "12px",
+              ".MuiTabs-scroller": {
+                overflowX: "auto !important",
+              },
               button: {
-                width: "16.6666667%",
-                fontSize: { xs: 12, md: 16 },
+                width: { xs: "auto", md: "16.6666667%" },
+                fontSize: { xs: 13, md: 16 },
               },
             }}
           >

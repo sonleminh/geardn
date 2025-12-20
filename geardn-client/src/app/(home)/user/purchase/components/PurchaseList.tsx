@@ -42,7 +42,7 @@ const PurchaseList = ({ orders }: { orders: IOrder[] }) => {
               display: "flex",
               justifyContent: "space-between",
               borderBottom: "1px solid #e5e7eb",
-              p: "12px 16px",
+              p: { xs: "8px 8px", md: "12px 16px" },
             }}
           >
             <Box sx={{ display: "flex", alignItems: "center" }}>

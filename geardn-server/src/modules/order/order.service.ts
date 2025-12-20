@@ -19,6 +19,7 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { FindOrderStatusHistoryDto } from './dto/find-order-status-history.dto';
 import { FindOrdersDto } from './dto/find-orders.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 const ALLOWED_STATUS_TRANSITIONS: Readonly<
   Record<OrderStatus, readonly OrderStatus[]>
@@ -48,6 +49,7 @@ export class OrderService {
   constructor(
     private prisma: PrismaService,
     private readonly cartService: CartService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async create(createOrderDto: CreateOrderDto) {
@@ -63,7 +65,7 @@ export class OrderService {
       flag,
       completedAt,
     } = createOrderDto;
-    
+
     let orderItemsData = [];
 
     const order = await this.prisma.$transaction(async (tx) => {
@@ -155,10 +157,14 @@ export class OrderService {
         },
       });
 
-      return await tx.order.update({
+      await tx.order.update({
         where: { id: tempOrder.id },
         data: { orderCode },
       });
+
+      this.eventEmitter.emit('order.created', tempOrder);
+
+      return;
     });
 
     if (userId) {
@@ -179,6 +185,7 @@ export class OrderService {
         }
       }
     }
+
     return { data: order };
   }
 
@@ -191,7 +198,7 @@ export class OrderService {
       search,
       page = 1,
       limit = 10,
-      sortBy,  
+      sortBy,
       order = 'desc',
     } = dto || {};
     const skip = (page - 1) * limit;

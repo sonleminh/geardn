@@ -46,7 +46,7 @@ const Sidebar = ({ userData }: { userData: IUser | undefined }) => {
             display: "flex",
             alignItems: "center",
             p: "6px 0",
-            svg: { mr: 1 },
+            svg: { mr: { xs: 0.5, md: 1 } },
             "& p": {
               textAlign: "start",
               fontSize: 14,
@@ -56,15 +56,17 @@ const Sidebar = ({ userData }: { userData: IUser | undefined }) => {
         }}
       >
         <Box component={AppLink} href={"#"}>
-          <NotificationsNoneOutlinedIcon />
+          <NotificationsNoneOutlinedIcon
+            sx={{ fontSize: { xs: 20, md: 24 } }}
+          />
           <Typography>Thông báo</Typography>
         </Box>
         <Box component={AppLink} href={ROUTES.ACCOUNT}>
-          <Person2OutlinedIcon />
+          <Person2OutlinedIcon sx={{ fontSize: { xs: 20, md: 24 } }} />
           <Typography>Tài khoản của tôi</Typography>
         </Box>
         <Box component={AppLink} href={ROUTES.PURCHASE}>
-          <ListAltOutlinedIcon />
+          <ListAltOutlinedIcon sx={{ fontSize: { xs: 20, md: 24 } }} />
           <Typography>Đơn mua</Typography>
         </Box>
       </Box>

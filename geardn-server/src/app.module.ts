@@ -32,6 +32,9 @@ import { RealtimegModule } from './modules/realtime/realtime.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { OutboxModule } from './modules/outbox/outbox.module';
 import { NotificationsModule } from './modules/notification/notification.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { TelegrafModule } from 'nestjs-telegraf';
+import { TelegramNotificationService } from './modules/notification/telegram-notification.service';
 
 @Module({
   imports: [
@@ -39,6 +42,14 @@ import { NotificationsModule } from './modules/notification/notification.module'
       isGlobal: true,
       load: [configuration],
       envFilePath: ['.env.local', '.env.production'],
+    }),
+    EventEmitterModule.forRoot(),
+    TelegrafModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        token: configService.get<string>('TELEGRAM_BOT_TOKEN'),
+      }),
+      inject: [ConfigService],
     }),
     BullModule.forRootAsync({
       inject: [ConfigService],
@@ -83,6 +94,7 @@ import { NotificationsModule } from './modules/notification/notification.module'
     NotificationsModule,
   ],
   controllers: [AppController],
-  // providers: [{ provide: APP_FILTER, useClass: AllExceptionFilter }],
+  // providers: [{ provide: APP_FILTER, useClass: AllExceptionFilter }]
+  providers: [TelegramNotificationService],
 })
 export class AppModule {}
