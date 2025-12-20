@@ -15,9 +15,18 @@ const Explore = ({ exploreData }: { exploreData: IProduct[] | undefined }) => {
   return (
     <Box sx={{ mb: 10 }}>
       <LayoutContainer>
-        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            mb: 4,
+          }}
+        >
           <Typography
-            sx={{ mb: 4, fontSize: { xs: 24, md: 36 }, fontWeight: 700 }}
+            sx={{
+              fontSize: { xs: 24, md: 36 },
+              fontWeight: 700,
+            }}
           >
             Khám phá sản phẩm
           </Typography>

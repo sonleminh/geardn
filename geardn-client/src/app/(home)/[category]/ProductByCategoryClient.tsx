@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import Breadcrumbs from '@/components/common/Breadcrumbs';
-import ProductCard from '@/components/common/ProductCard';
-import { ProductFilters } from '@/components/common/ProductFilters';
-import LayoutContainer from '@/components/layout-container';
-import { IProduct } from '@/interfaces/IProduct';
-import { IQueryParams } from '@/interfaces/IQuery';
-import { useProductsByCategoryInfinite } from '@/queries/product';
-import { ProductsByCategoryResponse } from '@/types/response.type';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Box, Button, Grid2, Typography } from '@mui/material';
-import { useSearchParams } from 'next/navigation';
-import { useMemo } from 'react';
+import Breadcrumbs from "@/components/common/Breadcrumbs";
+import ProductCard from "@/components/common/ProductCard";
+import { ProductFilters } from "@/components/common/ProductFilters";
+import LayoutContainer from "@/components/layout-container";
+import { IProduct } from "@/interfaces/IProduct";
+import { IQueryParams } from "@/interfaces/IQuery";
+import { useProductsByCategoryInfinite } from "@/queries/product";
+import { ProductsByCategoryResponse } from "@/types/response.type";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { Box, Button, Grid2, Typography } from "@mui/material";
+import { useSearchParams } from "next/navigation";
+import { useMemo } from "react";
 
 type Props = {
   slug: string;
@@ -39,8 +39,8 @@ export default function ProductByCategoryClient({
   }, [q.data]);
 
   const breadcrumbsOptions = [
-    { href: '/', label: 'Trang chủ' },
-    { href: '', label: q?.data?.category?.name as string },
+    { href: "/", label: "Trang chủ" },
+    { href: "", label: q?.data?.category?.name as string },
   ];
 
   return (
@@ -48,34 +48,44 @@ export default function ProductByCategoryClient({
       <Box sx={{ mb: 2 }}>
         <Breadcrumbs options={breadcrumbsOptions} />
       </Box>
-      <Box sx={{ display: ' flex', justifyContent: 'space-between', mb: 2 }}>
-        <Typography>Tìm thấy {total} sản phẩm</Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+      <Box
+        sx={{
+          display: " flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 2,
+        }}
+      >
+        <Typography sx={{ fontSize: { xs: 13, md: 15 } }}>
+          Tìm thấy {total} sản phẩm
+        </Typography>
+        <Box sx={{ display: "flex", alignItems: "center" }}>
           <ProductFilters initial={params} />
         </Box>
       </Box>
       <Grid2 container spacing={2}>
         {products?.map((item) => (
-          <Grid2 size={3} key={item.id}>
+          <Grid2 size={{ xs: 6, md: 3 }} key={item.id}>
             <ProductCard data={item} />
           </Grid2>
         ))}
       </Grid2>
       {q.hasNextPage && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
           <Button
             onClick={() => q.fetchNextPage()}
             disabled={!q.hasNextPage || q.isFetchingNextPage}
-            variant='outlined'
+            variant="outlined"
             sx={{
               borderRadius: 100,
-              textTransform: 'none',
+              textTransform: "none",
               fontSize: 14,
               fontWeight: 600,
-            }}>
+            }}
+          >
             {q.isFetchingNextPage
-              ? 'Đang tải...'
-              : `Xem thêm ${total - products?.length} kết quả`}{' '}
+              ? "Đang tải..."
+              : `Xem thêm ${total - products?.length} kết quả`}{" "}
             {!q.isFetchingNextPage && <ExpandMoreIcon sx={{ ml: 0.5 }} />}
           </Button>
         </Box>

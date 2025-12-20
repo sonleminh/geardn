@@ -66,7 +66,7 @@ const ProductCatalog = ({
               <Box
                 sx={{
                   width: "100%",
-                  pt: 2,
+                  p: { xs: "16px 0 16px 0", md: "16px 0 0 0" },
                   bgcolor: "#fff",
                   boxShadow: {
                     xs: "none",
@@ -84,7 +84,6 @@ const ProductCatalog = ({
                 <List
                   sx={{
                     display: { xs: "grid", md: "block" },
-                    // gridTemplateRows: { xs: "repeat(2, 1fr)", md: "unset" },
                     gridTemplateColumns: {
                       xs: "repeat(4, 1fr)",
                       md: "unset",
@@ -156,21 +155,22 @@ const ProductCatalog = ({
                 </List>
               </Box>
             </Grid2>
-            <Grid2 size={{ xs: 12, md: 9 }}>
+            <Grid2 size={{ xs: 12, md: 9 }} sx={{ py: { xs: 2, md: 0 } }}>
               <Box sx={{ position: "relative" }}>
                 <Box
                   sx={{
                     display: "flex",
                     justifyContent: "space-between",
+                    alignItems: "center",
                     mb: 2,
                   }}
                 >
-                  <Typography sx={{ fontSize: 15 }}>
+                  <Typography sx={{ fontSize: { xs: 12, md: 15 } }}>
                     Tìm thấy <b>{total} </b>kết quả
                   </Typography>
                   <ProductFilters initial={params} />
                 </Box>
-                <Grid2 container spacing={2} sx={{ mb: 3 }}>
+                <Grid2 container spacing={{ xs: 1, md: 2 }} sx={{ mb: 3 }}>
                   {products?.length === 0
                     ? [1, 2, 3, 4, 5, 6, 7, 8, 9].map((item, index) => (
                         <Grid2 key={index} size={{ xs: 6, md: 4 }}>

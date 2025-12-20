@@ -17,8 +17,8 @@ const Footer = () => {
             <Box
               sx={{
                 position: "relative",
-                width: { xs: "120px", md: "145px" },
-                height: { xs: "48px", md: "60.5px" },
+                width: { xs: "100px", md: "145px" },
+                height: { xs: "40px", md: "60.5px" },
                 border: "2px solid #a3a3a3",
                 borderRadius: 2,
                 overflow: "hidden",
@@ -74,13 +74,14 @@ const Footer = () => {
             <List
               sx={{
                 display: "flex",
-                justifyContent: "space-between",
+                justifyContent: { xs: "left", md: "space-between" },
                 li: {
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
                   width: "40px",
                   height: "40px",
+                  mr: { xs: 2, md: 0 },
                   bgcolor: "#000",
                   color: "#fff",
                   borderRadius: "50%",
@@ -110,25 +111,30 @@ const Footer = () => {
         <Box
           sx={{
             display: "flex",
+            flexDirection: { xs: "column", md: "row" },
             justifyContent: "space-between",
             alignItems: "center",
             py: 3,
           }}
         >
-          <Typography sx={{ fontSize: 15 }}>
-            Copyright © 2024 Son Le | All Rights Reserved .
+          <Typography
+            sx={{ mb: { xs: 2, md: 0 }, fontSize: { xs: 12, md: 13 } }}
+          >
+            Copyright © 2024 Son Le | All Rights Reserved.
           </Typography>
           <Box
             sx={{
               display: "flex",
               alignItems: "center",
               "& p": {
-                fontSize: 15,
+                fontSize: { xs: 12, md: 13 },
               },
             }}
           >
-            <Typography sx={{ mr: 4 }}>Điều khoản dịch vụ</Typography>
-            <Typography>Chính sách</Typography>
+            <Typography sx={{ mr: 4 }}>
+              Địa chỉ: 02 Tô Hiến Thành, An Hải, Đà Nẵng. Điện thoại:
+              0789787200. Email: sonlele2000@gmail.com.
+            </Typography>
           </Box>
         </Box>
       </LayoutContainer>

@@ -1,8 +1,7 @@
-import React, { Suspense } from 'react';
-import { Metadata } from 'next';
-import { LoadingCircle } from '@/components/common/LoadingCircle';
-import LayoutContainer from '@/components/layout-container';
-import { getCategoryBySlug } from '@/data/category.server';
+import React, { Suspense } from "react";
+import { Metadata } from "next";
+import { LoadingCircle } from "@/components/common/LoadingCircle";
+import { getCategoryBySlug } from "@/data/category.server";
 
 export async function generateMetadata({
   params,
@@ -13,11 +12,11 @@ export async function generateMetadata({
   const res = await getCategoryBySlug(category).catch(() => null);
   const categoryData = res?.data;
 
-  const fallbackTitle = 'Sản phẩm';
+  const fallbackTitle = "Sản phẩm";
   const title = categoryData?.name
     ? `${categoryData.name} | GearDN`
     : `${fallbackTitle} | GearDN`;
-  const description = 'Danh mục sản phẩm trên GearDN';
+  const description = "Danh mục sản phẩm trên GearDN";
 
   const path = `/c/${encodeURIComponent(category)}`;
   const images = categoryData?.icon
@@ -37,7 +36,7 @@ export async function generateMetadata({
     description,
     alternates: { canonical: path },
     openGraph: {
-      type: 'website',
+      type: "website",
       url: path,
       title,
       description,
@@ -52,9 +51,5 @@ export default async function CategoryLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <Suspense fallback={<LoadingCircle />}>
-      <LayoutContainer>{children}</LayoutContainer>
-    </Suspense>
-  );
+  return <Suspense fallback={<LoadingCircle />}>{children}</Suspense>;
 }

@@ -1,10 +1,10 @@
-import { Box } from '@mui/material';
-import ProductByCategoryClient from './ProductByCategoryClient';
-import { getProductsByCategory } from '@/data/product.server';
+import { Box } from "@mui/material";
+import ProductByCategoryClient from "./ProductByCategoryClient";
+import { getProductsByCategory } from "@/data/product.server";
 import {
   parseProductListParams,
   toURLSearchParams,
-} from '@/lib/search/productList.params';
+} from "@/lib/search/productList.params";
 
 export default async function ProductByCategoryPage({
   params,
@@ -19,7 +19,9 @@ export default async function ProductByCategoryPage({
   const qs = toURLSearchParams(parsed);
   const initial = await getProductsByCategory(category, qs);
   return (
-    <Box sx={{ pt: 2, pb: 4, bgcolor: '#F3F4F6' }}>
+    <Box
+      sx={{ pt: { xs: 0, md: 2 }, pb: { xs: 4, md: 4 }, bgcolor: "#F3F4F6" }}
+    >
       <ProductByCategoryClient
         slug={category}
         initial={initial}

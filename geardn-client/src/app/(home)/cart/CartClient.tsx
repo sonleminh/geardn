@@ -1,15 +1,17 @@
-'use client';
+"use client";
 
-import React, { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import React, { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 import {
   Box,
   Button,
   Checkbox,
   Grid2,
+  IconButton,
   Paper,
+  Stack,
   SxProps,
   Table,
   TableBody,
@@ -20,34 +22,35 @@ import {
   TextField,
   Theme,
   Typography,
-} from '@mui/material';
+} from "@mui/material";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline"; // Added for mobile delete icon
 
-import { FullScreenLoader } from '@/components/common/FullScreenLoader';
-import SkeletonImage from '@/components/common/SkeletonImage';
-import LayoutContainer from '@/components/layout-container';
-import CustomDialog from '@/components/common/CustomDialog';
-import Breadcrumbs from '@/components/common/Breadcrumbs';
+import { FullScreenLoader } from "@/components/common/FullScreenLoader";
+import SkeletonImage from "@/components/common/SkeletonImage";
+import LayoutContainer from "@/components/layout-container";
+import CustomDialog from "@/components/common/CustomDialog";
+import Breadcrumbs from "@/components/common/Breadcrumbs";
 
-import { useNotificationStore } from '@/stores/notification-store';
-import { useAuthStore } from '@/stores/auth-store';
-import { useCartStore } from '@/stores/cart-store';
+import { useNotificationStore } from "@/stores/notification-store";
+import { useAuthStore } from "@/stores/auth-store";
+import { useCartStore } from "@/stores/cart-store";
 
-import { truncateTextByLine } from '@/utils/css-helper.util';
-import { formatPrice } from '@/utils/format-price';
+import { truncateTextByLine } from "@/utils/css-helper.util";
+import { formatPrice } from "@/utils/format-price";
 
-import { ROUTES } from '@/constants/route';
-import EMPTY_CART from '@/assets/empty-cart.png';
+import { ROUTES } from "@/constants/route";
+import EMPTY_CART from "@/assets/empty-cart.png";
 
-import { ICartResponse, ICartStoreItem } from '@/interfaces/ICart';
-import { IProductSkuAttributes } from '@/interfaces/IProductSku';
+import { ICartResponse, ICartStoreItem } from "@/interfaces/ICart";
+import { IProductSkuAttributes } from "@/interfaces/IProductSku";
 import {
   useDeleteCartItem,
   useGetCart,
   useGetCartStock,
   useUpdateQuantity,
-} from '@/queries/cart';
-import { useSession } from '@/hooks/useSession';
-import { BaseResponse } from '@/types/response.type';
+} from "@/queries/cart";
+import { useSession } from "@/hooks/useSession";
+import { BaseResponse } from "@/types/response.type";
 
 const CartClient = ({
   initialCart,
@@ -66,8 +69,8 @@ const CartClient = ({
   const router = useRouter();
 
   const breadcrumbsOptions = [
-    { href: '/', label: 'Trang chủ' },
-    { href: ROUTES.CART, label: 'Giỏ hàng' },
+    { href: "/", label: "Trang chủ" },
+    { href: ROUTES.CART, label: "Giỏ hàng" },
   ];
 
   const { data: cartStock } = useGetCartStock(
@@ -82,7 +85,7 @@ const CartClient = ({
 
   const { showNotification } = useNotificationStore();
 
-  const [draftQty, setDraftQty] = useState<Record<number, number | ''>>({});
+  const [draftQty, setDraftQty] = useState<Record<number, number | "">>({});
   const [editing, setEditing] = useState<Record<number, boolean>>({});
   const inputRefs = useRef<Record<number, HTMLInputElement | null>>({});
   const [openRemoveItemDialog, setOpenRemoveItemDialog] = useState(false);
@@ -92,6 +95,7 @@ const CartClient = ({
     name: string;
   }>();
 
+  // ... (Keep existing Logic handlers: getDisplayQty, handleFocus, handleChange, etc.) ...
   const getDisplayQty = (row: ICartStoreItem) =>
     editing[row.skuId] ? draftQty[row.skuId] ?? row.quantity : row.quantity;
 
@@ -101,8 +105,8 @@ const CartClient = ({
   };
 
   const handleChange = (skuId: number, raw: string) => {
-    if (raw === '') return setDraftQty((s) => ({ ...s, [skuId]: '' }));
-    const n = Number(raw.replace(/[^\d]/g, ''));
+    if (raw === "") return setDraftQty((s) => ({ ...s, [skuId]: "" }));
+    const n = Number(raw.replace(/[^\d]/g, ""));
     if (Number.isNaN(n)) return;
     setDraftQty((s) => ({ ...s, [skuId]: n }));
   };
@@ -110,7 +114,7 @@ const CartClient = ({
   const handleBlur = (row: ICartStoreItem) => {
     const { skuId, cartItemId, productName } = row;
     const raw = draftQty[skuId];
-    let next = typeof raw === 'number' ? raw : row.quantity;
+    let next = typeof raw === "number" ? raw : row.quantity;
 
     const stock =
       cartStock?.data?.find((i) => i.id === skuId)?.quantity ?? Infinity;
@@ -136,9 +140,9 @@ const CartClient = ({
     }
     setEditing((s) => ({ ...s, [skuId]: false }));
     setDraftQty((s) => {
-      const next = { ...s };
-      delete next[skuId];
-      return next;
+      const nextState = { ...s };
+      delete nextState[skuId];
+      return nextState;
     });
   };
 
@@ -185,6 +189,9 @@ const CartClient = ({
   };
 
   const handleSelectClick = (event: React.MouseEvent<unknown>, id: number) => {
+    // Stop propagation to prevent row clicks if necessary, mainly for mobile card taps
+    event.stopPropagation();
+
     const selectedIndex = selected.indexOf(id);
     let newSelected: number[] = [];
 
@@ -209,8 +216,8 @@ const CartClient = ({
         { id: payload.cartItemId, quantity: payload.quantity },
         {
           onError: () => {
-            showNotification('Đã có lỗi xảy ra', 'error');
-            updateQuantity(payload.skuId, payload.quantity - 1); // !!
+            showNotification("Đã có lỗi xảy ra", "error");
+            updateQuantity(payload.skuId, payload.quantity - 1);
           },
         }
       );
@@ -224,7 +231,7 @@ const CartClient = ({
         { id: payload.cartItemId, quantity: payload.quantity },
         {
           onError: () => {
-            updateQuantity(payload.skuId, payload.quantity - 1); // !!
+            updateQuantity(payload.skuId, payload.quantity - 1);
           },
         }
       );
@@ -326,7 +333,7 @@ const CartClient = ({
 
   const handlePayBtn = () => {
     if (selected.length === 0) {
-      return showNotification('Vui lòng chọn sản phẩm', 'warning');
+      return showNotification("Vui lòng chọn sản phẩm", "warning");
     }
     const selectedItems = selected
       .map((skuId) => cartItems?.find((item) => item.skuId === skuId))
@@ -350,10 +357,9 @@ const CartClient = ({
   useEffect(() => {
     if (!cartItems?.length) return;
     setDraftQty((prev) => {
-      const next: Record<number, number | ''> = { ...prev };
+      const next: Record<number, number | ""> = { ...prev };
       for (const it of cartItems) {
-        // chỉ cập nhật nếu chưa có draft hoặc draft rỗng
-        if (next[it.skuId] === undefined || next[it.skuId] === '') {
+        if (next[it.skuId] === undefined || next[it.skuId] === "") {
           next[it.skuId] = it.quantity;
         }
       }
@@ -367,10 +373,9 @@ const CartClient = ({
         { id: p.cartItemId, quantity: p.next },
         {
           onError: () => {
-            // rollback
             updateQuantity(p.skuId, p.prev);
             setDraftQty((s) => ({ ...s, [p.skuId]: p.prev }));
-            showNotification('Cập nhật số lượng thất bại', 'error');
+            showNotification("Cập nhật số lượng thất bại", "error");
           },
         }
       );
@@ -378,8 +383,61 @@ const CartClient = ({
     800
   );
 
+  const QuantityControl = ({ row }: { row: ICartStoreItem }) => (
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        "& .MuiButtonBase-root": {
+          minWidth: 28,
+          height: 28,
+          border: "1px solid #eee",
+        },
+      }}
+    >
+      <Button
+        sx={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
+        onClick={() =>
+          handleSubtractItem(row.skuId, row.productName, row?.cartItemId)
+        }
+      >
+        -
+      </Button>
+      <TextField
+        sx={QtyInputStyle}
+        variant="outlined"
+        type="text"
+        size="small"
+        value={getDisplayQty(row)}
+        onFocus={() => handleFocus(row.skuId, row.quantity)}
+        onChange={(e) => handleChange(row.skuId, e.target.value)}
+        onBlur={() => handleBlur(row)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") e.currentTarget.blur();
+        }}
+        inputRef={(el) => {
+          inputRefs.current[row.skuId] = el;
+        }}
+      />
+      <Button
+        sx={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}
+        onClick={() => handleAddItem(row?.skuId, row?.cartItemId)}
+        disabled={
+          (cartStock?.data?.find((item) => item.id === row?.skuId)?.quantity ??
+            0) <= (row?.quantity ?? 0)
+        }
+      >
+        +
+      </Button>
+    </Box>
+  );
+
   return (
-    <Box pt={2} pb={4} bgcolor={'#eee'}>
+    <Box
+      pb={{ xs: 22, md: 4 }}
+      bgcolor={"#F3F4F6"}
+      minHeight={{ xs: "100vh", md: "" }}
+    >
       <LayoutContainer>
         <Box sx={{ mb: 2 }}>
           <Breadcrumbs options={breadcrumbsOptions} />
@@ -387,28 +445,49 @@ const CartClient = ({
         <Box>
           {cartItems?.length > 0 ? (
             <Grid2 container spacing={2}>
-              <Grid2 size={8.5}>
-                <TableContainer component={Paper}>
-                  <Table sx={{ minWidth: 650 }} aria-label='simple table'>
+              <Grid2 size={{ xs: 12, md: 8.5 }}>
+                <Paper
+                  sx={{
+                    p: { xs: 1, md: 2 },
+                    mb: 2,
+                    display: { xs: "flex", md: "none" },
+                    alignItems: "center",
+                  }}
+                >
+                  <Checkbox
+                    checked={
+                      cartItems?.length > 0 &&
+                      selected?.length === cartItems?.length
+                    }
+                    onChange={handleSelectAllClick}
+                    sx={{ mr: 0.5 }}
+                  />
+                  <Typography fontWeight={600}>
+                    Chọn tất cả ({cartItems.length})
+                  </Typography>
+                </Paper>
+
+                <TableContainer
+                  component={Paper}
+                  sx={{ display: { xs: "none", md: "block" } }}
+                >
+                  <Table sx={{ minWidth: 650 }} aria-label="simple table">
                     <TableHead>
                       <TableRow>
-                        <TableCell width={'5%'}>
+                        <TableCell width={"5%"}>
                           <Checkbox
-                            color='primary'
+                            color="primary"
                             checked={
                               cartItems?.length > 0 &&
                               selected?.length === cartItems?.length
                             }
                             onChange={handleSelectAllClick}
-                            inputProps={{
-                              'aria-label': 'select all desserts',
-                            }}
                           />
                         </TableCell>
-                        <TableCell width={'45%'}>Sản phẩm</TableCell>
-                        <TableCell align='center'>Giá</TableCell>
-                        <TableCell align='center'>Số lượng</TableCell>
-                        <TableCell align='center' width={'13%'}>
+                        <TableCell width={"45%"}>Sản phẩm</TableCell>
+                        <TableCell align="center">Giá</TableCell>
+                        <TableCell align="center">Số lượng</TableCell>
+                        <TableCell align="center" width={"13%"}>
                           Tuỳ chọn
                         </TableCell>
                       </TableRow>
@@ -420,180 +499,112 @@ const CartClient = ({
                           <TableRow
                             key={row.skuId}
                             sx={{
-                              height: ' 96px',
-                              '&:last-child td, &:last-child th': { border: 0 },
-                            }}>
-                            <TableCell component='th' scope='row'>
+                              height: "96px",
+                              "&:last-child td, &:last-child th": { border: 0 },
+                            }}
+                          >
+                            <TableCell component="th" scope="row">
                               <Checkbox
-                                color='primary'
+                                color="primary"
                                 checked={isItemSelected}
                                 onClick={(e) => handleSelectClick(e, row.skuId)}
                               />
                             </TableCell>
-                            <TableCell
-                              sx={{
-                                width: '20%',
-                              }}
-                              component='th'
-                              scope='row'>
+                            <TableCell sx={{ width: "20%" }}>
                               <Box
-                                sx={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                }}>
+                                sx={{ display: "flex", alignItems: "center" }}
+                              >
                                 <Box
                                   sx={{
-                                    position: 'relative',
+                                    position: "relative",
                                     width: 60,
                                     height: 60,
                                     mr: 2,
                                     flexShrink: 0,
-                                    '.product-image': {
-                                      objectFit: 'cover',
-                                    },
-                                  }}>
+                                    ".product-image": { objectFit: "cover" },
+                                  }}
+                                >
                                   <SkeletonImage
                                     src={row?.imageUrl}
                                     alt={row?.productName}
                                     fill
-                                    className='product-image'
+                                    className="product-image"
                                   />
                                 </Box>
                                 <Box>
                                   <Typography
                                     sx={{
-                                      maxHeight: '32px',
+                                      maxHeight: "32px",
                                       mb: 0.5,
                                       fontSize: 14,
-                                      lineHeight: '16px',
-
+                                      lineHeight: "16px",
                                       ...truncateTextByLine(2),
-                                    }}>
+                                    }}
+                                  >
                                     {row?.productName}
                                   </Typography>
                                   {row?.attributes?.length ? (
                                     <Typography
                                       sx={{
-                                        display: 'inline-block',
-                                        px: '5px',
-                                        py: '1.5px',
-                                        bgcolor: '#f3f4f6',
+                                        display: "inline-block",
+                                        px: "5px",
+                                        py: "1.5px",
+                                        bgcolor: "#f3f4f6",
                                         fontSize: 11,
                                         borderRadius: 0.5,
-                                      }}>
+                                      }}
+                                    >
                                       {row?.attributes
                                         ?.map((item) => item?.attributeValue)
-                                        .join(', ')}
+                                        .join(", ")}
                                     </Typography>
-                                  ) : (
-                                    ''
-                                  )}
+                                  ) : null}
                                 </Box>
                               </Box>
                             </TableCell>
-                            <TableCell
-                              sx={{ fontSize: 14 }}
-                              component='th'
-                              scope='row'
-                              align='center'>
+                            <TableCell align="center" sx={{ fontSize: 14 }}>
                               {formatPrice(row?.sellingPrice)}
                             </TableCell>
-                            <TableCell
-                              component='th'
-                              scope='row'
-                              align='center'>
+                            <TableCell align="center">
                               <Box
                                 sx={{
-                                  display: 'flex',
-                                  justifyContent: 'center',
-                                  alignItems: 'center',
-                                  mb: 0.5,
-                                  '& .MuiButtonBase-root': {
-                                    minWidth: 28,
-                                    height: 28,
-                                    border: '1px solid #eee',
-                                  },
-                                }}>
-                                <Button
-                                  sx={{
-                                    borderTopRightRadius: 0,
-                                    borderBottomRightRadius: 0,
-                                  }}
-                                  onClick={() =>
-                                    handleSubtractItem(
-                                      row.skuId,
-                                      row.productName,
-                                      row?.cartItemId
-                                    )
-                                  }>
-                                  -
-                                </Button>
-                                <TextField
-                                  sx={QtyInputStyle}
-                                  variant='outlined'
-                                  type='text'
-                                  size='small'
-                                  value={getDisplayQty(row)}
-                                  onFocus={() =>
-                                    handleFocus(row.skuId, row.quantity)
-                                  }
-                                  onChange={(e) =>
-                                    handleChange(row.skuId, e.target.value)
-                                  }
-                                  onBlur={() => handleBlur(row)}
-                                  onKeyDown={(e) => {
-                                    if (e.key === 'Enter')
-                                      e.currentTarget.blur();
-                                  }}
-                                  inputRef={(el) => {
-                                    inputRefs.current[row.skuId] = el;
-                                  }}
-                                />
-                                <Button
-                                  sx={{
-                                    borderTopLeftRadius: 0,
-                                    borderBottomLeftRadius: 0,
-                                  }}
-                                  onClick={() =>
-                                    handleAddItem(row?.skuId, row?.cartItemId)
-                                  }
-                                  disabled={
-                                    (cartStock?.data?.find(
-                                      (item) => item.id === row?.skuId
-                                    )?.quantity ?? 0) <= (row?.quantity ?? 0)
-                                  }>
-                                  +
-                                </Button>
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  alignItems: "center",
+                                }}
+                              >
+                                <QuantityControl row={row} />
+                                {cartStock?.data &&
+                                  (cartStock?.data?.find(
+                                    (item) => item.id === row?.skuId
+                                  )?.quantity ?? 0) < 10 && (
+                                    <Typography
+                                      sx={{
+                                        fontSize: 12,
+                                        whiteSpace: "nowrap",
+                                        mt: 0.5,
+                                        color: "orange",
+                                      }}
+                                    >
+                                      Còn{" "}
+                                      {
+                                        cartStock?.data?.find(
+                                          (item) => item.id === row?.skuId
+                                        )?.quantity
+                                      }{" "}
+                                      sản phẩm
+                                    </Typography>
+                                  )}
                               </Box>
-                              {cartStock?.data &&
-                                (cartStock?.data?.find(
-                                  (item) => item.id === row?.skuId
-                                )?.quantity ?? 0) < 10 && (
-                                  <Typography
-                                    sx={{ fontSize: 12, whiteSpace: 'nowrap' }}>
-                                    Còn{' '}
-                                    {
-                                      cartStock?.data?.find(
-                                        (item) => item.id === row?.skuId
-                                      )?.quantity
-                                    }{' '}
-                                    sản phẩm
-                                  </Typography>
-                                )}
                             </TableCell>
-                            <TableCell
-                              component='th'
-                              scope='row'
-                              align='center'>
+                            <TableCell align="center">
                               <Typography
                                 sx={{
                                   fontSize: 14,
-                                  ':hover': {
-                                    color: 'red',
-                                    cursor: 'pointer',
-                                  },
+                                  ":hover": { color: "red", cursor: "pointer" },
                                 }}
-                                onClick={() => handleDeleteItem(row?.skuId)}>
+                                onClick={() => handleDeleteItem(row?.skuId)}
+                              >
                                 Xóa
                               </Typography>
                             </TableCell>
@@ -603,81 +614,233 @@ const CartClient = ({
                     </TableBody>
                   </Table>
                 </TableContainer>
+
+                <Box sx={{ display: { xs: "block", md: "none" } }}>
+                  {cartItems?.map((row) => {
+                    const isItemSelected = selected.includes(row.skuId);
+                    return (
+                      <Paper key={row.skuId} sx={{ p: 2, mb: 2 }}>
+                        <Grid2 container spacing={2} alignItems="flex-start">
+                          <Grid2 size="auto">
+                            <Checkbox
+                              sx={{ p: 0 }}
+                              color="primary"
+                              checked={isItemSelected}
+                              onClick={(e) => handleSelectClick(e, row.skuId)}
+                            />
+                          </Grid2>
+
+                          <Grid2 size="auto">
+                            <Box
+                              sx={{
+                                position: "relative",
+                                width: 80,
+                                height: 80,
+                                borderRadius: 1,
+                                overflow: "hidden",
+                                ".product-image": { objectFit: "cover" },
+                              }}
+                            >
+                              <SkeletonImage
+                                src={row?.imageUrl}
+                                alt={row?.productName}
+                                fill
+                                className="product-image"
+                              />
+                            </Box>
+                          </Grid2>
+
+                          <Grid2 size="grow">
+                            <Box
+                              display="flex"
+                              justifyContent="space-between"
+                              alignItems="flex-start"
+                            >
+                              <Stack spacing={0.5}>
+                                <Typography
+                                  sx={{
+                                    fontSize: 14,
+                                    fontWeight: 500,
+                                    ...truncateTextByLine(2),
+                                  }}
+                                >
+                                  {row?.productName}
+                                </Typography>
+                                {row?.attributes?.length ? (
+                                  <Typography
+                                    sx={{
+                                      display: "inline-block",
+                                      px: "6px",
+                                      py: "2px",
+                                      bgcolor: "#f3f4f6",
+                                      fontSize: 11,
+                                      borderRadius: 0.5,
+                                      width: "fit-content",
+                                    }}
+                                  >
+                                    {row?.attributes
+                                      ?.map((item) => item?.attributeValue)
+                                      .join(", ")}
+                                  </Typography>
+                                ) : null}
+                                <Typography
+                                  color="error"
+                                  fontWeight={600}
+                                  fontSize={15}
+                                >
+                                  {formatPrice(row?.sellingPrice)}
+                                </Typography>
+                              </Stack>
+                              <IconButton
+                                size="small"
+                                onClick={() => handleDeleteItem(row?.skuId)}
+                                sx={{ mt: -1, mr: -1 }}
+                              >
+                                <DeleteOutlineIcon fontSize="small" />
+                              </IconButton>
+                            </Box>
+
+                            <Box
+                              sx={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                                mt: 1.5,
+                              }}
+                            >
+                              <QuantityControl row={row} />
+                              {cartStock?.data &&
+                                (cartStock?.data?.find(
+                                  (item) => item.id === row?.skuId
+                                )?.quantity ?? 0) < 10 && (
+                                  <Typography
+                                    sx={{ fontSize: 11, color: "orange" }}
+                                  >
+                                    Còn{" "}
+                                    {
+                                      cartStock?.data?.find(
+                                        (item) => item.id === row?.skuId
+                                      )?.quantity
+                                    }
+                                  </Typography>
+                                )}
+                            </Box>
+                          </Grid2>
+                        </Grid2>
+                      </Paper>
+                    );
+                  })}
+                </Box>
               </Grid2>
-              <Grid2 sx={{ bgcolor: '#fff', borderRadius: 1 }} size={3.5} p={3}>
-                <Grid2 className='total'>
-                  <Grid2
-                    size={12}
-                    mb={2}
-                    className='total-price-label'
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                    }}>
-                    <Typography sx={{ fontSize: 15, fontWeight: 600 }}>
-                      Tổng cộng:
-                    </Typography>
-                    <Typography sx={{ fontSize: 14 }}>
-                      {selected?.length} sản phẩm
-                    </Typography>
+
+              <Grid2
+                size={{ xs: 12, md: 3.5 }}
+                sx={{
+                  position: { xs: "fixed", md: "unset" },
+                  bottom: { xs: 0, md: "auto" },
+                  top: { xs: "auto", md: 20 },
+                  left: { xs: 0, md: "auto" },
+                  right: { xs: 0, md: "auto" },
+                  zIndex: 1100,
+                  height: "fit-content",
+                }}
+              >
+                <Paper
+                  sx={{
+                    p: { xs: 1.5, md: 3 },
+                    borderRadius: { xs: 0, md: 1 },
+                    boxShadow: { xs: 10, md: 1 },
+                  }}
+                >
+                  <Grid2 className="total">
+                    <Grid2
+                      size={12}
+                      mb={{ xs: 0.5, md: 2 }}
+                      className="total-price-label"
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Typography sx={{ fontSize: 15, fontWeight: 600 }}>
+                        Tổng cộng:
+                      </Typography>
+                      <Typography sx={{ fontSize: 14 }}>
+                        {selected?.length} sản phẩm
+                      </Typography>
+                    </Grid2>
+                    <Grid2
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        mb: { xs: 1, md: 2 },
+                      }}
+                      size={12}
+                      className="total-price-cost"
+                    >
+                      <Typography sx={{ fontSize: 15, fontWeight: 600 }}>
+                        Thành tiền:
+                      </Typography>
+                      <Typography
+                        sx={{
+                          fontSize: 18,
+                          fontWeight: 700,
+                          color: "primary.main",
+                        }}
+                      >
+                        {formatPrice(totalAmount())}
+                      </Typography>
+                    </Grid2>
+                    <Button
+                      sx={{ mb: { xs: 1, md: 1.5 }, fontWeight: 600 }}
+                      variant="contained"
+                      size="large"
+                      fullWidth
+                      onClick={handlePayBtn}
+                    >
+                      Thanh toán
+                    </Button>
+                    <Button
+                      sx={{ fontWeight: 600 }}
+                      variant="outlined"
+                      size="large"
+                      fullWidth
+                      component={Link}
+                      href="/"
+                    >
+                      Tiếp tục mua hàng
+                    </Button>
                   </Grid2>
-                  <Grid2
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      mb: 2,
-                    }}
-                    size={12}
-                    className='total-price-cost'>
-                    <Typography sx={{ fontSize: 15, fontWeight: 600 }}>
-                      Thành tiền:
-                    </Typography>
-                    <Typography sx={{ fontSize: 18, fontWeight: 700 }}>
-                      {formatPrice(totalAmount())}
-                    </Typography>
-                  </Grid2>
-                  <Button
-                    sx={{ mb: 1.5, fontWeight: 600 }}
-                    variant='contained'
-                    size='large'
-                    fullWidth
-                    onClick={handlePayBtn}>
-                    Thanh toán
-                  </Button>
-                  <Button
-                    sx={{ fontWeight: 600 }}
-                    variant='outlined'
-                    size='large'
-                    fullWidth>
-                    Tiếp tục mua hàng
-                  </Button>
-                </Grid2>
+                </Paper>
               </Grid2>
             </Grid2>
           ) : (
+            // --- EMPTY CART STATE ---
             <Box
               sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
                 pb: 5,
-              }}>
+              }}
+            >
               <Box
                 sx={{
-                  position: 'relative',
-                  width: '300px',
-                  height: { xs: '180px' },
-                  overflow: 'hidden',
-                  '& img': {
-                    objectFit: 'contain',
+                  position: "relative",
+                  width: "300px",
+                  height: { xs: "180px" },
+                  overflow: "hidden",
+                  "& img": {
+                    objectFit: "contain",
                   },
-                }}>
+                }}
+              >
                 <SkeletonImage
                   src={EMPTY_CART}
-                  alt='geardn'
+                  alt="empty-cart"
                   fill
                   quality={90}
                   priority
@@ -689,10 +852,11 @@ const CartClient = ({
               <Button
                 sx={{ width: 220, fontWeight: 600 }}
                 component={Link}
-                href='/'
-                variant='contained'
-                size='large'
-                fullWidth>
+                href="/"
+                variant="contained"
+                size="large"
+                fullWidth
+              >
                 Tiếp tục mua hàng
               </Button>
             </Box>
@@ -700,10 +864,10 @@ const CartClient = ({
         </Box>
       </LayoutContainer>
       <CustomDialog
-        title='Bạn chắc chắn muốn bỏ sản phẩm này?'
-        content=''
-        okContent='Có'
-        cancelContent='Không'
+        title="Bạn chắc chắn muốn bỏ sản phẩm này?"
+        content=""
+        okContent="Có"
+        cancelContent="Không"
         open={openRemoveItemDialog}
         handleOk={handleOkRemoveItemDialog}
         handleClose={handleCloseRemoveItemDialog}
@@ -716,34 +880,34 @@ const CartClient = ({
 export default CartClient;
 
 const QtyInputStyle: SxProps<Theme> = {
-  width: '36px',
+  width: "36px",
   height: 28,
-  borderTop: '1px solid rgba(0,0,0,.09)',
-  borderBottom: '1px solid rgba(0,0,0,.09)',
-  '& .MuiOutlinedInput-root': {
+  borderTop: "1px solid rgba(0,0,0,.09)",
+  borderBottom: "1px solid rgba(0,0,0,.09)",
+  "& .MuiOutlinedInput-root": {
     height: 28,
-    '& fieldset': {
-      display: 'none',
+    "& fieldset": {
+      display: "none",
     },
   },
-  '.MuiInputBase-root': {
+  ".MuiInputBase-root": {
     height: 28,
     borderRadius: 0,
     fontSize: 14,
-    '.MuiInputBase-input': {
+    ".MuiInputBase-input": {
       height: 24,
       p: 0,
-      textAlign: 'center',
-      ':focus': {
-        border: '1px solid #000',
+      textAlign: "center",
+      ":focus": {
+        border: "1px solid #000",
       },
-      '&::-webkit-outer-spin-button, &::-webkit-inner-spin-button': {
-        display: 'none',
+      "&::-webkit-outer-spin-button, &::-webkit-inner-spin-button": {
+        display: "none",
       },
     },
-    '& .Mui-disabled': {
-      color: '#000',
-      WebkitTextFillColor: 'inherit',
+    "& .Mui-disabled": {
+      color: "#000",
+      WebkitTextFillColor: "inherit",
     },
   },
 };

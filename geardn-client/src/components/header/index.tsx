@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 
 import { useQueryClient } from "@tanstack/react-query";
 import MenuIcon from "@mui/icons-material/Menu";
+import LogoutIcon from "@mui/icons-material/Logout";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ListAltOutlinedIcon from "@mui/icons-material/ListAltOutlined";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
@@ -351,21 +352,12 @@ const Header = ({ initialUser }: { initialUser?: IUser | null }) => {
                         />
                       </ListItemButton>
                     </ListItem>
-                    <ListItem
-                      disablePadding
-                      onClick={() =>
-                        router.push(
-                          userData?.name ? ROUTES.ACCOUNT : ROUTES.LOGIN
-                        )
-                      }
-                    >
+                    <ListItem disablePadding onClick={handleLogout}>
                       <ListItemButton>
                         <ListItemIcon>
-                          <AccountCircleOutlinedIcon />
+                          <LogoutIcon />
                         </ListItemIcon>
-                        <ListItemText
-                          primary={userData ? userData?.name : "Đăng nhập"}
-                        />
+                        <ListItemText primary={"Đăng xuất"} />
                       </ListItemButton>
                     </ListItem>
                     <Divider />
