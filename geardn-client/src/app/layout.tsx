@@ -2,6 +2,7 @@ import React from 'react';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { Inter } from 'next/font/google';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
+import { GoogleAnalytics } from '@next/third-parties/google'
 import CssBaseline from '@mui/material/CssBaseline';
 
 import ColorModeProvider from '@/providers/color-mode-store-provider';
@@ -24,6 +25,7 @@ export default function RootLayout({
   return (
     <html lang='en' suppressHydrationWarning>
       <body className={inter.className} suppressHydrationWarning>
+        <GoogleAnalytics gaId="G-Z9ZSEQE027" />
         <AppRouterCacheProvider>
           <Providers>
             <GoogleOAuthProvider

@@ -154,8 +154,6 @@ export class OrderService {
         },
       });
 
-      console.log('Event emitted 1:', 1);
-
 
       const updatedOrder = await tx.order.update({
         where: { id: tempOrder.id },
@@ -164,11 +162,9 @@ export class OrderService {
           orderItems: true,
         },
       });
-      console.log('Event emitted 2:', updatedOrder);
 
       const cc = this.eventEmitter.emit('order.created', updatedOrder);
-      console.log('Event emitted 3:', cc);
-      return;
+      return updatedOrder;
     });
 
     if (userId) {
