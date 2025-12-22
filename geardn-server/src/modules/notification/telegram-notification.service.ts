@@ -21,7 +21,6 @@ export class TelegramNotificationService {
 
   @OnEvent('order.created')
   async handleOrderCreatedEvent(order?: OrderEntity & { orderItems: OrderItem[] }) {
-    console.log('order', order);
     
     const message = 
      `
@@ -30,7 +29,6 @@ export class TelegramNotificationService {
 ℹ️ <b>Order ID:</b> ${order?.orderCode}
 👤 <b>Customer:</b> ${order?.fullName}
 👤 <b>Address:</b> ${order?.shipment?.address}
-// 👤 <b>Delivery date:</b> ${order?.shipment}
 💰 <b>Total:</b> ${formatPrice(Number(order?.totalPrice))}
 📦 <b>Items:</b>
 ${order?.orderItems?.map((item) => `  • ${item?.productName} (x${item?.quantity})`).join('\n')}
