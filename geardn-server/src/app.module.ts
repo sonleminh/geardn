@@ -94,7 +94,7 @@ import { AnalyticsModule } from './modules/google-analytics/analytics.module';
     NotificationsModule,
   ],
   controllers: [AppController],
-  // providers: [{ provide: APP_FILTER, useClass: AllExceptionFilter }]
+  // providers: [{ provide: APP_FILTER, useClass: AllExceptionFilter }] c
   providers: [TelegramNotificationService],
 })
 export class AppModule {}
