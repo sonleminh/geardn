@@ -136,9 +136,6 @@ export class OrderService {
           },
           completedAt,
         },
-        include: {
-          orderItems: true,
-        },
       });
 
       const paddedId = String(tempOrder.id).padStart(6, '0');
@@ -157,13 +154,20 @@ export class OrderService {
         },
       });
 
-      await tx.order.update({
+      console.log('Event emitted 1:', 1);
+
+
+      const updatedOrder = await tx.order.update({
         where: { id: tempOrder.id },
         data: { orderCode },
+         include: {
+          orderItems: true,
+        },
       });
+      console.log('Event emitted 2:', updatedOrder);
 
-      this.eventEmitter.emit('order.created', tempOrder);
-
+      const cc = this.eventEmitter.emit('order.created', updatedOrder);
+      console.log('Event emitted 3:', cc);
       return;
     });
 

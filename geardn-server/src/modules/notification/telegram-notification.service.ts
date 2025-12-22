@@ -5,6 +5,7 @@ import { InjectBot } from 'nestjs-telegraf';
 import { Context, Telegraf } from 'telegraf';
 import { Order, OrderItem } from '@prisma/client';
 import { OrderEntity } from '../order/entities/order.entity';
+import { formatPrice } from '../../utils/format-price';
 
 @Injectable()
 export class TelegramNotificationService {
@@ -19,23 +20,31 @@ export class TelegramNotificationService {
   }
 
   @OnEvent('order.created')
-  async handleOrderCreatedEvent(order: OrderEntity & { items: OrderItem[] }) {
-    const message = `
+  async handleOrderCreatedEvent(order?: OrderEntity & { orderItems: OrderItem[] }) {
+    console.log('order', order);
+    
+    const message = 
+     `
 🚨 <b>New Order Received!</b> 🚨
 
-🆔 <b>Order ID:</b> #${order.id}
-👤 <b>Customer:</b> ${order.fullName}
-💰 <b>Total:</b> $${order.totalPrice}
-📦 <b>Items:</b> ${order.items.map((item) => `${item.productName} (${item.quantity})`).join(', ')}
+ℹ️ <b>Order ID:</b> ${order?.orderCode}
+👤 <b>Customer:</b> ${order?.fullName}
+👤 <b>Address:</b> ${order?.shipment?.address}
+// 👤 <b>Delivery date:</b> ${order?.shipment}
+💰 <b>Total:</b> ${formatPrice(Number(order?.totalPrice))}
+📦 <b>Items:</b>
+${order?.orderItems?.map((item) => `  • ${item?.productName} (x${item?.quantity})`).join('\n')}
 
-<i>Check dashboard for details.</i>
-    `;
+<b>Dashboard:</b> <a href="https://admin.geardn.id.vn">admin.geardn.id.vn</a>
+
+    `
+    ;
 
     try {
       await this.bot.telegram.sendMessage(this.adminId, message, {
         parse_mode: 'HTML',
       });
-      this.logger.log(`Notification sent for Order #${order.id}`);
+      this.logger.log(`Notification sent for Order #${order?.orderCode}`);
     } catch (error) {
       this.logger.error('Failed to send Telegram notification', error);
     }
