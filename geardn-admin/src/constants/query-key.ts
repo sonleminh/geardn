@@ -1,5 +1,6 @@
 export const QueryKeys = {
     AdjustmentLog: 'ADJUSTMENT_LOG',
+    AnalyticDashboard: 'ANALYTIC_DASHBOARD',
     Attribute: 'ATTRIBUTE',
     AttributeValue: 'ATTRIBUTE_VALUE',
     Category: 'CATEGORY',
