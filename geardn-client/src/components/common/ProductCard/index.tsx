@@ -65,7 +65,10 @@ const ProductCard = ({ data }: { data: IProduct }) => {
                 5.0{" "}
                 <Typography
                   component={"span"}
-                  sx={{ display: { xs: "none", md: "inline-block" } }}
+                  sx={{
+                    display: { xs: "none", md: "inline-block" },
+                    fontSize: 13,
+                  }}
                 >
                   (2 reviews)
                 </Typography>

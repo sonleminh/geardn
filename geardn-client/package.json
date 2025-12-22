@@ -45,6 +45,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/set-cookie-parser": "^2.4.10",
+    "env-cmd": "^11.0.0",
     "eslint": "^9",
     "eslint-config-next": "15.1.7",
     "typescript": "^5"
