@@ -87,10 +87,13 @@ export class AnalyticsService {
     }) || [];
 
     return {
-      activeUsersNow,
-      summary,
-      topPagesList,
-      trend,
+      data: {
+        activeUsersNow,
+        summary,
+        topPagesList,
+        trend,
+      },
+      message: 'Dashboard statistics fetched successfully',
     };
   }
   

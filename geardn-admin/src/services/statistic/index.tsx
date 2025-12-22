@@ -8,6 +8,7 @@ import { axiosInstance } from '../axiosInstance';
 import { TBaseResponse } from '@/types/response.type';
 import { useQuery } from '@tanstack/react-query';
 import { QueryKeys } from '@/constants/query-key';
+import { IDashboardStatistics } from '@/interfaces/IAnalytic';
 
 const statisticUrl = '/statistics';
 
@@ -127,5 +128,19 @@ export const useGetOrderSummaryStats = () => {
     queryFn: () => getOrderSummaryStats(),
     refetchOnWindowFocus: true,
     refetchOnMount: true,
+  });
+};
+
+const getDashboardStatistics = async () => {
+  const result = await axiosInstance.get(`analytics/dashboard`);
+  return result.data as TBaseResponse<IDashboardStatistics>;
+};
+
+export const useGetGoogleAnalytics = () => {
+  return useQuery({
+    queryKey: [QueryKeys.AnalyticDashboard],
+    queryFn: () => getDashboardStatistics(),
+    refetchOnWindowFocus: false,
+    refetchInterval: false,
   });
 };

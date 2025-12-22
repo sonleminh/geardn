@@ -42,6 +42,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import { ROUTES } from '@/constants/route';
 import { formatPrice } from '@/utils/format-price';
 import {
+  useGetGoogleAnalytics,
   useGetOverviewStats,
   useGetRevenueProfitStats,
 } from '@/services/statistic';
@@ -275,6 +276,8 @@ const Dashboard: FC = () => {
   });
   const { data: overviewStats, isLoading: isLoadingOverviewStats } =
     useGetOverviewStats();
+   const { data: googleAnalyticDashboard, isLoading: isLoadingGoogleAnalytics } =
+    useGetGoogleAnalytics();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -465,7 +468,7 @@ const Dashboard: FC = () => {
             icon={<VisibilityIcon sx={{ fontSize: 24 }} />}
             title='Lượt truy cập'
             subtitle='Avg.time: 4:20m'
-            value='696'
+            value={googleAnalyticDashboard?.data?.summary?.views || 0}
             trend={
               <Typography sx={cardTrend}>
                 {overview && overview?.growth?.delivered > 0 ? (
@@ -497,7 +500,7 @@ const Dashboard: FC = () => {
                 </Typography>
               </Typography>
             }
-            isLoading={isLoadingOverviewStats}
+            isLoading={isLoadingOverviewStats && isLoadingGoogleAnalytics}
           />
         </Grid2>
 
