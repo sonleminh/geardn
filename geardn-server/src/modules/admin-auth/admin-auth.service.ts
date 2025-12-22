@@ -11,7 +11,6 @@ import { Request as expressRequest, Response } from 'express';
 import { UserService } from '../user/user.service';
 import { ILoginResponse } from 'src/interfaces/IUser';
 import { ITokenPayload } from 'src/interfaces/ITokenPayload';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 @Injectable()
 export class AdminAuthService {
   private ATSecret: string;
@@ -23,7 +22,6 @@ export class AdminAuthService {
     private userService: UserService,
     private configService: ConfigService,
     private readonly jwtService: JwtService,
-    private eventEmitter: EventEmitter2
   ) {
     this.ATSecret = this.configService.get('AT_SECRET');
     this.RTSecret = this.configService.get('RT_SECRET');
@@ -56,7 +54,6 @@ export class AdminAuthService {
 
       this.storeToken(res, 'access_token', access_token, 2);
       this.storeToken(res, 'refresh_token', refresh_token, 48);
-      this.eventEmitter.emit('order.created');
       return user;
     } catch (error) {
       throw error;
