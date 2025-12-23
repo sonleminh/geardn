@@ -444,6 +444,13 @@ export class ProductService {
           priceMin: true,
           priceMax: true,
           createdAt: true,
+          category: {
+            select: {
+              id: true,
+              slug: true,
+              name: true,
+            },
+          },
         },
       }),
       this.prisma.product.count({ where: baseWhere }),
