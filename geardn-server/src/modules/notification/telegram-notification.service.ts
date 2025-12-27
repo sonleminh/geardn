@@ -20,24 +20,23 @@ export class TelegramNotificationService {
   }
 
   @OnEvent('order.created')
-  async handleOrderCreatedEvent(order?: OrderEntity & { orderItems: OrderItem[] }) {
-    
-    const message = 
-     `
+  async handleOrderCreatedEvent(
+    order?: OrderEntity & { orderItems: OrderItem[] },
+  ) {
+    const message = `
 🚨 <b>New Order Received!</b> 🚨
 
 ℹ️ <b>Order ID:</b> ${order?.orderCode}
 👤 <b>Customer:</b> ${order?.fullName}
 👤 <b>Address:</b> ${order?.shipment?.address}
+👤 <b>Phone:</b> ${order?.cancelReason}
 💰 <b>Total:</b> ${formatPrice(Number(order?.totalPrice))}
 📦 <b>Items:</b>
 ${order?.orderItems?.map((item) => `  • ${item?.productName} (x${item?.quantity})`).join('\n')}
 
 <b>Dashboard:</b> <a href="https://admin.geardn.id.vn">admin.geardn.id.vn</a>
 
-    `
-    ;
-
+    `;
     try {
       await this.bot.telegram.sendMessage(this.adminId, message, {
         parse_mode: 'HTML',

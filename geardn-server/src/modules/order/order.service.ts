@@ -154,16 +154,15 @@ export class OrderService {
         },
       });
 
-
       const updatedOrder = await tx.order.update({
         where: { id: tempOrder.id },
         data: { orderCode },
-         include: {
+        include: {
           orderItems: true,
         },
       });
 
-      const cc = this.eventEmitter.emit('order.created', updatedOrder);
+      await this.eventEmitter.emit('order.created', updatedOrder);
       return updatedOrder;
     });
 
