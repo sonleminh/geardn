@@ -28,8 +28,8 @@ export class TelegramNotificationService {
 
 ℹ️ <b>Order ID:</b> ${order?.orderCode}
 👤 <b>Customer:</b> ${order?.fullName}
-👤 <b>Address:</b> ${order?.shipment?.address}
-👤 <b>Phone:</b> ${order?.cancelReason}
+🏠 <b>Address:</b> ${order?.shipment?.address}
+📞 <b>Phone:</b> ${order?.phoneNumber}
 💰 <b>Total:</b> ${formatPrice(Number(order?.totalPrice))}
 📦 <b>Items:</b>
 ${order?.orderItems?.map((item) => `  • ${item?.productName} (x${item?.quantity})`).join('\n')}
