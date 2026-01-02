@@ -1,14 +1,14 @@
-import { ChangeEvent, useEffect, useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
+import { ChangeEvent, useEffect, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 
-import AddIcon from '@mui/icons-material/Add';
-import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import AddIcon from "@mui/icons-material/Add";
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import {
   Box,
   Breadcrumbs,
@@ -27,46 +27,46 @@ import {
   SxProps,
   Theme,
   Typography,
-} from '@mui/material';
+} from "@mui/material";
 
-import { ROUTES } from '@/constants/route';
-import { QueryKeys } from '@/constants/query-key';
-import { useAlertContext } from '@/contexts/AlertContext';
-import { useGetAttributeList } from '@/services/attribute';
+import { ROUTES } from "@/constants/route";
+import { QueryKeys } from "@/constants/query-key";
+import { useAlertContext } from "@/contexts/AlertContext";
+import { useGetAttributeList } from "@/services/attribute";
 import {
   useGetAttributeValueList,
   useGetAttributeValuesByAttributeId,
-} from '@/services/attribute-value';
-import { useGetProductById } from '@/services/product';
+} from "@/services/attribute-value";
+import { useGetProductById } from "@/services/product";
 import {
   useCreateSku,
   useGetSkuByProductSku,
   useUpdateSku,
-} from '@/services/sku';
-import ImageUpload from '@/components/ImageUpload';
-import Input from '@/components/Input';
-import SuspenseLoader from '@/components/SuspenseLoader';
+} from "@/services/sku";
+import ImageUpload from "@/components/ImageUpload";
+import Input from "@/components/Input";
+import SuspenseLoader from "@/components/SuspenseLoader";
 
 const createSchema = Yup.object().shape({
   sellingPrice: Yup.number()
-    .required('Vui lòng nhập giá bán')
-    .min(0, 'Giá bán phải lớn hơn hoặc bằng 0')
-    .typeError('Giá bán phải là số'),
+    .required("Vui lòng nhập giá bán")
+    .min(0, "Giá bán phải lớn hơn hoặc bằng 0")
+    .typeError("Giá bán phải là số"),
   imageUrl: Yup.string().nullable(),
 });
 
 const updateSchema = Yup.object().shape({
   sellingPrice: Yup.number()
-    .required('Vui lòng nhập giá bán')
-    .min(0, 'Giá bán phải lớn hơn hoặc bằng 0')
-    .typeError('Giá bán phải là số'),
+    .required("Vui lòng nhập giá bán")
+    .min(0, "Giá bán phải lớn hơn hoặc bằng 0")
+    .typeError("Giá bán phải là số"),
   imageUrl: Yup.string().nullable(),
 });
 
 const ProductSkuUpsert = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const isEdit = location?.pathname.includes('update');
+  const isEdit = location?.pathname.includes("update");
   const { productId, skuId } = useParams<{
     productId: string;
     skuId: string;
@@ -76,8 +76,8 @@ const ProductSkuUpsert = () => {
   const [isEditAttribute, setIsEditAttribute] = useState<boolean>(false);
   const [editAttIndex, setEditAttIndex] = useState<number | null>(null);
 
-  const [attributeId, setAttributeId] = useState<string>('');
-  const [attributeValueId, setAttributeValueId] = useState<string>('');
+  const [attributeId, setAttributeId] = useState<string>("");
+  const [attributeValueId, setAttributeValueId] = useState<string>("");
   const [attributeList, setAttributeList] = useState<
     { attributeId: string; attributeValueId: string }[]
   >([]);
@@ -86,7 +86,7 @@ const ProductSkuUpsert = () => {
   const { data: productData } = useGetProductById(productId ? +productId : 0);
 
   const { data: skuData } = useGetSkuByProductSku(
-    isEdit ? (skuId as string) : ''
+    isEdit ? (skuId as string) : ""
   );
   const { data: attributeListData } = useGetAttributeList();
   const { data: attributeValueByAttIdListData } =
@@ -100,8 +100,8 @@ const ProductSkuUpsert = () => {
 
   useEffect(() => {
     if (skuData) {
-      formik.setFieldValue('sellingPrice', skuData?.data?.sellingPrice);
-      formik.setFieldValue('imageUrl', skuData?.data?.imageUrl);
+      formik.setFieldValue("sellingPrice", skuData?.data?.sellingPrice);
+      formik.setFieldValue("imageUrl", skuData?.data?.imageUrl);
       setAttributeList(
         skuData?.data?.productSkuAttributes?.map((item) => ({
           attributeId: String(item?.attributeValue?.attribute?.id),
@@ -113,22 +113,22 @@ const ProductSkuUpsert = () => {
 
   const formik = useFormik({
     initialValues: {
-      sellingPrice: '',
-      imageUrl: '',
+      sellingPrice: "",
+      imageUrl: "",
     },
     validationSchema: isEdit ? updateSchema : createSchema,
     validateOnChange: false,
     onSubmit(values) {
       if (isEdit && !skuId) {
-        throw new Error('skuId is missing');
+        throw new Error("skuId is missing");
       }
       if (attributeId || attributeValueId) {
-        return showAlert('Chưa lưu phân loại hàng', 'error');
+        return showAlert("Chưa lưu phân loại hàng", "error");
       }
       const payload = {
         ...values,
         sellingPrice: +values.sellingPrice,
-        imageUrl: values.imageUrl === '' ? null : values.imageUrl,
+        imageUrl: values.imageUrl === "" ? null : values.imageUrl,
         attributeValues: attributeList?.map((item) => ({
           attributeValueId: +item.attributeValueId,
         })),
@@ -140,11 +140,11 @@ const ProductSkuUpsert = () => {
           {
             onSuccess() {
               queryClient.invalidateQueries({ queryKey: [QueryKeys.Sku] });
-              showAlert('Cập nhật sản phẩm thành công', 'success');
+              showAlert("Cập nhật sản phẩm thành công", "success");
               navigate(-1);
             },
             onError() {
-              showAlert('Đã có lỗi xảy ra', 'error');
+              showAlert("Đã có lỗi xảy ra", "error");
             },
           }
         );
@@ -152,7 +152,7 @@ const ProductSkuUpsert = () => {
         createSkuMutate(payload, {
           onSuccess() {
             queryClient.invalidateQueries({ queryKey: [QueryKeys.Sku] });
-            showAlert('Tạo sản phẩm thành công', 'success');
+            showAlert("Tạo sản phẩm thành công", "success");
             navigate(-1);
           },
         });
@@ -174,7 +174,7 @@ const ProductSkuUpsert = () => {
   };
 
   const handleUploadResult = (result: string) => {
-    formik.setFieldValue('imageUrl', result);
+    formik.setFieldValue("imageUrl", result);
   };
 
   const handleAddAttribute = () => {
@@ -197,7 +197,7 @@ const ProductSkuUpsert = () => {
     });
 
     if (isAlreadySelected && !isEditAttribute) {
-      return showAlert('Bạn đã chọn loại thuộc tính này!', 'error');
+      return showAlert("Bạn đã chọn loại thuộc tính này!", "error");
     }
 
     if (editAttIndex !== null && attributeValueId) {
@@ -207,8 +207,8 @@ const ProductSkuUpsert = () => {
         attributeValueId: attributeValueId,
       };
       setAttributeList(updatedAttributeList);
-      setAttributeValueId('');
-      setAttributeId('');
+      setAttributeValueId("");
+      setAttributeId("");
     } else {
       if (attributeValueId) {
         setAttributeList((prev) => [
@@ -216,15 +216,15 @@ const ProductSkuUpsert = () => {
           { attributeId: attributeId, attributeValueId: attributeValueId },
         ]);
       }
-      setAttributeValueId('');
-      setAttributeId('');
+      setAttributeValueId("");
+      setAttributeId("");
     }
     setIsEditAttribute(false);
   };
 
   const handleDelBtn = () => {
-    setAttributeId('');
-    setAttributeValueId('');
+    setAttributeId("");
+    setAttributeValueId("");
   };
 
   const handleDeleteAttribute = (attributeIndex: number) => {
@@ -265,34 +265,37 @@ const ProductSkuUpsert = () => {
     <>
       <Box sx={{ mb: 3 }}>
         <Breadcrumbs
-          separator={<NavigateNextIcon fontSize='small' />}
-          aria-label='breadcrumb'>
+          separator={<NavigateNextIcon fontSize="small" />}
+          aria-label="breadcrumb"
+        >
           <Link
-            underline='hover'
-            color='inherit'
+            underline="hover"
+            color="inherit"
             onClick={() => navigate(ROUTES.DASHBOARD)}
             sx={{
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-            }}>
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
             <HomeOutlinedIcon sx={{ fontSize: 24 }} />
           </Link>
           <Link
-            underline='hover'
-            color='inherit'
+            underline="hover"
+            color="inherit"
             onClick={() => navigate(ROUTES.PRODUCT)}
             sx={{
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-            }}>
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
             Sản phẩm
           </Link>
-          <Typography color='text.primary'>
+          <Typography color="text.primary">
             {isEdit
-              ? 'Chỉnh sửa phân loại sản phẩm'
-              : 'Thêm phân loại sản phẩm'}
+              ? "Chỉnh sửa phân loại sản phẩm"
+              : "Thêm phân loại sản phẩm"}
           </Typography>
         </Breadcrumbs>
       </Box>
@@ -300,17 +303,17 @@ const ProductSkuUpsert = () => {
       <Typography sx={{ mb: 2, fontSize: 20, fontWeight: 600 }}>
         {isEdit
           ? `Chỉnh sửa phân loại sản phẩm: ${
-              skuData?.data?.product?.name ?? ''
+              skuData?.data?.product?.name ?? ""
             }`
-          : `Thêm phân loại sản phẩm: ${productData?.data?.name ?? ''}`}
+          : `Thêm phân loại sản phẩm: ${productData?.data?.name ?? ""}`}
       </Typography>
 
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
         <Grid2 container spacing={3}>
           <Grid2 size={6}>
             <Card>
               <CardHeader
-                title='Thông tin:'
+                title="Thông tin:"
                 sx={{
                   span: {
                     fontSize: 18,
@@ -323,14 +326,15 @@ const ProductSkuUpsert = () => {
                 {(showAttributeForm || isEdit) && (
                   <Grid2 container spacing={2} mb={2}>
                     <Grid2 size={6}>
-                      <FormControl variant='filled' fullWidth>
+                      <FormControl variant="filled" fullWidth>
                         <InputLabel>Loại</InputLabel>
                         <Select
                           disableUnderline
-                          size='small'
+                          size="small"
                           onChange={handleAttributeChange}
-                          value={attributeId ?? ''}
-                          disabled={isEditAttribute}>
+                          value={attributeId ?? ""}
+                          disabled={isEditAttribute}
+                        >
                           {attributeListData?.data?.map((item) => (
                             <MenuItem key={item?.id} value={String(item.id)}>
                               {item?.label}
@@ -340,14 +344,15 @@ const ProductSkuUpsert = () => {
                       </FormControl>
                     </Grid2>
                     <Grid2 size={6}>
-                      <FormControl variant='filled' fullWidth>
+                      <FormControl variant="filled" fullWidth>
                         <InputLabel>Giá trị</InputLabel>
                         <Select
                           disableUnderline
-                          size='small'
+                          size="small"
                           onChange={handleAttributeValueValueChange}
-                          value={attributeValueId ?? ''}
-                          disabled={!attributeValueByAttIdListData}>
+                          value={attributeValueId ?? ""}
+                          disabled={!attributeValueByAttIdListData}
+                        >
                           {attributeValueByAttIdListData?.data?.map((item) => (
                             <MenuItem key={item?.id} value={String(item?.id)}>
                               {item.value}
@@ -356,23 +361,25 @@ const ProductSkuUpsert = () => {
                         </Select>
                       </FormControl>
                     </Grid2>
-                    <Box sx={{ display: 'flex', ml: 'auto' }}>
+                    <Box sx={{ display: "flex", ml: "auto" }}>
                       <Typography sx={helperTextStyle}></Typography>
                       <Button
-                        sx={{ ml: 2, textTransform: 'initial' }}
-                        variant='contained'
+                        sx={{ ml: 2, textTransform: "initial" }}
+                        variant="contained"
                         disabled={!attributeValueId}
-                        onClick={handleSaveAttribute}>
+                        onClick={handleSaveAttribute}
+                      >
                         Lưu
                       </Button>
                       <Button
-                        sx={{ ml: 2, textTransform: 'initial' }}
-                        variant='outlined'
+                        sx={{ ml: 2, textTransform: "initial" }}
+                        variant="outlined"
                         onClick={handleDelBtn}
                         disabled={
                           attributeId?.length <= 0 &&
                           attributeValueId?.length <= 0
-                        }>
+                        }
+                      >
                         Xóa
                       </Button>
                     </Box>
@@ -381,22 +388,23 @@ const ProductSkuUpsert = () => {
                 {!showAttributeForm && (
                   <Button
                     sx={{ height: 32 }}
-                    variant={'contained'}
-                    size='small'
-                    onClick={handleAddAttribute}>
+                    variant={"contained"}
+                    size="small"
+                    onClick={handleAddAttribute}
+                  >
                     <AddIcon />
                   </Button>
                 )}
                 <FormControl fullWidth>
                   <Input
-                    label='Giá bán'
-                    name='sellingPrice'
-                    variant='filled'
-                    type='number'
-                    size='small'
+                    label="Giá bán"
+                    name="sellingPrice"
+                    variant="filled"
+                    type="number"
+                    size="small"
                     required
                     helperText={
-                      <Box component={'span'} sx={helperTextStyle}>
+                      <Box component={"span"} sx={helperTextStyle}>
                         {formik.errors.sellingPrice}
                       </Box>
                     }
@@ -404,11 +412,11 @@ const ProductSkuUpsert = () => {
                     onChange={handleChangeValue}
                   />
                 </FormControl>
-                <FormControl fullWidth margin='normal'>
+                <FormControl fullWidth margin="normal">
                   <ImageUpload
-                    title={'Ảnh:'}
+                    title={"Ảnh:"}
                     helperText={
-                      <Box component={'span'} sx={helperTextStyle}>
+                      <Box component={"span"} sx={helperTextStyle}>
                         {formik.errors.imageUrl}
                       </Box>
                     }
@@ -422,7 +430,7 @@ const ProductSkuUpsert = () => {
           <Grid2 size={6}>
             <Card>
               <CardHeader
-                title='Danh sách thuộc tính:'
+                title="Danh sách thuộc tính:"
                 sx={{
                   span: {
                     fontSize: 18,
@@ -433,14 +441,15 @@ const ProductSkuUpsert = () => {
               <Divider />
               <CardContent>
                 {attributeList?.length > 0 ? (
-                  <Grid2 size={12} className='attribute-list'>
+                  <Grid2 size={12} className="attribute-list">
                     <Box
                       sx={{
-                        width: '400px',
-                        p: '12px 20px',
-                        border: '1px solid #ccc',
+                        width: "400px",
+                        p: "12px 20px",
+                        border: "1px solid #ccc",
                         borderRadius: 1,
-                      }}>
+                      }}
+                    >
                       {attributeList?.map((item, index) => {
                         const attributeValueItem = getAttributeLabel(
                           item?.attributeId,
@@ -450,14 +459,15 @@ const ProductSkuUpsert = () => {
                           <Box
                             key={item?.attributeValueId}
                             sx={{
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                              alignItems: 'center',
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "center",
                               my: 1.5,
-                            }}>
+                            }}
+                          >
                             <Typography key={item?.attributeValueId}>
-                              {attributeValueItem?.attribute ?? ''} -{' '}
-                              {attributeValueItem?.attributeValue ?? ''}
+                              {attributeValueItem?.attribute ?? ""} -{" "}
+                              {attributeValueItem?.attributeValue ?? ""}
                             </Typography>
                             <Box>
                               <Button
@@ -466,14 +476,15 @@ const ProductSkuUpsert = () => {
                                   width: 40,
                                   height: 30,
                                 }}
-                                variant='outlined'
+                                variant="outlined"
                                 onClick={() =>
                                   handleEditAttribute(
                                     String(item.attributeId),
                                     String(item.attributeValueId),
                                     index
                                   )
-                                }>
+                                }
+                              >
                                 <EditOutlinedIcon sx={{ fontSize: 20 }} />
                               </Button>
                               <Button
@@ -483,8 +494,9 @@ const ProductSkuUpsert = () => {
                                   height: 30,
                                   ml: 2,
                                 }}
-                                variant='outlined'
-                                onClick={() => handleDeleteAttribute(index)}>
+                                variant="outlined"
+                                onClick={() => handleDeleteAttribute(index)}
+                              >
                                 <DeleteOutlineOutlinedIcon
                                   sx={{ fontSize: 20 }}
                                 />
@@ -502,16 +514,18 @@ const ProductSkuUpsert = () => {
             </Card>
           </Grid2>
         </Grid2>
-        <Box sx={{ textAlign: 'end' }}>
+        <Box sx={{ textAlign: "end" }}>
           <Button
             onClick={() => navigate(`/product/${productData?.data.id}/sku`)}
-            sx={{ mr: 2 }}>
+            sx={{ mr: 2 }}
+          >
             Trở lại
           </Button>
           <Button
-            variant='contained'
+            variant="contained"
             onClick={() => formik.handleSubmit()}
-            sx={{ minWidth: 100 }}>
+            sx={{ minWidth: 100 }}
+          >
             Lưu
           </Button>
         </Box>
@@ -524,6 +538,6 @@ const ProductSkuUpsert = () => {
 export default ProductSkuUpsert;
 
 const helperTextStyle: SxProps<Theme> = {
-  color: 'red',
+  color: "red",
   fontSize: 13,
 };

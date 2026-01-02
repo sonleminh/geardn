@@ -445,7 +445,7 @@ export class StatisticsService {
     return { revenue, profit, orders };
   }
 
-  async getOrderStats(filters: DateRange): Promise<{
+  async getDailyOrderStats(filters: DateRange): Promise<{
     orderStats: OrderTimeRangeStats[];
     totals: { orders: number };
   }> {
@@ -523,37 +523,44 @@ export class StatisticsService {
     const { currentFrom, currentTo, prevFrom, prevTo } =
       this.getMonthlyRanges();
 
-    const [deliveredCount, pendingCount, canceledCount, currentMonthCanceledCount, currentMonthDeliveredCount, previousMonthDeliveredCount] =
-      await Promise.all([
-        this.prisma.order.count({ where: { status: 'DELIVERED' } }),
-        this.prisma.order.count({
-          where: {
-            status: {
-              in: ['PENDING', 'PROCESSING', 'SHIPPED'] ,
-            },
+    const [
+      deliveredCount,
+      pendingCount,
+      canceledCount,
+      currentMonthCanceledCount,
+      currentMonthDeliveredCount,
+      previousMonthDeliveredCount,
+    ] = await Promise.all([
+      this.prisma.order.count({ where: { status: 'DELIVERED' } }),
+      this.prisma.order.count({
+        where: {
+          status: {
+            in: ['PENDING', 'PROCESSING', 'SHIPPED'],
           },
-        }),
-        this.prisma.order.count({ where: { status: { in: ['CANCELED', 'DELIVERY_FAILED'] } } }),
-        this.prisma.order.count({
-          where: {
-            status: { in: ['CANCELED', 'DELIVERY_FAILED'] },
-            createdAt: { gte: new Date(currentFrom), lte: new Date(currentTo) },
-          },
-        }),
-        this.prisma.order.count({
-          where: {
-            status: 'DELIVERED',
-            completedAt: { gte: new Date(currentFrom), lte: new Date(currentTo) },
-          },
-        }),
-        this.prisma.order.count({
-          where: {
-            status: 'DELIVERED',
-            completedAt: { gte: new Date(prevFrom), lte: new Date(prevTo) },
-          },
-        }),
-       
-      ]);
+        },
+      }),
+      this.prisma.order.count({
+        where: { status: { in: ['CANCELED', 'DELIVERY_FAILED'] } },
+      }),
+      this.prisma.order.count({
+        where: {
+          status: { in: ['CANCELED', 'DELIVERY_FAILED'] },
+          createdAt: { gte: new Date(currentFrom), lte: new Date(currentTo) },
+        },
+      }),
+      this.prisma.order.count({
+        where: {
+          status: 'DELIVERED',
+          completedAt: { gte: new Date(currentFrom), lte: new Date(currentTo) },
+        },
+      }),
+      this.prisma.order.count({
+        where: {
+          status: 'DELIVERED',
+          completedAt: { gte: new Date(prevFrom), lte: new Date(prevTo) },
+        },
+      }),
+    ]);
 
     const deliveredGrowthPercent = this.calculateGrowthPercent(
       currentMonthDeliveredCount,
@@ -570,12 +577,15 @@ export class StatisticsService {
         deliveredLastMonthCount: previousMonthDeliveredCount,
       },
       rates: {
-        cancellationRate: (canceledCount / (deliveredCount+ canceledCount)) * 100,
-        cancellationRateThisMonth: (currentMonthCanceledCount / (currentMonthDeliveredCount + currentMonthCanceledCount)) * 100,
+        cancellationRate:
+          (canceledCount / (deliveredCount + canceledCount)) * 100,
+        cancellationRateThisMonth:
+          (currentMonthCanceledCount /
+            (currentMonthDeliveredCount + currentMonthCanceledCount)) *
+          100,
       },
       growth: {
         delivered: deliveredGrowthPercent,
-       
       },
     };
   }

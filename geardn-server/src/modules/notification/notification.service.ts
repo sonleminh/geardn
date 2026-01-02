@@ -86,9 +86,6 @@ export class NotificationsService {
     };
   }
 
-  /**
-   * Get unread notifications count for a user.
-   */
   async getStats(
     userId: number,
   ): Promise<{ unseenCount: number; unreadCount: number }> {
@@ -126,7 +123,7 @@ export class NotificationsService {
       where: {
         id: userId,
       },
-      data: { lastSeenNotificationsAt: new Date()  },
+      data: { lastSeenNotificationsAt: new Date() },
     });
     return { success: true };
   }

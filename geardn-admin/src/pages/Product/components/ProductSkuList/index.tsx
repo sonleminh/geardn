@@ -1,20 +1,20 @@
-import { FC, memo } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import moment from 'moment';
-import { AxiosError } from 'axios';
-import { ErrorResponse } from '@/interfaces/IError';
+import { FC, memo } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import moment from "moment";
+import { AxiosError } from "axios";
+import { ErrorResponse } from "@/interfaces/IError";
 
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from "@tanstack/react-query";
 
-import { AddCircleOutlined } from '@mui/icons-material';
-import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import CircleIcon from '@mui/icons-material/Circle';
-import RestoreIcon from '@mui/icons-material/Restore';
-import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
+import { AddCircleOutlined } from "@mui/icons-material";
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import CircleIcon from "@mui/icons-material/Circle";
+import RestoreIcon from "@mui/icons-material/Restore";
+import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
 
 import {
   Box,
@@ -30,47 +30,47 @@ import {
   TableHead,
   TableRow,
   Typography,
-} from '@mui/material';
+} from "@mui/material";
 
-import { QueryKeys } from '@/constants/query-key';
-import { ROUTES } from '@/constants/route';
+import { QueryKeys } from "@/constants/query-key";
+import { ROUTES } from "@/constants/route";
 
-import { TableColumn } from '@/interfaces/ITableColumn';
+import { TableColumn } from "@/interfaces/ITableColumn";
 
-import { useAlertContext } from '@/contexts/AlertContext';
+import { useAlertContext } from "@/contexts/AlertContext";
 
-import useConfirmModal from '@/hooks/useModalConfirm';
+import useConfirmModal from "@/hooks/useModalConfirm";
 
-import { useGetProductById } from '@/services/product';
+import { useGetProductById } from "@/services/product";
 import {
   useDeleteSku,
   useDeleteSkuPermanent,
   useGetSkusByProductId,
   useRestoreSku,
-} from '@/services/sku';
+} from "@/services/sku";
 
-import { truncateTextByLine } from '@/utils/css-helper.util';
-import { formatPrice } from '@/utils/format-price';
+import { truncateTextByLine } from "@/utils/css-helper.util";
+import { formatPrice } from "@/utils/format-price";
 
-import ActionButton from '@/components/ActionButton';
-import ButtonWithTooltip from '@/components/ButtonWithTooltip';
-import { TableSkeleton } from '@/components/TableSkeleton';
+import ActionButton from "@/components/ActionButton";
+import ButtonWithTooltip from "@/components/ButtonWithTooltip";
+import { TableSkeleton } from "@/components/TableSkeleton";
 
 const columns: TableColumn[] = [
-  { width: '50px', align: 'center' },
-  { width: '100px', align: 'center' },
-  { width: '50px', align: 'center' },
-  { width: '150px', align: 'center' },
-  { width: '100px', align: 'center' },
-  { width: '100px', align: 'center' },
-  { width: '100px', align: 'center' },
-  { width: '100px', align: 'center' },
+  { width: "50px", align: "center" },
+  { width: "100px", align: "center" },
+  { width: "50px", align: "center" },
+  { width: "150px", align: "center" },
+  { width: "100px", align: "center" },
+  { width: "100px", align: "center" },
+  { width: "100px", align: "center" },
+  { width: "100px", align: "center" },
 ];
 
 const StatusDot: FC<{ isDeleted?: boolean }> = memo(({ isDeleted }) => (
   <Typography sx={{ fontSize: 14 }}>
     <CircleIcon
-      sx={{ mr: 0.5, color: isDeleted ? '#ff0000' : '#00a35c', fontSize: 12 }}
+      sx={{ mr: 0.5, color: isDeleted ? "#ff0000" : "#00a35c", fontSize: 12 }}
     />
   </Typography>
 ));
@@ -85,7 +85,7 @@ const ProductSkuList = () => {
   const { data: productData } = useGetProductById(id ? +id : 0);
   const { data: skusData, isLoading: isLoadingSkus } = useGetSkusByProductId({
     id: id ? +id : 0,
-    state: 'all',
+    state: "all",
   });
 
   const { mutate: deleteSkuMutate } = useDeleteSku();
@@ -96,11 +96,11 @@ const ProductSkuList = () => {
     deleteSkuMutate(id, {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: [QueryKeys.Sku] });
-        showAlert('Xóa mã hàng thành công', 'success');
+        showAlert("Xóa mã hàng thành công", "success");
       },
       onError(error: Error) {
         const axiosError = error as AxiosError<ErrorResponse>;
-        showAlert(axiosError?.response?.data?.message ?? 'Lỗi', 'error');
+        showAlert(axiosError?.response?.data?.message ?? "Lỗi", "error");
       },
     });
   };
@@ -109,11 +109,11 @@ const ProductSkuList = () => {
     restoreSkuMutate(id, {
       onSuccess() {
         queryClient.invalidateQueries({ queryKey: [QueryKeys.Sku] });
-        showAlert('Khôi phục mã hàng thành công', 'success');
+        showAlert("Khôi phục mã hàng thành công", "success");
       },
       onError(error: Error) {
         const axiosError = error as AxiosError<ErrorResponse>;
-        showAlert(axiosError?.response?.data?.message ?? 'Lỗi', 'error');
+        showAlert(axiosError?.response?.data?.message ?? "Lỗi", "error");
       },
     });
   };
@@ -122,11 +122,11 @@ const ProductSkuList = () => {
     deleteSkuPermanentMutate(id, {
       onSuccess() {
         queryClient.invalidateQueries({ queryKey: [QueryKeys.Sku] });
-        showAlert('Xoá vĩnh viễn mã hàng thành công', 'success');
+        showAlert("Xoá vĩnh viễn mã hàng thành công", "success");
       },
       onError(error: Error) {
         const axiosError = error as AxiosError<ErrorResponse>;
-        showAlert(axiosError?.response?.data?.message ?? 'Lỗi', 'error');
+        showAlert(axiosError?.response?.data?.message ?? "Lỗi", "error");
       },
     });
   };
@@ -134,38 +134,43 @@ const ProductSkuList = () => {
   return (
     <>
       <Breadcrumbs
-        separator={<NavigateNextIcon fontSize='small' />}
-        aria-label='breadcrumb'
-        sx={{ mb: 3 }}>
+        separator={<NavigateNextIcon fontSize="small" />}
+        aria-label="breadcrumb"
+        sx={{ mb: 3 }}
+      >
         <Link
-          underline='hover'
-          color='inherit'
+          underline="hover"
+          color="inherit"
           onClick={() => navigate(ROUTES.DASHBOARD)}
-          sx={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+          sx={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+        >
           <HomeOutlinedIcon sx={{ fontSize: 24 }} />
         </Link>
         <Link
-          underline='hover'
-          color='inherit'
+          underline="hover"
+          color="inherit"
           onClick={() => navigate(ROUTES.PRODUCT)}
-          sx={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+          sx={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+        >
           Sản phẩm
         </Link>
-        <Typography color='text.primary'>Danh sách mã hàng</Typography>
+        <Typography color="text.primary">Danh sách mã hàng</Typography>
       </Breadcrumbs>
       <Card>
         <CardHeader
           action={
             <ButtonWithTooltip
-              variant='contained'
+              variant="contained"
               onClick={() => navigate(`/product/${id}/sku/create`)}
-              title='Thêm mã hàng'>
+              title="Thêm mã hàng"
+            >
               <AddCircleOutlined />
             </ButtonWithTooltip>
           }
           title={
             <Typography
-              sx={{ fontSize: 20, fontWeight: 500, ...truncateTextByLine(1) }}>
+              sx={{ fontSize: 20, fontWeight: 500, ...truncateTextByLine(1) }}
+            >
               Danh sách mã hàng: {productData?.data?.name}
             </Typography>
           }
@@ -175,14 +180,14 @@ const ProductSkuList = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell align='center'>STT</TableCell>
+                <TableCell align="center">STT</TableCell>
                 <TableCell>Tên</TableCell>
-                <TableCell align='center'>Ảnh</TableCell>
-                <TableCell align='center'>Phân loại</TableCell>
-                <TableCell align='center'>Giá bán</TableCell>
-                <TableCell align='center'>Ngày tạo</TableCell>
-                <TableCell align='center'>Đã xóa</TableCell>
-                <TableCell align='center'>Hành động</TableCell>
+                <TableCell align="center">Ảnh</TableCell>
+                <TableCell align="center">Phân loại</TableCell>
+                <TableCell align="center">Giá bán</TableCell>
+                <TableCell align="center">Ngày tạo</TableCell>
+                <TableCell align="center">Đã xóa</TableCell>
+                <TableCell align="center">Hành động</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -193,93 +198,96 @@ const ProductSkuList = () => {
                 skusData.data.length > 0 ? (
                 skusData.data.map((item, index) => (
                   <TableRow key={index}>
-                    <TableCell align='center'>{index + 1}</TableCell>
+                    <TableCell align="center">{index + 1}</TableCell>
                     <TableCell sx={{}}>
                       <Typography sx={{ ...truncateTextByLine(2) }}>
                         {item?.sku}
                       </Typography>
                     </TableCell>
-                    <TableCell align='center'>
+                    <TableCell align="center">
                       {item?.imageUrl ? (
                         <Box
                           sx={{
                             height: 40,
-                            '.thumbnail': {
+                            ".thumbnail": {
                               width: 40,
                               height: 40,
-                              objectFit: 'contain',
+                              objectFit: "contain",
                             },
-                          }}>
-                          <img src={item?.imageUrl} className='thumbnail' />
+                          }}
+                        >
+                          <img src={item?.imageUrl} className="thumbnail" />
                         </Box>
                       ) : (
-                        'Không có'
+                        "Không có"
                       )}
                     </TableCell>
                     <TableCell>
-                      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                      <Box sx={{ display: "flex", flexDirection: "column" }}>
                         {item?.productSkuAttributes?.length
                           ? item?.productSkuAttributes?.map(
                               (item, prdSkuAttrIndex) => (
                                 <Typography
                                   key={prdSkuAttrIndex}
-                                  sx={{ fontSize: 14 }}>
-                                  {item?.attributeValue?.attribute?.label}:{' '}
+                                  sx={{ fontSize: 14 }}
+                                >
+                                  {item?.attributeValue?.attribute?.label}:{" "}
                                   {item?.attributeValue?.value}
                                 </Typography>
                               )
                             )
-                          : 'Không có'}
+                          : "Không có"}
                       </Box>
                     </TableCell>
-                    <TableCell align='center'>
+                    <TableCell align="center">
                       {formatPrice(item?.sellingPrice)}
                     </TableCell>
-                    <TableCell align='center'>
-                      {moment(item?.createdAt).format('DD/MM/YYYY')}
+                    <TableCell align="center">
+                      {moment(item?.createdAt).format("DD/MM/YYYY")}
                     </TableCell>
-                    <TableCell align='center'>
+                    <TableCell align="center">
                       <StatusDot isDeleted={item?.isDeleted} />
                     </TableCell>
-                    <TableCell align='center'>
+                    <TableCell align="center">
                       <ActionButton>
                         <Box mb={1}>
                           <ButtonWithTooltip
-                            color='primary'
+                            color="primary"
                             onClick={() => navigate(`/product/sku/${item?.id}`)}
-                            variant='outlined'
-                            title='Xem chi tiết'
-                            placement='left'>
+                            variant="outlined"
+                            title="Xem chi tiết"
+                            placement="left"
+                          >
                             <InfoOutlinedIcon />
                           </ButtonWithTooltip>
                         </Box>
                         <Box mb={1}>
                           <ButtonWithTooltip
-                            color='primary'
-                            onClick={() =>
-                              navigate(`/product/sku/update/${item?.id}`)
-                            }
-                            variant='outlined'
-                            title='Chỉnh sửa'
-                            placement='left'>
+                            color="primary"
+                            onClick={() => navigate(`update/${item?.id}`)}
+                            variant="outlined"
+                            title="Chỉnh sửa"
+                            placement="left"
+                          >
                             <EditOutlinedIcon />
                           </ButtonWithTooltip>
                         </Box>
                         {!item?.isDeleted && (
                           <Box mb={1}>
                             <ButtonWithTooltip
-                              color='error'
-                              variant='outlined'
-                              title='Xoá'
-                              placement='left'
+                              color="error"
+                              variant="outlined"
+                              title="Xoá"
+                              placement="left"
                               onClick={() =>
                                 showConfirmModal({
-                                  title: 'Xoá mã hàng',
+                                  title: "Xoá mã hàng",
                                   content:
-                                    'Bạn có chắc chắn muốn xoá mã hàng này?',
+                                    "Bạn có chắc chắn muốn xoá mã hàng này?",
                                   onOk: () => handleDelete(item?.id),
                                 })
-                              }>
+                              }
+                            >
                               <DeleteOutlineOutlinedIcon />
                             </ButtonWithTooltip>
                           </Box>
@@ -287,17 +295,18 @@ const ProductSkuList = () => {
                         {item?.isDeleted && (
                           <Box mb={item?.isDeleted ? 1 : 0}>
                             <ButtonWithTooltip
-                              variant='outlined'
-                              title='Khôi phục'
-                              placement='left'
+                              variant="outlined"
+                              title="Khôi phục"
+                              placement="left"
                               onClick={() =>
                                 showConfirmModal({
-                                  title: 'Khôi phục mã hàng',
+                                  title: "Khôi phục mã hàng",
                                   content:
-                                    'Bạn có chắc chắn muốn khôi phục mã hàng này?',
+                                    "Bạn có chắc chắn muốn khôi phục mã hàng này?",
                                   onOk: () => handleRestore(item?.id),
                                 })
-                              }>
+                              }
+                            >
                               <RestoreIcon />
                             </ButtonWithTooltip>
                           </Box>
@@ -305,18 +314,19 @@ const ProductSkuList = () => {
                         {item?.isDeleted && (
                           <Box>
                             <ButtonWithTooltip
-                              color='error'
-                              variant='outlined'
-                              title='Xoá vĩnh viễn'
-                              placement='left'
+                              color="error"
+                              variant="outlined"
+                              title="Xoá vĩnh viễn"
+                              placement="left"
                               onClick={() =>
                                 showConfirmModal({
-                                  title: 'Xoá vĩnh viễn mã hàng',
+                                  title: "Xoá vĩnh viễn mã hàng",
                                   content:
-                                    'Bạn có chắc chắn muốn xoá vĩnh viễn mã hàng này?',
+                                    "Bạn có chắc chắn muốn xoá vĩnh viễn mã hàng này?",
                                   onOk: () => handleDeletePermanent(item?.id),
                                 })
-                              }>
+                              }
+                            >
                               <DeleteForeverOutlinedIcon />
                             </ButtonWithTooltip>
                           </Box>
@@ -327,7 +337,7 @@ const ProductSkuList = () => {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={5} align='center'>
+                  <TableCell colSpan={5} align="center">
                     Không có dữ liệu
                   </TableCell>
                 </TableRow>

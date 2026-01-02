@@ -1,19 +1,19 @@
-import { format, subDays } from 'date-fns';
-import { vi } from 'date-fns/locale';
-import React, { useCallback, useMemo, useState } from 'react';
-import { Line } from 'react-chartjs-2';
-import { RangeKeyDict } from 'react-date-range';
-import { useNavigate } from 'react-router-dom';
+import { format, subDays } from "date-fns";
+import { vi } from "date-fns/locale";
+import React, { useCallback, useMemo, useState } from "react";
+import { Line } from "react-chartjs-2";
+import { RangeKeyDict } from "react-date-range";
+import { useNavigate } from "react-router-dom";
 
-import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
-import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
-import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import TrendingDownIcon from '@mui/icons-material/TrendingDown';
-import TrendingFlatIcon from '@mui/icons-material/TrendingFlat';
+import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
+import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
+import CheckOutlinedIcon from "@mui/icons-material/CheckOutlined";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import TrendingDownIcon from "@mui/icons-material/TrendingDown";
+import TrendingFlatIcon from "@mui/icons-material/TrendingFlat";
 
 import {
   Box,
@@ -24,19 +24,19 @@ import {
   Link,
   Skeleton,
   Typography,
-} from '@mui/material';
+} from "@mui/material";
 
-import DateRangeMenu from '@/components/DateRangeMenu';
-import { ROUTES } from '@/constants/route';
-import { IOrderDateStats } from '@/interfaces/IStats';
+import DateRangeMenu from "@/components/DateRangeMenu";
+import { ROUTES } from "@/constants/route";
+import { IOrderDailyStat } from "@/interfaces/IStats";
 import {
   useGetOrderStats,
   useGetOrderSummaryStats,
-} from '@/services/statistic';
+} from "@/services/statistic";
 
 const cardTrend = {
-  display: 'flex',
-  alignItems: 'center',
+  display: "flex",
+  alignItems: "center",
   fontSize: 14,
   fontWeight: 500,
 };
@@ -52,7 +52,7 @@ interface SummaryStatProps {
 
 const valueStyle = (value: number) => ({
   fontWeight: 500,
-  color: value < 0 ? 'red' : 'green',
+  color: value < 0 ? "red" : "green",
 });
 
 const SummaryStat: React.FC<SummaryStatProps> = ({
@@ -67,44 +67,46 @@ const SummaryStat: React.FC<SummaryStatProps> = ({
   return (
     <Box
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-      }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+      }}
+    >
+      <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
         <Box
           sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
             width: 48,
             height: 48,
             mr: 2,
             bgcolor: iconBg,
-            borderRadius: '50%',
-          }}>
+            borderRadius: "50%",
+          }}
+        >
           {icon}
         </Box>
         <Typography sx={{ fontSize: 16, fontWeight: 500 }}>{label}</Typography>
       </Box>
       {value}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
+      <Box sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}>
         {isLoading ? (
           <>
             <Skeleton
-              variant='text'
+              variant="text"
               width={80}
               height={20}
               sx={{
-                bgcolor: 'rgba(255, 255, 255, 0.3)',
+                bgcolor: "rgba(255, 255, 255, 0.3)",
               }}
             />
             <Skeleton
-              variant='text'
+              variant="text"
               width={80}
               height={20}
               sx={{
-                bgcolor: 'rgba(255, 255, 255, 0.3)',
+                bgcolor: "rgba(255, 255, 255, 0.3)",
               }}
             />
           </>
@@ -128,7 +130,7 @@ const OrderStats: React.FC = () => {
     {
       startDate: new Date(new Date().setDate(new Date().getDate() - 7)),
       endDate: new Date(),
-      key: 'selection',
+      key: "selection",
     },
   ]);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -139,94 +141,98 @@ const OrderStats: React.FC = () => {
   const summaryStats = useMemo(
     () => [
       {
-        label: 'Tổng đơn hàng',
+        label: "Tổng đơn hàng",
         value: (
           <Typography sx={{ fontSize: 28, fontWeight: 500 }}>
             {orderSummaryStats?.data.totals.delivered || 0} đơn
           </Typography>
         ),
-        icon: <ShoppingBagOutlinedIcon sx={{ color: '#fff' }} />,
-        iconBg: '#000',
+        icon: <ShoppingBagOutlinedIcon sx={{ color: "#fff" }} />,
+        iconBg: "#000",
         trend: (
           <Typography sx={cardTrend}>
             {orderSummaryStats &&
             orderSummaryStats?.data?.growth?.delivered > 0 ? (
-              <TrendingUpIcon sx={{ mr: 1, color: '#59b35c' }} />
+              <TrendingUpIcon sx={{ mr: 1, color: "#59b35c" }} />
             ) : orderSummaryStats &&
               orderSummaryStats?.data?.growth?.delivered < 0 ? (
-              <TrendingDownIcon sx={{ mr: 1, color: 'red' }} />
+              <TrendingDownIcon sx={{ mr: 1, color: "red" }} />
             ) : (
-              <TrendingFlatIcon sx={{ mr: 1, color: '#828384' }} />
+              <TrendingFlatIcon sx={{ mr: 1, color: "#828384" }} />
             )}
             <Typography
-              component='span'
-              sx={valueStyle(orderSummaryStats?.data?.growth?.delivered || 0)}>
+              component="span"
+              sx={valueStyle(orderSummaryStats?.data?.growth?.delivered || 0)}
+            >
               {orderSummaryStats?.data?.growth?.delivered?.toFixed(2)}%
             </Typography>
           </Typography>
         ),
         extra: (
           <Typography sx={cardTrend}>
-            <Typography component='span' sx={{ mr: 1, fontWeight: 500 }}>
-              {orderSummaryStats?.data?.totals?.deliveredThisMonthCount || 0}{' '}
+            <Typography component="span" sx={{ mr: 1, fontWeight: 500 }}>
+              {orderSummaryStats?.data?.totals?.deliveredThisMonthCount || 0}{" "}
             </Typography>
             <Typography
-              component='span'
-              sx={{ fontWeight: 500, color: '#828384' }}>
+              component="span"
+              sx={{ fontWeight: 500, color: "#828384" }}
+            >
               tháng này
             </Typography>
           </Typography>
         ),
       },
       {
-        label: 'Đơn hoàn thành',
+        label: "Đơn hoàn thành",
         value: (
-          <Typography sx={{ fontSize: 28, fontWeight: 500, color: '#59b35c' }}>
+          <Typography sx={{ fontSize: 28, fontWeight: 500, color: "#59b35c" }}>
             {orderSummaryStats?.data.totals.delivered || 0} đơn
           </Typography>
         ),
-        icon: <CheckOutlinedIcon sx={{ color: '#fff' }} />,
-        iconBg: '#59b35c',
+        icon: <CheckOutlinedIcon sx={{ color: "#fff" }} />,
+        iconBg: "#59b35c",
       },
       {
-        label: 'Đang xử lý',
+        label: "Đang xử lý",
         value: (
-          <Typography sx={{ fontSize: 28, fontWeight: 500, color: '#588fe1' }}>
+          <Typography sx={{ fontSize: 28, fontWeight: 500, color: "#588fe1" }}>
             {orderSummaryStats?.data?.totals?.pending || 0} đơn
           </Typography>
         ),
-        icon: <TrendingUpIcon sx={{ color: '#fff' }} />,
-        iconBg: '#588fe1',
+        icon: <TrendingUpIcon sx={{ color: "#fff" }} />,
+        iconBg: "#588fe1",
       },
       {
-        label: 'Đơn huỷ',
+        label: "Đơn huỷ",
         value: (
-          <Typography sx={{ fontSize: 28, fontWeight: 500, color: '#d34141' }}>
+          <Typography sx={{ fontSize: 28, fontWeight: 500, color: "#d34141" }}>
             {orderSummaryStats?.data?.totals?.canceled} đơn
           </Typography>
         ),
-        icon: <CancelOutlinedIcon sx={{ color: '#fff' }} />,
-        iconBg: '#d34141',
+        icon: <CancelOutlinedIcon sx={{ color: "#fff" }} />,
+        iconBg: "#d34141",
         trend: (
           <Typography sx={cardTrend}>
-            <Typography component='span' sx={{ mr: 1, fontWeight: 500 }}>
+            <Typography component="span" sx={{ mr: 1, fontWeight: 500 }}>
               Tỉ lệ huỷ đơn:
             </Typography>
             <Typography
-              component='span'
-              sx={valueStyle(orderSummaryStats?.data?.growth?.delivered || 0)}>
+              component="span"
+              sx={valueStyle(orderSummaryStats?.data?.growth?.delivered || 0)}
+            >
               {orderSummaryStats?.data?.rates?.cancellationRate?.toFixed(2)}%
             </Typography>
           </Typography>
         ),
         extra: (
           <Typography sx={cardTrend}>
-            <Typography component='span' sx={{ mr: 1, fontWeight: 500 }}>
-              {orderSummaryStats?.data?.totals?.canceledThisMonthCount || 0}{' '}
+            <Typography component="span" sx={{ mr: 1, fontWeight: 500 }}>
+              {orderSummaryStats?.data?.totals?.canceledThisMonthCount || 0}{" "}
             </Typography>
             <Typography
-              component='span'
-              sx={{ fontWeight: 500, color: '#828384' }}>
+              component="span"
+              sx={{ fontWeight: 500, color: "#828384" }}
+            >
               tháng này
             </Typography>
           </Typography>
@@ -247,34 +253,34 @@ const OrderStats: React.FC = () => {
         labels: [],
         datasets: [
           {
-            label: 'Đơn hàng',
+            label: "Đơn hàng",
             data: [],
             fill: false,
-            borderColor: '#000',
-            backgroundColor: '#fff',
+            borderColor: "#000",
+            backgroundColor: "#fff",
             tension: 0.1,
           },
         ],
       };
     }
 
-    const labels = orderStats?.data?.orderStats.map((item: IOrderDateStats) => {
-      return format(new Date(item.date), 'dd/MM', { locale: vi });
+    const labels = orderStats?.data?.orderStats.map((item: IOrderDailyStat) => {
+      return format(new Date(item.date), "dd/MM", { locale: vi });
     });
 
     return {
       labels,
       datasets: [
         {
-          label: 'Đơn hàng',
+          label: "Đơn hàng",
           data: orderStats?.data?.orderStats.map(
-            (item: IOrderDateStats) => item.orders
+            (item: IOrderDailyStat) => item.orders
           ),
           fill: false,
-          borderColor: '#000',
-          backgroundColor: '#fff',
+          borderColor: "#000",
+          backgroundColor: "#fff",
           tension: 0.4,
-          yAxisID: 'y',
+          yAxisID: "y",
         },
       ],
     };
@@ -287,7 +293,7 @@ const OrderStats: React.FC = () => {
       plugins: {
         legend: {
           display: true,
-          position: 'top' as const,
+          position: "top" as const,
         },
         title: {
           display: true,
@@ -323,7 +329,7 @@ const OrderStats: React.FC = () => {
     (daysAgo: number) => {
       const endDate = new Date();
       const startDate = subDays(new Date(), daysAgo);
-      setDateRange([{ startDate, endDate, key: 'selection' }]);
+      setDateRange([{ startDate, endDate, key: "selection" }]);
       handleClose();
     },
     [handleClose]
@@ -335,7 +341,7 @@ const OrderStats: React.FC = () => {
         {
           startDate: selection.startDate,
           endDate: selection.endDate,
-          key: 'selection',
+          key: "selection",
         },
       ]);
     }
@@ -343,13 +349,13 @@ const OrderStats: React.FC = () => {
 
   const getDateDisplayText = useCallback(() => {
     const { startDate, endDate } = dateRange[0];
-    if (!startDate || !endDate) return 'Chọn ngày';
+    if (!startDate || !endDate) return "Chọn ngày";
     if (startDate.getTime() === endDate.getTime()) {
-      return format(startDate, 'dd/MM/yyyy', { locale: vi });
+      return format(startDate, "dd/MM/yyyy", { locale: vi });
     }
-    return `${format(startDate, 'dd/MM/yyyy', { locale: vi })} - ${format(
+    return `${format(startDate, "dd/MM/yyyy", { locale: vi })} - ${format(
       endDate,
-      'dd/MM/yyyy',
+      "dd/MM/yyyy",
       { locale: vi }
     )}`;
   }, [dateRange]);
@@ -357,49 +363,55 @@ const OrderStats: React.FC = () => {
   return (
     <>
       <Breadcrumbs
-        separator={<NavigateNextIcon fontSize='small' />}
-        aria-label='breadcrumb'
-        sx={{ mb: 3 }}>
+        separator={<NavigateNextIcon fontSize="small" />}
+        aria-label="breadcrumb"
+        sx={{ mb: 3 }}
+      >
         <Link
-          underline='hover'
-          color='inherit'
+          underline="hover"
+          color="inherit"
           onClick={() => navigate(ROUTES.DASHBOARD)}
-          sx={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+          sx={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+        >
           <HomeOutlinedIcon sx={{ fontSize: 24 }} />
         </Link>
-        <Typography color='text.primary'>Thống kê đơn hàng</Typography>
+        <Typography color="text.primary">Thống kê đơn hàng</Typography>
       </Breadcrumbs>
       <Card>
         <CardContent sx={{}}>
           <>
             <Box
               sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
                 mb: 4,
-              }}>
+              }}
+            >
               <Typography sx={{ fontSize: 20, fontWeight: 500 }}>
                 Thống kê đơn hàng
               </Typography>
               <Button
-                variant='outlined'
+                variant="outlined"
                 onClick={handleClick}
                 endIcon={<KeyboardArrowDownIcon />}
-                sx={{ minWidth: 150 }}>
+                sx={{ minWidth: 150 }}
+              >
                 {getDateDisplayText()}
               </Button>
             </Box>
             <Box
               sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-evenly',
-              }}>
-              <Box sx={{ textAlign: 'center' }}>
-                <Typography sx={{ color: '#696969' }}>Tổng đơn hàng</Typography>
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-evenly",
+              }}
+            >
+              <Box sx={{ textAlign: "center" }}>
+                <Typography sx={{ color: "#696969" }}>Tổng đơn hàng</Typography>
                 <Typography
-                  sx={{ fontSize: 20, fontWeight: 600, color: '#333' }}>
+                  sx={{ fontSize: 20, fontWeight: 600, color: "#333" }}
+                >
                   {orderSummaryStats?.data?.totals?.delivered || 0}
                 </Typography>
               </Box>
@@ -412,18 +424,19 @@ const OrderStats: React.FC = () => {
               dateRange={dateRange}
               onRangeChange={handleDateRangeChange}
             />
-            <Box sx={{ width: '100%', height: 400, p: 0, m: 0 }}>
+            <Box sx={{ width: "100%", height: 400, p: 0, m: 0 }}>
               <Line data={chartData} options={chartOptions} />
             </Box>
           </>
-          <Box sx={{ mt: 4, display: 'flex', justifyContent: 'space-between' }}>
+          <Box sx={{ mt: 4, display: "flex", justifyContent: "space-between" }}>
             {summaryStats.map((stat, idx) => (
               <Box
                 key={idx}
                 sx={{
-                  width: '25%',
-                  borderLeft: idx !== 0 ? '1px solid #e0e0e0' : 'none',
-                }}>
+                  width: "25%",
+                  borderLeft: idx !== 0 ? "1px solid #e0e0e0" : "none",
+                }}
+              >
                 <Box sx={{ px: 3 }}>
                   <SummaryStat {...stat} />
                 </Box>

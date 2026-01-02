@@ -6,11 +6,16 @@ import { GetTimeRangeStatsDto } from './dto/get-time-range-stats.dto';
 import { GetProductStatsDto } from './dto/get-product-stats.dto';
 import { GetOrderStatsDto } from './dto/get-order-stats.dto';
 import { JwtAdminAuthGuard } from '../admin-auth/guards/jwt-admin-auth.guard';
+import { AnalyticsService } from '../google-analytics/analytics.service';
+import { GetViewStatsDto } from './dto/get-view-stats.dto';
 
 @Controller('statistics')
 @UseGuards(JwtAdminAuthGuard)
 export class StatisticsController {
-  constructor(private readonly statisticsService: StatisticsService) {}
+  constructor(
+    private readonly statisticsService: StatisticsService,
+    private readonly analyticsService: AnalyticsService,
+  ) {}
 
   @Get('revenue')
   async getRevenueStats(@Query() dto: GetRevenueStatsDto) {
@@ -51,9 +56,9 @@ export class StatisticsController {
     return this.statisticsService.getRevenueProfitSummary();
   }
 
-  @Get('order')
-  async getOrderStats(@Query() dto: GetOrderStatsDto) {
-    return this.statisticsService.getOrderStats({
+  @Get('orders')
+  async getDailyOrderStats(@Query() dto: GetOrderStatsDto) {
+    return this.statisticsService.getDailyOrderStats({
       fromDate: dto.fromDate,
       toDate: dto.toDate,
     });
@@ -145,7 +150,8 @@ export class StatisticsController {
         total: {
           revenue: revenueProfitSummary.totals.totalRevenue,
           profit: revenueProfitSummary.totals.totalProfit,
-          totalCurrentMonthRevenue: revenueProfitSummary.totals.totalCurrentMonthRevenue,
+          totalCurrentMonthRevenue:
+            revenueProfitSummary.totals.totalCurrentMonthRevenue,
           orders: orderSummary.totals.delivered,
           pendingOrders: orderSummary.totals.pending,
           canceledOrders: orderSummary.totals.canceled,
@@ -174,6 +180,29 @@ export class StatisticsController {
     return {
       data: stats,
       message: 'Stock summary retrieved successfully',
+    };
+  }
+
+  @Get('views-daily')
+  async getViewChart(@Query() dto: GetViewStatsDto) {
+    return this.analyticsService.getDailyViewStats({
+      fromDate: dto.fromDate,
+      toDate: dto.toDate,
+    });
+  }
+
+  @Get('views-summary')
+  async getSummary(@Query() dto: GetViewStatsDto) {
+    // Tận dụng lại DTO date range cũ
+    const data = await this.analyticsService.getSummaryStats({
+      fromDate: dto.fromDate,
+      toDate: dto.toDate,
+    });
+
+    return {
+      success: true,
+      message: 'Summary statistics fetched successfully',
+      data: data,
     };
   }
 }

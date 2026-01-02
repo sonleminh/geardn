@@ -546,7 +546,7 @@ export class ProductService {
           },
         },
         orderBy: {
-          createdAt: 'desc',
+          priority: 'desc',
         },
       }),
       this.prisma.product.count({ where }),

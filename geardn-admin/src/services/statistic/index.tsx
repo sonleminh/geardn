@@ -1,16 +1,18 @@
+import { QueryKeys } from "@/constants/query-key";
+import { IDashboardStatistics } from "@/interfaces/IAnalytic";
 import {
-  IOrderStats,
+  IOrderStatisticResponse,
   IOrderSummaryStats,
   IRevenueProfitStats,
   IRevenueProfitSummaryStats,
-} from '@/interfaces/IStats';
-import { axiosInstance } from '../axiosInstance';
-import { TBaseResponse } from '@/types/response.type';
-import { useQuery } from '@tanstack/react-query';
-import { QueryKeys } from '@/constants/query-key';
-import { IDashboardStatistics } from '@/interfaces/IAnalytic';
+  ISummaryStatsResponse,
+  IViewStatisticResponse,
+} from "@/interfaces/IStats";
+import { TBaseResponse } from "@/types/response.type";
+import { useQuery } from "@tanstack/react-query";
+import { axiosInstance } from "../axiosInstance";
 
-const statisticUrl = '/statistics';
+const statisticUrl = "/statistics";
 
 interface IOverviewStats {
   total: {
@@ -105,7 +107,7 @@ const getOrderStats = async (query: { fromDate: Date; toDate: Date }) => {
       toDate: query.toDate.toISOString(),
     },
   });
-  return result.data as TBaseResponse<IOrderStats>;
+  return result.data as TBaseResponse<IOrderStatisticResponse>;
 };
 
 export const useGetOrderStats = (query: { fromDate: Date; toDate: Date }) => {
@@ -142,5 +144,49 @@ export const useGetGoogleAnalytics = () => {
     queryFn: () => getDashboardStatistics(),
     refetchOnWindowFocus: false,
     refetchInterval: false,
+  });
+};
+
+const getDailyViewStats = async (query: { fromDate: Date; toDate: Date }) => {
+  const result = await axiosInstance.get(`${statisticUrl}/views-daily`, {
+    params: {
+      fromDate: query.fromDate.toISOString(),
+      toDate: query.toDate.toISOString(),
+    },
+  });
+  return result.data as TBaseResponse<IViewStatisticResponse>;
+};
+
+export const useGetDailyViewStats = (query: {
+  fromDate: Date;
+  toDate: Date;
+}) => {
+  return useQuery({
+    queryKey: [QueryKeys.DailyViewStats, query],
+    queryFn: () => getDailyViewStats(query),
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+  });
+};
+
+const getViewSummaryStats = async (query: { fromDate: Date; toDate: Date }) => {
+  const result = await axiosInstance.get(`${statisticUrl}/views-summary`, {
+    params: {
+      fromDate: query.fromDate.toISOString(),
+      toDate: query.toDate.toISOString(),
+    },
+  });
+  return result.data as TBaseResponse<ISummaryStatsResponse>;
+};
+
+export const useGetViewSummaryStats = (query: {
+  fromDate: Date;
+  toDate: Date;
+}) => {
+  return useQuery({
+    queryKey: [QueryKeys.ViewSummaryStats, query],
+    queryFn: () => getViewSummaryStats(query),
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
   });
 };
