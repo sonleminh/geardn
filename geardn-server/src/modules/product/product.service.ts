@@ -74,19 +74,16 @@ export class ProductService {
       > = {
         createdAt: 'createdAt',
         price: 'priceMin',
-        name: 'name', // Ví dụ thêm sort theo tên
+        name: 'name',
       };
 
       const orderByField = sortFieldMap[sortBy] || 'createdAt';
 
-      orderBy = [
-        { [orderByField]: order }, // Sort theo user yêu cầu
-        { id: 'desc' }, // Tie-breaker
-      ];
+      orderBy = [{ [orderByField]: order }, { id: 'desc' }];
     }
 
     const where: Prisma.ProductWhereInput = {
-      AND: [{ isDeleted: false }],
+      AND: [{ isDeleted: false, isVisible: false }],
     };
 
     const [products, total] = await this.prisma.$transaction([
@@ -97,7 +94,6 @@ export class ProductService {
         orderBy,
         include: {
           category: { select: { id: true, name: true, slug: true } },
-          // có thể thêm select tối ưu nếu bảng to
         },
       }),
       this.prisma.product.count({ where }),
@@ -126,7 +122,7 @@ export class ProductService {
     const sortDir: 'asc' | 'desc' = dto.order ?? 'desc';
     const sortByPrice = !!dto.order;
 
-    const cur = this.decodeCursor(dto.cursor); // { v:1, k:'priceMin'|'createdAt', p?:number, c?:string, id:number }
+    const cur = this.decodeCursor(dto.cursor);
 
     const baseWhere: Prisma.ProductWhereInput = {
       AND: [
@@ -135,12 +131,9 @@ export class ProductService {
       ],
     };
 
-    // điều kiện “seek”
     const seekWhere: Prisma.ProductWhereInput = (() => {
       if (!cur) return {};
       if (sortByPrice && cur.k === 'priceMin' && typeof cur.p === 'number') {
-        // (priceMin > p) OR (priceMin = p AND id > lastId) với asc
-        // Ngược lại dùng < và id < cho desc
         const cmpPrice = sortDir === 'asc' ? 'gt' : 'lt';
         const cmpId = sortDir === 'asc' ? 'gt' : 'lt';
         return {
