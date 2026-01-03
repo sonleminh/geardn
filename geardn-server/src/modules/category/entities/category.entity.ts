@@ -14,6 +14,9 @@ export class CategoryEntity implements Category {
   @ApiProperty({ required: true })
   slug: string;
 
+  @ApiProperty()
+  priority: number;
+
   @ApiProperty({ default: false })
   isDeleted: boolean;
 

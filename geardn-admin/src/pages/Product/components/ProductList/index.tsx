@@ -21,49 +21,49 @@ import {
   TableRow,
   TextField,
   Typography,
-} from '@mui/material';
-import { useQueryClient } from '@tanstack/react-query';
-import { useCallback, useMemo, useState } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+} from "@mui/material";
+import { useQueryClient } from "@tanstack/react-query";
+import { useCallback, useMemo, useState } from "react";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 
-import Input from '@/components/Input';
-import ActionButton from '@/components/ActionButton';
-import ButtonWithTooltip from '@/components/ButtonWithTooltip';
-import ExcelUpload from '@/components/ExcelUpload';
-import SuspenseLoader from '@/components/SuspenseLoader';
-import TableFilter from '@/components/TableFilter';
-import { TableSkeleton } from '@/components/TableSkeleton';
-import { AddCircleOutlined } from '@mui/icons-material';
-import AutoDeleteOutlinedIcon from '@mui/icons-material/AutoDeleteOutlined';
-import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import ListAltIcon from '@mui/icons-material/ListAlt';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import SearchIcon from '@mui/icons-material/Search';
-import { FiPackage } from 'react-icons/fi';
+import Input from "@/components/Input";
+import ActionButton from "@/components/ActionButton";
+import ButtonWithTooltip from "@/components/ButtonWithTooltip";
+import ExcelUpload from "@/components/ExcelUpload";
+import SuspenseLoader from "@/components/SuspenseLoader";
+import TableFilter from "@/components/TableFilter";
+import { TableSkeleton } from "@/components/TableSkeleton";
+import { AddCircleOutlined } from "@mui/icons-material";
+import AutoDeleteOutlinedIcon from "@mui/icons-material/AutoDeleteOutlined";
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import ListAltIcon from "@mui/icons-material/ListAlt";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import SearchIcon from "@mui/icons-material/Search";
+import { FiPackage } from "react-icons/fi";
 
-import { useAlertContext } from '@/contexts/AlertContext';
-import useConfirmModal from '@/hooks/useModalConfirm';
+import { useAlertContext } from "@/contexts/AlertContext";
+import useConfirmModal from "@/hooks/useModalConfirm";
 
-import { ICategory } from '@/interfaces/ICategory';
-import { ColumnAlign, TableColumn } from '@/interfaces/ITableColumn';
+import { ICategory } from "@/interfaces/ICategory";
+import { ColumnAlign, TableColumn } from "@/interfaces/ITableColumn";
 
-import { QueryKeys } from '@/constants/query-key';
-import { ROUTES } from '@/constants/route';
-import { IEnum } from '@/interfaces/IEnum';
-import { useGetCategoryList } from '@/services/category';
-import { useGetEnumByContext } from '@/services/enum';
+import { QueryKeys } from "@/constants/query-key";
+import { ROUTES } from "@/constants/route";
+import { IEnum } from "@/interfaces/IEnum";
+import { useGetCategoryList } from "@/services/category";
+import { useGetEnumByContext } from "@/services/enum";
 import {
   useDeleteProduct,
   useGetProductList,
   useUpdateProductIsVisible,
   useUpdateProductPriority,
-} from '@/services/product';
-import { truncateTextByLine } from '@/utils/css-helper.util';
+} from "@/services/product";
+import { truncateTextByLine } from "@/utils/css-helper.util";
 
 interface Data {
   stt: number;
@@ -102,98 +102,98 @@ const INITIAL_COLUMN_FILTERS: ColumnFilters = {
 
 const headCells: readonly HeadCell[] = [
   {
-    align: 'center',
-    id: 'stt',
+    align: "center",
+    id: "stt",
     disablePadding: false,
-    label: 'STT',
+    label: "STT",
     isFilter: false,
-    width: '4%',
+    width: "4%",
   },
   {
-    id: 'name',
+    id: "name",
     disablePadding: false,
-    label: 'Tên sản phẩm',
+    label: "Tên sản phẩm",
     isFilter: false,
-    width: '27%',
+    width: "27%",
   },
   {
-    align: 'center',
-    id: 'image',
+    align: "center",
+    id: "image",
     disablePadding: false,
-    label: 'Ảnh',
-    width: '7%',
+    label: "Ảnh",
+    width: "7%",
   },
   {
-    id: 'variation',
+    id: "variation",
     disablePadding: false,
-    align: 'center',
-    label: 'Biến thế',
-    width: '7%',
+    align: "center",
+    label: "Biến thế",
+    width: "7%",
   },
   {
-    id: 'category',
+    id: "category",
     disablePadding: false,
-    align: 'center',
-    label: 'Danh mục',
+    align: "center",
+    label: "Danh mục",
     isFilter: true,
-    width: '12%',
+    width: "12%",
   },
   {
-    id: 'stock',
+    id: "stock",
     disablePadding: false,
-    align: 'center',
-    label: 'Tồn kho',
-    width: '7%',
+    align: "center",
+    label: "Tồn kho",
+    width: "7%",
   },
   {
-    align: 'center',
-    id: 'status',
+    align: "center",
+    id: "status",
     disablePadding: false,
-    label: 'Trạng thái',
-    width: '13%',
+    label: "Trạng thái",
+    width: "13%",
     isFilter: true,
   },
   {
-    align: 'center',
-    id: 'isVisible',
+    align: "center",
+    id: "isVisible",
     disablePadding: false,
-    label: 'Hiển thị',
-    width: '7%',
-  },
-   {
-    align: 'center',
-    id: 'priority',
-    disablePadding: false,
-    label: 'Ưu tiên',
-    width: '8%',
+    label: "Hiển thị",
+    width: "7%",
   },
   {
-    align: 'center',
-    id: 'action',
+    align: "center",
+    id: "priority",
     disablePadding: false,
-    label: 'Hành động',
-    width: '8%',
+    label: "Ưu tiên",
+    width: "8%",
+  },
+  {
+    align: "center",
+    id: "action",
+    disablePadding: false,
+    label: "Hành động",
+    width: "8%",
   },
 ];
 
 const columns: TableColumn[] = [
-  { width: '50px', align: 'center', type: 'text' },
-  { width: '280px', type: 'text' },
-  { width: '100px', align: 'center', type: 'image' },
-  { width: '130px', type: 'text' },
-  { width: '100px', align: 'center', type: 'text' },
-  { width: '100px', align: 'center', type: 'text' },
-  { width: '100px', align: 'center', type: 'text' },
-  { width: '100px', align: 'center', type: 'text' },
-  { width: '100px', align: 'center', type: 'text' },
-  { width: '100px', align: 'center', type: 'action' },
+  { width: "50px", align: "center", type: "text" },
+  { width: "280px", type: "text" },
+  { width: "100px", align: "center", type: "image" },
+  { width: "130px", type: "text" },
+  { width: "100px", align: "center", type: "text" },
+  { width: "100px", align: "center", type: "text" },
+  { width: "100px", align: "center", type: "text" },
+  { width: "100px", align: "center", type: "text" },
+  { width: "100px", align: "center", type: "text" },
+  { width: "100px", align: "center", type: "action" },
 ];
 
 const useFilterState = () => {
   const [filterAnchorEl, setFilterAnchorEl] = useState<null | HTMLElement>(
     null
   );
-  const [activeFilterColumn, setActiveFilterColumn] = useState<string>('');
+  const [activeFilterColumn, setActiveFilterColumn] = useState<string>("");
   const [columnFilters, setColumnFilters] = useState<ColumnFilters>(
     INITIAL_COLUMN_FILTERS
   );
@@ -208,7 +208,7 @@ const useFilterState = () => {
 
   const handleFilterClose = useCallback(() => {
     setFilterAnchorEl(null);
-    setActiveFilterColumn('');
+    setActiveFilterColumn("");
   }, []);
 
   const handleColumnFilterChange = useCallback(
@@ -274,12 +274,12 @@ const FilterChips = ({
 }: FilterChipsProps) => {
   const getFilterLabels = useCallback(
     (filterKey: string, values: string[]) => {
-      if (filterKey === 'category') {
+      if (filterKey === "category") {
         return values.map(
           (value: string) =>
             categoriesData?.data?.find((c) => c.id === +value)?.name || value
         );
-      } else if (filterKey === 'status') {
+      } else if (filterKey === "status") {
         return values.map(
           (value: string) =>
             productStatusEnumData?.data?.find((e) => e.value === value)
@@ -292,7 +292,7 @@ const FilterChips = ({
   );
 
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
       <FilterListIcon />
       {Object.entries(columnFilters).map(([filterKey, filterValues]) => {
         const values = filterValues as string[];
@@ -313,7 +313,7 @@ const FilterChips = ({
               });
               onFilterChange(filterKey, newValues);
             }}
-            size='small'
+            size="small"
             sx={{ maxWidth: 120 }}
           />
         ));
@@ -328,14 +328,14 @@ export default function ProductList() {
   const queryClient = useQueryClient();
   const { showAlert } = useAlertContext();
 
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [updateIsVisibleId, setUpdateIsVisibleId] = useState<number | null>(
     null
   );
-    const [updatePriorityId, setUpdatePriorityId] = useState<number | null>(
-    null
-  );
-  const [updatingPriorityValue, setUpdatingPriorityValue] = useState<number | string | null>(null);
+  const [updatePriorityId, setUpdatePriorityId] = useState<number | null>(null);
+  const [updatingPriorityValue, setUpdatingPriorityValue] = useState<
+    number | string | null
+  >(null);
 
   const {
     filterAnchorEl,
@@ -356,21 +356,19 @@ export default function ProductList() {
     search: searchQuery,
     categoryIds: columnFilters.category,
     statuses: columnFilters.status,
-    isDeleted: 'false',
+    isDeleted: "false",
   });
   const {
     mutate: updateProductIsVisibleMutate,
     isPending: isUpdatingIsVisible,
   } = useUpdateProductIsVisible();
 
-    const {
-    mutate: updateProductPriorityMutate,
-    isPending: isUpdatingPriority,
-  } = useUpdateProductPriority();
+  const { mutate: updateProductPriorityMutate, isPending: isUpdatingPriority } =
+    useUpdateProductPriority();
 
   const { mutate: deleteProductMutate, isPending: isDeleting } =
     useDeleteProduct();
-  const { data: productStatusEnumData } = useGetEnumByContext('product-status');
+  const { data: productStatusEnumData } = useGetEnumByContext("product-status");
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
@@ -380,7 +378,7 @@ export default function ProductList() {
     deleteProductMutate(id, {
       onSuccess() {
         queryClient.invalidateQueries({ queryKey: [QueryKeys.Product] });
-        showAlert('Xóa sản phẩm thành công', 'success');
+        showAlert("Xóa sản phẩm thành công", "success");
       },
     });
   };
@@ -392,31 +390,32 @@ export default function ProductList() {
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: [QueryKeys.Product] });
-          showAlert('Cập nhật trạng thái hiển thị thành công', 'success');
+          showAlert("Cập nhật trạng thái hiển thị thành công", "success");
         },
         onError: () => {
-          showAlert('Cập nhật trạng thái hiển thị thất bại', 'error');
+          showAlert("Cập nhật trạng thái hiển thị thất bại", "error");
         },
       }
     );
   };
 
-  const handleUpdatePriority = (id: number, priority: string | number | null) => {
-    console.log('priority', priority);
-    
-    if( updatingPriorityValue === null ||
-      priority === null || priority === '') return;
+  const handleUpdatePriority = (
+    id: number,
+    priority: string | number | null
+  ) => {
+    if (updatingPriorityValue === null || priority === null || priority === "")
+      return;
     updateProductPriorityMutate(
       { id, priority: +priority },
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: [QueryKeys.Product] });
-          showAlert('Cập nhật độ ưu tiên thành công', 'success');
+          showAlert("Cập nhật độ ưu tiên thành công", "success");
           setUpdatePriorityId(null);
           setUpdatingPriorityValue(null);
         },
         onError: () => {
-          showAlert('Cập nhật độ ưu tiên thất bại', 'error');
+          showAlert("Cập nhật độ ưu tiên thất bại", "error");
           setUpdatePriorityId(null);
           setUpdatingPriorityValue(null);
         },
@@ -426,10 +425,10 @@ export default function ProductList() {
 
   const renderFilterContent = useCallback(() => {
     switch (activeFilterColumn) {
-      case 'category':
+      case "category":
         return (
           <TableFilter
-            title='Lọc theo danh mục'
+            title="Lọc theo danh mục"
             options={
               categoriesData?.data?.map((category) => ({
                 id: category.id,
@@ -438,15 +437,15 @@ export default function ProductList() {
             }
             selectedValues={columnFilters.category}
             onFilterChange={(newValues) =>
-              handleColumnFilterChange('category', newValues)
+              handleColumnFilterChange("category", newValues)
             }
             onClose={handleFilterClose}
           />
         );
-      case 'status':
+      case "status":
         return (
           <TableFilter
-            title='Lọc theo trạng thái'
+            title="Lọc theo trạng thái"
             options={
               productStatusEnumData?.data?.map((status) => ({
                 id: status.value,
@@ -455,7 +454,7 @@ export default function ProductList() {
             }
             selectedValues={columnFilters.status}
             onFilterChange={(newValues) =>
-              handleColumnFilterChange('status', newValues)
+              handleColumnFilterChange("status", newValues)
             }
             onClose={handleFilterClose}
           />
@@ -485,17 +484,19 @@ export default function ProductList() {
   return (
     <>
       <Breadcrumbs
-        separator={<NavigateNextIcon fontSize='small' />}
-        aria-label='breadcrumb'
-        sx={{ mb: 3 }}>
+        separator={<NavigateNextIcon fontSize="small" />}
+        aria-label="breadcrumb"
+        sx={{ mb: 3 }}
+      >
         <Link
-          underline='hover'
-          color='inherit'
+          underline="hover"
+          color="inherit"
           onClick={() => navigate(ROUTES.DASHBOARD)}
-          sx={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+          sx={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+        >
           <HomeOutlinedIcon sx={{ fontSize: 24 }} />
         </Link>
-        <Typography color='text.primary'>Danh sách sản phẩm</Typography>
+        <Typography color="text.primary">Danh sách sản phẩm</Typography>
       </Breadcrumbs>
       <Card sx={{ mt: 3, borderRadius: 2 }}>
         <CardHeader
@@ -505,20 +506,22 @@ export default function ProductList() {
             </Typography>
           }
           action={
-            <Box sx={{ display: 'flex', gap: 2 }}>
+            <Box sx={{ display: "flex", gap: 2 }}>
               <ExcelUpload />
               <ButtonWithTooltip
-                variant='outlined'
-                onClick={() => navigate('deleted')}
-                title='Đã xoá'
-                sx={{ textTransform: 'none' }}>
+                variant="outlined"
+                onClick={() => navigate("deleted")}
+                title="Đã xoá"
+                sx={{ textTransform: "none" }}
+              >
                 <AutoDeleteOutlinedIcon />
               </ButtonWithTooltip>
               <ButtonWithTooltip
-                variant='contained'
-                onClick={() => navigate('create')}
-                title='Thêm sản phẩm'
-                sx={{ textTransform: 'none' }}>
+                variant="contained"
+                onClick={() => navigate("create")}
+                title="Thêm sản phẩm"
+                sx={{ textTransform: "none" }}
+              >
                 <AddCircleOutlined />
               </ButtonWithTooltip>
             </Box>
@@ -527,7 +530,8 @@ export default function ProductList() {
 
         <Divider />
         <CardContent
-          sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 0 }}>
+          sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 0 }}
+        >
           <TableContainer>
             <Table>
               <TableHead>
@@ -535,16 +539,18 @@ export default function ProductList() {
                   <TableCell colSpan={headCells.length} sx={{ px: 0 }}>
                     <Box
                       sx={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
+                        display: "flex",
+                        justifyContent: "space-between",
                         mb: 2,
-                      }}>
+                      }}
+                    >
                       <Box
                         sx={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                        }}>
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                        }}
+                      >
                         <FilterChips
                           columnFilters={columnFilters}
                           categoriesData={categoriesData || { data: [] }}
@@ -558,18 +564,18 @@ export default function ProductList() {
                     <Box>
                       <TextField
                         fullWidth
-                        size='small'
-                        placeholder='Tìm kiếm sản phẩm...'
+                        size="small"
+                        placeholder="Tìm kiếm sản phẩm..."
                         value={searchQuery}
                         onChange={handleSearchChange}
                         sx={{
-                          '& .MuiInputBase-root': {
+                          "& .MuiInputBase-root": {
                             minHeight: 40,
                           },
                         }}
                         InputProps={{
                           startAdornment: (
-                            <InputAdornment position='start'>
+                            <InputAdornment position="start">
                               <SearchIcon />
                             </InputAdornment>
                           ),
@@ -582,13 +588,14 @@ export default function ProductList() {
                   {headCells?.map((headCell) => (
                     <TableCell
                       key={headCell.id}
-                      align={headCell.align ?? 'left'}
-                      padding={headCell.disablePadding ? 'none' : 'normal'}
-                      sx={{ width: headCell.width }}>
+                      align={headCell.align ?? "left"}
+                      padding={headCell.disablePadding ? "none" : "normal"}
+                      sx={{ width: headCell.width }}
+                    >
                       {headCell.label}
                       {headCell.isFilter ? (
                         <>
-                          {' '}
+                          {" "}
                           {(() => {
                             const filterValue =
                               columnFilters[
@@ -600,8 +607,9 @@ export default function ProductList() {
                             ) {
                               return (
                                 <Typography
-                                  component='span'
-                                  sx={{ fontSize: 14 }}>
+                                  component="span"
+                                  sx={{ fontSize: 14 }}
+                                >
                                   ({filterValue.length})
                                 </Typography>
                               );
@@ -609,8 +617,9 @@ export default function ProductList() {
                             return null;
                           })()}
                           <IconButton
-                            size='small'
-                            onClick={(e) => handleFilterClick(e, headCell.id)}>
+                            size="small"
+                            onClick={(e) => handleFilterClick(e, headCell.id)}
+                          >
                             <FilterAltOutlinedIcon sx={{ fontSize: 18 }} />
                           </IconButton>
                         </>
@@ -625,20 +634,21 @@ export default function ProductList() {
                 ) : productsData?.data?.length ? (
                   productsData?.data?.map((product, index) => (
                     <TableRow key={product.id}>
-                      <TableCell align='center'>
+                      <TableCell align="center">
                         {page * rowsPerPage + index + 1}
                       </TableCell>
                       <TableCell>
                         <Typography
                           sx={{
                             fontSize: 14,
-                            color: '#000',
+                            color: "#000",
                             ...truncateTextByLine(2),
-                          }}>
+                          }}
+                        >
                           {product.name}
                         </Typography>
                       </TableCell>
-                      <TableCell align='center'>
+                      <TableCell align="center">
                         <Box
                           sx={{
                             height: 48,
@@ -646,9 +656,10 @@ export default function ProductList() {
                               width: 48,
                               height: 48,
                               mr: 1,
-                              objectFit: 'contain',
+                              objectFit: "contain",
                             },
-                          }}>
+                          }}
+                        >
                           <img src={product?.images?.[0]} alt={product?.name} />
                         </Box>
                       </TableCell>
@@ -658,77 +669,82 @@ export default function ProductList() {
                           to={`${ROUTES.PRODUCT}/${product.id}/sku`}
                           sx={{
                             py: 0.5,
-                            bgcolor: '#f8f8f8',
-                            color: '#3e3e3e',
-                            border: '1px solid #cccccc',
+                            bgcolor: "#f8f8f8",
+                            color: "#3e3e3e",
+                            border: "1px solid #cccccc",
                             borderRadius: 1,
                             fontSize: 13,
-                            textAlign: 'center',
-                            textDecoration: 'none',
+                            textAlign: "center",
+                            textDecoration: "none",
                             ...truncateTextByLine(1),
-                            '&:hover': {
-                              bgcolor: '#eeeeee',
+                            "&:hover": {
+                              bgcolor: "#eeeeee",
                             },
-                          }}>
+                          }}
+                        >
                           {product.skus.length} SKU
                         </Link>
                       </TableCell>
 
-                      <TableCell align='center'>
+                      <TableCell align="center">
                         <Typography
                           sx={{
                             fontSize: 14,
-                            color: '#000',
+                            color: "#000",
                             ...truncateTextByLine(2),
-                          }}>
+                          }}
+                        >
                           {product.category?.name}
                         </Typography>
                       </TableCell>
-                      <TableCell align='center'>
+                      <TableCell align="center">
                         <Box
                           sx={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
                             gap: 1.5,
-                          }}>
+                          }}
+                        >
                           <Box
                             sx={{
                               width: 24,
                               height: 24,
                               mb: 0.3,
                               fontSize: 24,
-                            }}>
+                            }}
+                          >
                             <FiPackage />
                           </Box>
                           <Typography>{product?.totalStock}</Typography>
                         </Box>
                       </TableCell>
-                      <TableCell align='center'>
+                      <TableCell align="center">
                         <Button
-                          variant='outlined'
+                          variant="outlined"
                           color={
-                            product?.status === 'ACTIVE'
-                              ? 'success'
-                              : product?.status === 'DRAFT'
-                              ? 'primary'
-                              : product?.status === 'DISCONTINUED'
-                              ? 'warning'
-                              : 'error'
+                            product?.status === "ACTIVE"
+                              ? "success"
+                              : product?.status === "DRAFT"
+                              ? "primary"
+                              : product?.status === "DISCONTINUED"
+                              ? "warning"
+                              : "error"
                           }
-                          size='small'
+                          size="small"
                           sx={{
                             width: 120,
                             fontSize: 13,
-                            textTransform: 'none',
-                          }}>
-                          {statusMap?.[product?.status] || 'Không xác định'}
+                            textTransform: "none",
+                          }}
+                        >
+                          {statusMap?.[product?.status] || "Không xác định"}
                         </Button>
                       </TableCell>
 
-                      <TableCell align='center'>
+                      <TableCell align="center">
                         <Switch
-                          color='primary'
+                          color="primary"
                           checked={product?.isVisible}
                           onChange={(_, checked) =>
                             handleUpdateIsVisible(product.id, checked)
@@ -739,91 +755,105 @@ export default function ProductList() {
                           }
                         />
                       </TableCell>
-                       <TableCell align='center'>
-                          <Input size='small' type='number'
-                           value={updatePriorityId === product.id ? updatingPriorityValue : product?.priority}
-                            onChange={(e) => 
-                              setUpdatingPriorityValue((e.target.value))
-                            } 
-                            onFocus={()=> {setUpdatePriorityId(product?.id); setUpdatingPriorityValue(product?.priority)}}
-                            onBlur={(e)=> {
-                              if(updatePriorityId !== product?.id) return;
-                              
+                      <TableCell align="center">
+                        <Input
+                          size="small"
+                          type="number"
+                          value={
+                            updatePriorityId === product.id
+                              ? updatingPriorityValue
+                              : product?.priority
+                          }
+                          onChange={(e) =>
+                            setUpdatingPriorityValue(e.target.value)
+                          }
+                          onFocus={() => {
+                            setUpdatePriorityId(product?.id);
+                            setUpdatingPriorityValue(product?.priority);
+                          }}
+                          onBlur={(e) => {
+                            if (updatePriorityId !== product?.id) return;
 
-                              const currentValue = e.target.value;
-                             if (
-                                currentValue !== '' && 
-                                currentValue !== null && 
-                                Number(currentValue) !== product.priority
-                              ) {
-                                handleUpdatePriority(product.id, Number(currentValue));
-                              }
-                            }}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') {
-                                (e.target as HTMLInputElement).blur();
-                              }
-                              else if (e.key === 'Escape') {
-                                const input = e.target as HTMLInputElement;
-                                input.value = String(product.priority);
-
-                                setUpdatePriorityId(null);
-                                setUpdatingPriorityValue(null);
-
-                                input.blur();
-                              }
-                            }}
-                            disabled={
-                              isUpdatingPriority &&
-                              product.id === updatePriorityId
+                            const currentValue = e.target.value;
+                            if (
+                              currentValue !== "" &&
+                              currentValue !== null &&
+                              Number(currentValue) !== product.priority
+                            ) {
+                              handleUpdatePriority(
+                                product.id,
+                                Number(currentValue)
+                              );
                             }
-                          />
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              (e.target as HTMLInputElement).blur();
+                            } else if (e.key === "Escape") {
+                              const input = e.target as HTMLInputElement;
+                              input.value = String(product.priority);
+
+                              setUpdatePriorityId(null);
+                              setUpdatingPriorityValue(null);
+
+                              input.blur();
+                            }
+                          }}
+                          disabled={
+                            isUpdatingPriority &&
+                            product.id === updatePriorityId
+                          }
+                        />
                       </TableCell>
-                      <TableCell align='center'>
+                      <TableCell align="center">
                         <ActionButton>
                           <Box mb={1}>
                             <ButtonWithTooltip
-                              color='primary'
-                              variant='outlined'
-                              title='Xem chi tiết'
-                              placement='left'
-                              onClick={() => navigate(`${product.id}`)}>
+                              color="primary"
+                              variant="outlined"
+                              title="Xem chi tiết"
+                              placement="left"
+                              onClick={() => navigate(`${product.id}`)}
+                            >
                               <InfoOutlinedIcon />
                             </ButtonWithTooltip>
                           </Box>
                           <Box mb={1}>
                             <ButtonWithTooltip
-                              color='primary'
-                              variant='outlined'
-                              title='Danh sách mã hàng'
-                              placement='left'
-                              onClick={() => navigate(`${product.id}/sku`)}>
+                              color="primary"
+                              variant="outlined"
+                              title="Danh sách mã hàng"
+                              placement="left"
+                              onClick={() => navigate(`${product.id}/sku`)}
+                            >
                               <ListAltIcon />
                             </ButtonWithTooltip>
                           </Box>
                           <Box mb={1}>
                             <ButtonWithTooltip
-                              color='primary'
-                              variant='outlined'
-                              title='Chỉnh sửa'
-                              placement='left'
-                              onClick={() => navigate(`update/${product.id}`)}>
+                              color="primary"
+                              variant="outlined"
+                              title="Chỉnh sửa"
+                              placement="left"
+                              onClick={() => navigate(`update/${product.id}`)}
+                            >
                               <EditOutlinedIcon />
                             </ButtonWithTooltip>
                           </Box>
                           <ButtonWithTooltip
-                            color='error'
-                            variant='outlined'
-                            title='Xoá'
-                            placement='left'
+                            color="error"
+                            variant="outlined"
+                            title="Xoá"
+                            placement="left"
                             onClick={() =>
                               showConfirmModal({
-                                title: 'Xoá sản phẩm',
+                                title: "Xoá sản phẩm",
                                 content:
-                                  'Bạn có chắc chắn muốn xoá sản phẩm này?',
+                                  "Bạn có chắc chắn muốn xoá sản phẩm này?",
                                 onOk: () => handleDelete(product?.id),
                               })
-                            }>
+                            }
+                          >
                             <DeleteOutlineOutlinedIcon />
                           </ButtonWithTooltip>
                         </ActionButton>
@@ -832,7 +862,7 @@ export default function ProductList() {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell align='center' colSpan={headCells.length + 1}>
+                    <TableCell align="center" colSpan={headCells.length + 1}>
                       Không có dữ liệu
                     </TableCell>
                   </TableRow>
@@ -841,14 +871,14 @@ export default function ProductList() {
             </Table>
           </TableContainer>
           <TablePagination
-            component='div'
+            component="div"
             count={productsData?.meta?.total || 0}
             page={page}
             onPageChange={handleChangePage}
             rowsPerPage={rowsPerPage}
             onRowsPerPageChange={handleChangeRowsPerPage}
             rowsPerPageOptions={[10, 20, 30, 50]}
-            labelRowsPerPage='Số hàng mỗi trang'
+            labelRowsPerPage="Số hàng mỗi trang"
             labelDisplayedRows={({ from, to, count }) =>
               `${from}-${to} của ${count !== -1 ? count : `hơn ${to}`}`
             }
@@ -860,13 +890,14 @@ export default function ProductList() {
           anchorEl={filterAnchorEl}
           onClose={handleFilterClose}
           anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'left',
+            vertical: "bottom",
+            horizontal: "left",
           }}
           transformOrigin={{
-            vertical: 'top',
-            horizontal: 'left',
-          }}>
+            vertical: "top",
+            horizontal: "left",
+          }}
+        >
           {renderFilterContent()}
         </Popover>
 

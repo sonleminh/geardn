@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-import Input from '@/components/Input';
-import LoadingSelect from '@/components/LoadingSelect';
-import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import Input from "@/components/Input";
+import LoadingSelect from "@/components/LoadingSelect";
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import {
   Box,
   Button,
@@ -24,18 +24,18 @@ import {
   TableRow,
   Theme,
   Typography,
-} from '@mui/material';
+} from "@mui/material";
 
-import { useAlertContext } from '@/contexts/AlertContext';
+import { useAlertContext } from "@/contexts/AlertContext";
 
-import { ICheckoutItem, IOrder, IOrderItem } from '@/interfaces/IOrder';
+import { ICheckoutItem, IOrder, IOrderItem } from "@/interfaces/IOrder";
 
-import { useGetProductByCateId, useGetProductById } from '@/services/product';
+import { useGetProductByCateId, useGetProductById } from "@/services/product";
 
-import { IProductSku } from '@/interfaces/IProductSku';
-import { useGetCategoryList } from '@/services/category';
-import { truncateTextByLine } from '@/utils/css-helper.util';
-import { formatPrice } from '@/utils/format-price';
+import { IProductSku } from "@/interfaces/IProductSku";
+import { useGetCategoryList } from "@/services/category";
+import { truncateTextByLine } from "@/utils/css-helper.util";
+import { formatPrice } from "@/utils/format-price";
 
 interface ProductSelectorProps {
   orderData?: IOrder;
@@ -52,10 +52,10 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
 }) => {
   const { showAlert } = useAlertContext();
 
-  const [categoryId, setCategoryId] = useState<string>('');
-  const [productId, setProductId] = useState<string>('');
-  const [quantity, setQuantity] = useState('');
-  const [selectedSkuId, setSelectedSkuId] = useState<string>('');
+  const [categoryId, setCategoryId] = useState<string>("");
+  const [productId, setProductId] = useState<string>("");
+  const [quantity, setQuantity] = useState("");
+  const [selectedSkuId, setSelectedSkuId] = useState<string>("");
   const [selectedSku, setSelectedSku] = useState<IProductSku>();
   const [isOrderItemEdit, setIsOrderItemEdit] = useState<boolean>(false);
   const [itemIndex, setItemIndex] = useState<number | null>(null);
@@ -83,7 +83,7 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
       !isOrderItemEdit &&
       orderItems?.find((item) => item?.skuId === +selectedSkuId)
     ) {
-      return showAlert('Sản phẩm đã có trong danh sách!', 'error');
+      return showAlert("Sản phẩm đã có trong danh sách!", "error");
     }
 
     const newItem = {
@@ -92,9 +92,9 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
       quantity: +quantity,
       sellingPrice: selectedSku?.sellingPrice ?? 0,
       imageUrl: selectedSku?.imageUrl
-        ? selectedSku?.imageUrl ?? ''
-        : productData?.data?.images[0] ?? '',
-      productName: productData?.data?.name ?? '',
+        ? selectedSku?.imageUrl ?? ""
+        : productData?.data?.images[0] ?? "",
+      productName: productData?.data?.name ?? "",
       // productSlug: productData?.data?.slug ?? '',
       // skuCode: selectedSku?.sku ?? '',
       skuAttributes:
@@ -113,22 +113,18 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
       setOrderItems((prev: ICheckoutItem[]) => [...prev, newItem]);
     }
 
-    setCategoryId('');
-    setProductId('');
-    setSelectedSkuId('');
+    setCategoryId("");
+    setProductId("");
+    setSelectedSkuId("");
     setSelectedSku(undefined);
-    setQuantity('');
+    setQuantity("");
   };
 
-  console.log('slted:', selectedSku);
   const handleEditOrderItem = (item: ICheckoutItem, index: number) => {
     setIsOrderItemEdit(true);
     setProductId(item?.productId.toString());
     setSelectedSkuId(item?.skuId.toString());
-    console.log(
-      '2',
-      productData?.data?.skus?.find((sku) => sku?.id === +selectedSkuId)
-    );
+
     setSelectedSku(
       productData?.data?.skus?.find((sku) => sku?.id === +selectedSkuId)
     );
@@ -144,9 +140,9 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
 
   const handleCancelUpsertOrderItem = () => {
     setIsOrderItemEdit(false);
-    setCategoryId('');
-    setProductId('');
-    setQuantity('');
+    setCategoryId("");
+    setProductId("");
+    setQuantity("");
   };
 
   const totalAmount = () => {
@@ -159,7 +155,7 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
   return (
     <Card>
       <CardHeader
-        title='Danh sách sản phẩm'
+        title="Danh sách sản phẩm"
         sx={{
           span: {
             fontSize: 18,
@@ -172,17 +168,18 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
           <Grid2 size={5}>
             <Typography>Thêm sản phẩm:</Typography>
             <FormControl
-              variant='filled'
-              margin='dense'
+              variant="filled"
+              margin="dense"
               fullWidth
               disabled={
-                orderData?.status !== 'PENDING' && isEdit && isLoadingProducts
+                orderData?.status !== "PENDING" && isEdit && isLoadingProducts
               }
-              sx={selectStyle}>
+              sx={selectStyle}
+            >
               <InputLabel>Danh mục</InputLabel>
               <LoadingSelect
                 disableUnderline
-                size='small'
+                size="small"
                 loading={isLoadingCategories}
                 options={
                   categoriesData?.data?.map((item) => ({
@@ -192,25 +189,26 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
                 }
                 onChange={(e) => {
                   setCategoryId(e?.target?.value as string);
-                  setProductId('');
-                  setSelectedSkuId('');
-                  setQuantity('');
+                  setProductId("");
+                  setSelectedSkuId("");
+                  setQuantity("");
                 }}
-                value={categoryId ?? ''}
+                value={categoryId ?? ""}
               />
             </FormControl>
             <FormControl
-              variant='filled'
-              margin='dense'
+              variant="filled"
+              margin="dense"
               fullWidth
               disabled={
-                (orderData?.status !== 'PENDING' && isEdit) || isLoadingProducts
+                (orderData?.status !== "PENDING" && isEdit) || isLoadingProducts
               }
-              sx={selectStyle}>
+              sx={selectStyle}
+            >
               <InputLabel>Sản phẩm</InputLabel>
               <LoadingSelect
                 disableUnderline
-                size='small'
+                size="small"
                 loading={isLoadingProducts}
                 options={
                   productsByCategoryData?.data?.map((item) => ({
@@ -220,23 +218,24 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
                 }
                 onChange={(e) => {
                   setProductId(e.target.value as string);
-                  setSelectedSkuId('');
+                  setSelectedSkuId("");
                   setSelectedSku(undefined);
-                  setQuantity('');
+                  setQuantity("");
                 }}
-                value={productId ?? ''}
+                value={productId ?? ""}
               />
             </FormControl>
             <FormControl
-              variant='filled'
-              margin='dense'
+              variant="filled"
+              margin="dense"
               fullWidth
-              disabled={orderData?.status !== 'PENDING' && isEdit}
-              sx={selectStyle}>
+              disabled={orderData?.status !== "PENDING" && isEdit}
+              sx={selectStyle}
+            >
               <InputLabel>Phân loại sản phẩm</InputLabel>
               <LoadingSelect
                 disableUnderline
-                size='small'
+                size="small"
                 loading={isLoadingProduct}
                 options={
                   productData?.data?.skus?.map((item) => ({
@@ -245,31 +244,34 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
                       <Box
                         key={item.id}
                         sx={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          width: '100%',
-                        }}>
+                          display: "flex",
+                          justifyContent: "space-between",
+                          width: "100%",
+                        }}
+                      >
                         <Box>
                           {item.productSkuAttributes.map((attribute, index) => (
                             <Typography
                               key={index}
-                              component='span'
-                              sx={{ fontSize: 14 }}>
-                              {attribute?.attributeValue?.attribute?.label}:{' '}
-                              {attribute?.attributeValue?.value}{' '}
+                              component="span"
+                              sx={{ fontSize: 14 }}
+                            >
+                              {attribute?.attributeValue?.attribute?.label}:{" "}
+                              {attribute?.attributeValue?.value}{" "}
                               {index < item.productSkuAttributes.length - 1 &&
-                                '- '}
+                                "- "}
                             </Typography>
                           ))}
                         </Box>
                         <Typography
-                          component='span'
-                          sx={{ fontSize: 14, fontWeight: 'bold' }}>
+                          component="span"
+                          sx={{ fontSize: 14, fontWeight: "bold" }}
+                        >
                           {item.sku}
                         </Typography>
                       </Box>
                     ) : (
-                      <Typography component='span' sx={{ fontSize: 14 }}>
+                      <Typography component="span" sx={{ fontSize: 14 }}>
                         Không có phân loại - {item.sku}
                       </Typography>
                     ),
@@ -277,37 +279,37 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
                 }
                 onChange={(e) => {
                   setSelectedSkuId(e.target.value as string);
-                  setQuantity('');
+                  setQuantity("");
                 }}
-                value={selectedSkuId ?? ''}
+                value={selectedSkuId ?? ""}
               />
             </FormControl>
 
             {categoryId && productId && (
               <Box my={2}>
                 <Grid2 container spacing={4}>
-                  <Grid2 sx={{ display: 'flex' }} size={6}>
+                  <Grid2 sx={{ display: "flex" }} size={6}>
                     <Typography mr={2}>Ảnh:</Typography>
                     {selectedSku && (
                       <img
                         src={
                           selectedSku?.imageUrl ?? productData?.data?.images[0]
                         }
-                        alt=''
+                        alt=""
                         style={{
-                          width: '100%',
-                          maxWidth: '60px',
-                          height: '60px',
-                          borderRadius: '4px',
-                          border: '1px solid #ccc',
-                          objectFit: 'contain',
+                          width: "100%",
+                          maxWidth: "60px",
+                          height: "60px",
+                          borderRadius: "4px",
+                          border: "1px solid #ccc",
+                          objectFit: "contain",
                         }}
                       />
                     )}
                   </Grid2>
                   <Grid2 size={6}>
                     <Typography>
-                      Kho:{' '}
+                      Kho:{" "}
                       {selectedSku?.stocks?.reduce(
                         (acc, stock) => acc + stock?.quantity,
                         0
@@ -319,15 +321,15 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
             )}
             <FormControl fullWidth>
               <Input
-                label='Số lượng'
-                name='quantity'
-                variant='filled'
-                margin='dense'
-                size='small'
-                type='number'
+                label="Số lượng"
+                name="quantity"
+                variant="filled"
+                margin="dense"
+                size="small"
+                type="number"
                 disabled={
                   !selectedSku?.stocks?.length ||
-                  (orderData?.status !== 'PENDING' && isEdit)
+                  (orderData?.status !== "PENDING" && isEdit)
                 }
                 onChange={(e) => {
                   const value = e.target.value;
@@ -345,25 +347,27 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
                         .toString()
                     );
                   } else {
-                    setQuantity(value ? parseInt(value, 10)?.toString() : '');
+                    setQuantity(value ? parseInt(value, 10)?.toString() : "");
                   }
                 }}
                 value={quantity}
               />
             </FormControl>
 
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+            <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
               <Button
-                variant='contained'
+                variant="contained"
                 onClick={hanldeUpsertOrderItem}
-                disabled={!selectedSku || !quantity}>
-                {isOrderItemEdit ? 'Lưu' : 'Thêm'}
+                disabled={!selectedSku || !quantity}
+              >
+                {isOrderItemEdit ? "Lưu" : "Thêm"}
               </Button>
               <Button
                 sx={{ ml: 2 }}
-                variant='outlined'
+                variant="outlined"
                 disabled={!categoryId || !productId}
-                onClick={handleCancelUpsertOrderItem}>
+                onClick={handleCancelUpsertOrderItem}
+              >
                 Hủy
               </Button>
             </Box>
@@ -371,28 +375,28 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
           <Grid2 size={7}>
             <Typography mb={1}>Sản phẩm:</Typography>
             <TableContainer component={Paper}>
-              <Table sx={{}} aria-label='simple table'>
+              <Table sx={{}} aria-label="simple table">
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ width: '3%', px: 1 }} align='center'>
+                    <TableCell sx={{ width: "3%", px: 1 }} align="center">
                       STT
                     </TableCell>
-                    <TableCell sx={{ width: '21%', px: 1 }} align='center'>
+                    <TableCell sx={{ width: "21%", px: 1 }} align="center">
                       Tên
                     </TableCell>
-                    <TableCell sx={{ width: '5%', px: 0 }} align='center'>
+                    <TableCell sx={{ width: "5%", px: 0 }} align="center">
                       Ảnh
                     </TableCell>
-                    <TableCell sx={{ width: '30%', px: 1 }} align='center'>
+                    <TableCell sx={{ width: "30%", px: 1 }} align="center">
                       Phân loại
                     </TableCell>
-                    <TableCell sx={{ width: '5%', px: 1 }} align='center'>
+                    <TableCell sx={{ width: "5%", px: 1 }} align="center">
                       SL
                     </TableCell>
-                    <TableCell sx={{ width: '16%', px: 1 }} align='center'>
+                    <TableCell sx={{ width: "16%", px: 1 }} align="center">
                       Giá
                     </TableCell>
-                    <TableCell sx={{ width: '20%' }} align='center'>
+                    <TableCell sx={{ width: "20%" }} align="center">
                       Tuỳ chọn
                     </TableCell>
                   </TableRow>
@@ -403,32 +407,35 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
                       <TableRow
                         key={`${item?.skuId}-${index}`}
                         sx={{
-                          '&:last-child td, &:last-child th': { border: 0 },
-                        }}>
+                          "&:last-child td, &:last-child th": { border: 0 },
+                        }}
+                      >
                         <TableCell
                           sx={{ px: 1 }}
-                          component='th'
-                          scope='row'
-                          align='center'>
+                          component="th"
+                          scope="row"
+                          align="center"
+                        >
                           {index + 1}
                         </TableCell>
-                        <TableCell sx={{ px: 1 }} component='th' scope='row'>
+                        <TableCell sx={{ px: 1 }} component="th" scope="row">
                           <Typography
-                            sx={{ fontSize: 13, ...truncateTextByLine(1) }}>
+                            sx={{ fontSize: 13, ...truncateTextByLine(1) }}
+                          >
                             {item.productName}
                           </Typography>
                         </TableCell>
-                        <TableCell sx={{ px: 0 }} align='center'>
+                        <TableCell sx={{ px: 0 }} align="center">
                           <img
                             src={item?.imageUrl}
-                            alt=''
+                            alt=""
                             style={{
-                              width: '30px',
-                              maxWidth: '30px',
-                              height: '30px',
-                              objectFit: 'contain',
-                              border: '1px solid #ccc',
-                              borderRadius: '2px',
+                              width: "30px",
+                              maxWidth: "30px",
+                              height: "30px",
+                              objectFit: "contain",
+                              border: "1px solid #ccc",
+                              borderRadius: "2px",
                             }}
                           />
                         </TableCell>
@@ -437,7 +444,8 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
                             item.skuAttributes.map((attribute) => (
                               <Typography
                                 key={attribute.attribute}
-                                sx={{ fontSize: 13 }}>
+                                sx={{ fontSize: 13 }}
+                              >
                                 {attribute.attribute}: {attribute.value}
                               </Typography>
                             ))
@@ -447,13 +455,13 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
                             </Typography>
                           )}
                         </TableCell>
-                        <TableCell sx={{ px: 1 }} align='center'>
+                        <TableCell sx={{ px: 1 }} align="center">
                           {item.quantity}
                         </TableCell>
-                        <TableCell sx={{ fontSize: 12 }} align='right'>
+                        <TableCell sx={{ fontSize: 12 }} align="right">
                           {formatPrice(item?.sellingPrice)}
                         </TableCell>
-                        <TableCell align='center'>
+                        <TableCell align="center">
                           <Button
                             sx={{
                               minWidth: 20,
@@ -461,18 +469,20 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
                               height: 30,
                               mr: 1,
                             }}
-                            variant='outlined'
-                            disabled={orderData?.status !== 'PENDING' && isEdit}
+                            variant="outlined"
+                            disabled={orderData?.status !== "PENDING" && isEdit}
                             onClick={() => {
                               handleEditOrderItem(item, index);
-                            }}>
+                            }}
+                          >
                             <EditOutlinedIcon sx={{ fontSize: 14 }} />
                           </Button>
                           <Button
                             sx={{ minWidth: 20, width: 20, height: 30 }}
-                            variant='outlined'
-                            disabled={orderData?.status !== 'PENDING' && isEdit}
-                            onClick={() => handleDeleteOrderItem(index)}>
+                            variant="outlined"
+                            disabled={orderData?.status !== "PENDING" && isEdit}
+                            onClick={() => handleDeleteOrderItem(index)}
+                          >
                             <DeleteOutlineOutlinedIcon sx={{ fontSize: 14 }} />
                           </Button>
                         </TableCell>
@@ -481,16 +491,18 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
                   ) : (
                     <TableRow
                       sx={{
-                        height: '80px',
-                        '& td': { border: 0 },
-                      }}>
+                        height: "80px",
+                        "& td": { border: 0 },
+                      }}
+                    >
                       <TableCell
                         colSpan={6}
-                        align='center'
+                        align="center"
                         sx={{
-                          textAlign: 'center',
-                          color: '#999',
-                        }}>
+                          textAlign: "center",
+                          color: "#999",
+                        }}
+                      >
                         Empty
                       </TableCell>
                     </TableRow>
@@ -500,13 +512,14 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
               <Divider />
               <Box
                 sx={{
-                  display: 'flex',
-                  justifyContent: 'end',
-                  alignItems: 'center',
-                  width: '100%',
+                  display: "flex",
+                  justifyContent: "end",
+                  alignItems: "center",
+                  width: "100%",
                   px: 4,
                   py: 1,
-                }}>
+                }}
+              >
                 <Typography sx={{ mr: 4, fontSize: 14 }}>Tổng tiền:</Typography>
                 <Typography>{formatPrice(totalAmount())}</Typography>
               </Box>
@@ -521,24 +534,24 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
 export default ProductSelector;
 
 const selectStyle: SxProps<Theme> = {
-  '& .MuiFilledInput-root': {
-    overflow: 'hidden',
+  "& .MuiFilledInput-root": {
+    overflow: "hidden",
     borderRadius: 1,
-    backgroundColor: '#fff !important',
-    border: '1px solid',
-    borderColor: 'rgba(0,0,0,0.23)',
-    '&:hover': {
-      backgroundColor: 'transparent',
+    backgroundColor: "#fff !important",
+    border: "1px solid",
+    borderColor: "rgba(0,0,0,0.23)",
+    "&:hover": {
+      backgroundColor: "transparent",
     },
-    '&.Mui-focused': {
-      backgroundColor: 'transparent',
-      border: '2px solid',
+    "&.Mui-focused": {
+      backgroundColor: "transparent",
+      border: "2px solid",
     },
   },
-  '& .MuiInputLabel-asterisk': {
-    color: 'red',
+  "& .MuiInputLabel-asterisk": {
+    color: "red",
   },
-  '& .Mui-disabled': {
-    cursor: 'not-allowed',
+  "& .Mui-disabled": {
+    cursor: "not-allowed",
   },
 };

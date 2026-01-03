@@ -62,6 +62,16 @@ export class CategoryController {
     return this.categoryService.update(+id, updateCategoryDto);
   }
 
+  @UseGuards(JwtAdminAuthGuard)
+  @Patch(':id/priority')
+  @ApiCreatedResponse({ type: CategoryEntity })
+  updatePriority(
+    @Param('id') id: string,
+    @Body() { priority }: { priority: number },
+  ) {
+    return this.categoryService.updatePriority(+id, priority);
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.categoryService.softDelete(+id);

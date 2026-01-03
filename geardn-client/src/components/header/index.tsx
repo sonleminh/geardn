@@ -26,8 +26,6 @@ import {
   Menu,
   MenuItem,
   Typography,
-  useMediaQuery,
-  useTheme,
 } from "@mui/material";
 
 import SkeletonImage from "../common/SkeletonImage";
@@ -45,7 +43,6 @@ import SearchIconExpand from "../common/SearchIconExpand";
 import { HeaderStyle } from "./style";
 
 const Header = ({ initialUser }: { initialUser?: IUser | null }) => {
-  const theme = useTheme();
   const router = useRouter();
   const pathname = usePathname();
   const queryClient = useQueryClient();
@@ -57,7 +54,6 @@ const Header = ({ initialUser }: { initialUser?: IUser | null }) => {
   const { mutateAsync: onLogout } = useLogout();
   const userData = data?.data ?? initialUser;
 
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [openMenuDrawer, setOpenMenuDrawer] = useState(false);
@@ -116,8 +112,6 @@ const Header = ({ initialUser }: { initialUser?: IUser | null }) => {
       setAnchorEl(event.currentTarget);
     }
   };
-
-  console.log("isMb", isMobile);
 
   return (
     <Box sx={HeaderStyle(isExpanded, pathname)}>

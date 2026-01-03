@@ -16,7 +16,10 @@ export class CategoryService {
 
   async findAll() {
     const [res, total] = await Promise.all([
-      this.prisma.category.findMany({ where: { isDeleted: false }, orderBy: { createdAt: 'asc' } }),
+      this.prisma.category.findMany({
+        where: { isDeleted: false },
+        orderBy: { priority: 'desc' },
+      }),
       this.prisma.category.count(),
     ]);
     return {
@@ -77,6 +80,17 @@ export class CategoryService {
     return {
       deleteCount: 1,
     };
+  }
+
+  async updatePriority(id: number, priority: number) {
+    await this.prisma.$transaction(async (tx) => {
+      await tx.category.update({
+        where: { id: id },
+        data: { priority },
+      });
+    });
+
+    return { message: 'Category priority updated successfully' };
   }
 
   async restore(id: number) {

@@ -102,6 +102,7 @@ model Category {
   isDeleted Boolean   @default(false)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  priority  Int       @default(0)
   products  Product[]
 }
 

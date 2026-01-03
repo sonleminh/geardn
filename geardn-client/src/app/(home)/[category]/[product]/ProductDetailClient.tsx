@@ -305,9 +305,6 @@ const ProductDetailClient = ({
     );
   }, [selectedSku]);
 
-  console.log("selectedSku", selectedSku);
-  console.log("selectedSkuStock", selectedSkuStock);
-
   return (
     <Box pt={2} pb={4}>
       <Box sx={{ mb: 2 }}>

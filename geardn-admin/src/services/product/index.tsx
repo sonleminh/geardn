@@ -1,18 +1,18 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
-import { axiosInstance } from '../axiosInstance';
-import { QueryKeys } from '@/constants/query-key';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { AxiosError } from "axios";
+import { axiosInstance } from "../axiosInstance";
+import { QueryKeys } from "@/constants/query-key";
 
-import { useAlertContext } from '@/contexts/AlertContext';
+import { useAlertContext } from "@/contexts/AlertContext";
 import {
   ICreateProduct,
   IProduct,
   IUpdateProductIsVisiblePayload,
   IUpdateProductPayload,
   IUpdateProductPriorityPayload,
-} from '@/interfaces/IProduct';
-import { ErrorResponse } from '@/interfaces/IError';
-import { TBaseResponse, TPaginatedResponse } from '@/types/response.type';
+} from "@/interfaces/IProduct";
+import { ErrorResponse } from "@/interfaces/IError";
+import { TBaseResponse, TPaginatedResponse } from "@/types/response.type";
 
 interface IGetProductListQuery {
   page?: number;
@@ -23,7 +23,7 @@ interface IGetProductListQuery {
   isDeleted?: string;
 }
 
-const productUrl = '/products';
+const productUrl = "/products";
 
 const createProduct = async (payload: ICreateProduct) => {
   const result = await axiosInstance.post(`${productUrl}`, payload);
@@ -42,8 +42,8 @@ const getProductList = async (query?: IGetProductListQuery) => {
       page: query?.page ?? 0,
       limit: query?.limit ?? 10,
       search: query?.search,
-      categoryIds: query?.categoryIds?.join(','),
-      statuses: query?.statuses?.join(','),
+      categoryIds: query?.categoryIds?.join(","),
+      statuses: query?.statuses?.join(","),
       isDeleted: query?.isDeleted,
     },
   });
@@ -66,7 +66,7 @@ const getProductByCateId = async (id: number | undefined) => {
 
 export const useGetProductByCateId = (id: number | undefined) => {
   return useQuery({
-    queryKey: [QueryKeys.Product, 'category', id],
+    queryKey: [QueryKeys.Product, "category", id],
     queryFn: () => getProductByCateId(id),
     refetchOnWindowFocus: false,
     refetchInterval: false,
@@ -106,11 +106,11 @@ export const useGetProductBySlug = (slug: string) => {
 
 const uploadProductsFile = async (file: File) => {
   const formData = new FormData();
-  formData.append('file', file);
+  formData.append("file", file);
 
   const result = await axiosInstance.post(`${productUrl}/upload`, formData, {
     headers: {
-      'Content-Type': 'multipart/form-data',
+      "Content-Type": "multipart/form-data",
     },
   });
   return result.data as IProduct;
@@ -236,7 +236,7 @@ export const useUpdateProductPriority = () => {
 
       const prevData = allProductQueries.map(([queryKey, data]) => [
         queryKey,
-        data ? JSON.parse(JSON.stringify(data)) : data, // Deep clone
+        data ? JSON.parse(JSON.stringify(data)) : data,
       ]);
 
       allProductQueries.forEach(([queryKey, data]) => {
@@ -260,7 +260,6 @@ export const useUpdateProductPriority = () => {
     },
     onError: (_err, _payload, ctx) => {
       if (!ctx?.prevData) return;
-      // Rollback all affected queries to their previous values
       (ctx.prevData as Array<[unknown, unknown]>).forEach(
         ([queryKey, data]) => {
           queryClient.setQueryData(queryKey as any, data);
@@ -268,7 +267,6 @@ export const useUpdateProductPriority = () => {
       );
     },
     onSettled: () => {
-      // Ensure server state sync after success or error
       queryClient.invalidateQueries({ queryKey: [QueryKeys.Product] });
     },
   });
@@ -313,11 +311,11 @@ const uploadImage = async (
 ) => {
   const formData = new FormData();
   for (let i = 0; i < files.length; i++) {
-    formData.append('files', files[i]);
+    formData.append("files", files[i]);
   }
   const result = await axiosInstance.post(`upload`, formData, {
     headers: {
-      'Content-Type': 'multipart/form-data',
+      "Content-Type": "multipart/form-data",
     },
     onUploadProgress: (event) => {
       if (event.total) {
@@ -342,7 +340,7 @@ export const useUploadImage = () => {
       onProgress: (progress: number) => void;
     }) => uploadImage(files, onProgress),
     onError(error: AxiosError<ErrorResponse>) {
-      showAlert(error?.response?.data?.message || 'Upload failed', 'error');
+      showAlert(error?.response?.data?.message || "Upload failed", "error");
     },
   });
 };

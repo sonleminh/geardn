@@ -1,14 +1,15 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { axiosInstance } from '../axiosInstance';
-import { QueryKeys } from '@/constants/query-key';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { axiosInstance } from "../axiosInstance";
+import { QueryKeys } from "@/constants/query-key";
 import {
   ICategory,
   ICreateCategory,
   IUpdateCategoryPayload,
-} from '@/interfaces/ICategory';
-import { TBaseResponse, TPaginatedResponse } from '@/types/response.type';
+  IUpdateCategoryPriorityPayload,
+} from "@/interfaces/ICategory";
+import { TBaseResponse, TPaginatedResponse } from "@/types/response.type";
 
-const categoryUrl = '/categories';
+const categoryUrl = "/categories";
 
 const getCategoryList = async () => {
   const result = await axiosInstance.get(`${categoryUrl}`);
@@ -50,8 +51,6 @@ export const useCreateCategory = () => {
   });
 };
 
-// Update
-
 const updateCategory = async (payload: IUpdateCategoryPayload) => {
   const { id, ...rest } = payload;
   const result = await axiosInstance.patch(`${categoryUrl}/${id}`, rest);
@@ -61,6 +60,63 @@ const updateCategory = async (payload: IUpdateCategoryPayload) => {
 export const useUpdateCategory = () => {
   return useMutation({
     mutationFn: updateCategory,
+  });
+};
+
+const updateCategoryPriority = async (
+  payload: IUpdateCategoryPriorityPayload
+) => {
+  const { id, ...rest } = payload;
+  const result = await axiosInstance.patch(`${categoryUrl}/${id}`, rest);
+  return result.data as ICategory;
+};
+
+export const useUpdateCategoryPriority = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updateCategoryPriority,
+    onMutate: async (payload: IUpdateCategoryPriorityPayload) => {
+      queryClient.cancelQueries({ queryKey: [QueryKeys.Category] });
+
+      const allProductQueries = queryClient.getQueriesData({
+        queryKey: [QueryKeys.Category],
+      });
+
+      const prevData = allProductQueries.map(([queryKey, data]) => [
+        queryKey,
+        data ? JSON.parse(JSON.stringify(data)) : data,
+      ]);
+
+      allProductQueries.forEach(([queryKey, data]) => {
+        if (data) {
+          queryClient.setQueryData(
+            queryKey,
+            (old: TPaginatedResponse<ICategory> | undefined) => {
+              if (!old) return old;
+              const items = old.data.map((it: ICategory) => {
+                if (it.id === payload.id) {
+                  return { ...it, priority: payload.priority };
+                }
+                return it;
+              });
+              return { ...old, data: items };
+            }
+          );
+        }
+      });
+      return { prevData };
+    },
+    onError: (_err, _payload, ctx) => {
+      if (!ctx?.prevData) return;
+      (ctx.prevData as Array<[unknown, unknown]>).forEach(
+        ([queryKey, data]) => {
+          queryClient.setQueryData(queryKey as any, data);
+        }
+      );
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: [QueryKeys.Product] });
+    },
   });
 };
 
