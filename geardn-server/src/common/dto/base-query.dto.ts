@@ -20,7 +20,7 @@ export class BaseQueryDto {
   @Min(1)
   @Transform(({ value }) => {
     const n = Number(value);
-    if (Number.isNaN(n)) return 1;
+    return Number.isNaN(n) ? 1 : n;
   })
   page: number = 1;
 
