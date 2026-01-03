@@ -1,22 +1,43 @@
-// prisma/seed.ts
-
 import { PrismaClient, ProductStatus } from '@prisma/client';
 
-// initialize Prisma Client
 const prisma = new PrismaClient();
 
 const categorySeedList = [
-  { name: 'Bàn phím', icon: 'https://storage.googleapis.com/geardn-a6c28.appspot.com/1755230275956-keyboard-icon.png', slug: 'ban-phim' },
-  { name: 'Chuột', icon: 'https://storage.googleapis.com/geardn-a6c28.appspot.com/1755230300189-mouse-icon.png', slug: 'chuot' },
+  {
+    name: 'Bàn phím',
+    icon: 'https://storage.googleapis.com/geardn-a6c28.appspot.com/1755230275956-keyboard-icon.png',
+    slug: 'ban-phim',
+  },
+  {
+    name: 'Chuột',
+    icon: 'https://storage.googleapis.com/geardn-a6c28.appspot.com/1755230300189-mouse-icon.png',
+    slug: 'chuot',
+  },
   {
     name: 'Giá treo màn hình',
     icon: 'https://storage.googleapis.com/geardn-a6c28.appspot.com/1758180530732-desk-mount.png',
     slug: 'gia-treo-man-hinh',
   },
-  { name: 'Màn hình', icon: 'https://storage.googleapis.com/geardn-a6c28.appspot.com/1755230318576-monitor-icon.png', slug: 'man-hinh' },
-  { name: 'Phụ kiện', icon: 'https://storage.googleapis.com/geardn-a6c28.appspot.com/1755230291682-assessories-icon.png', slug: 'phu-kien' },
-  { name: 'Bàn, ghế', icon: 'https://storage.googleapis.com/geardn-a6c28.appspot.com/1758179359300-workspace-icon.png', slug: 'ban-ghe' },
-  { name: 'Hàng cũ', icon: 'https://storage.googleapis.com/geardn-a6c28.appspot.com/1758179359300-workspace-icon.png', slug: 'hang-cu' },
+  {
+    name: 'Màn hình',
+    icon: 'https://storage.googleapis.com/geardn-a6c28.appspot.com/1755230318576-monitor-icon.png',
+    slug: 'man-hinh',
+  },
+  {
+    name: 'Phụ kiện',
+    icon: 'https://storage.googleapis.com/geardn-a6c28.appspot.com/1755230291682-assessories-icon.png',
+    slug: 'phu-kien',
+  },
+  {
+    name: 'Bàn, ghế',
+    icon: 'https://storage.googleapis.com/geardn-a6c28.appspot.com/1758179359300-workspace-icon.png',
+    slug: 'ban-ghe',
+  },
+  {
+    name: 'Hàng cũ',
+    icon: 'https://storage.googleapis.com/geardn-a6c28.appspot.com/1758179359300-workspace-icon.png',
+    slug: 'hang-cu',
+  },
 ];
 
 const warehouseSeedList = [
@@ -89,7 +110,8 @@ const productSeedList = [
   {
     name: 'Đèn màn hình LED Xiaomi Lymax L1 / L1 Plus bảo vệ mắt 3 chế độ sáng',
     slug: 'en-man-hinh-led-xiaomi-lymax-l1-l1-plus-bao-ve-mat-3-che-o-sang',
-    description: '<p>Đèn màn hình LED Xiaomi Lymax L1 / L1 Plus bảo vệ mắt 3 chế độ sáng</p>',
+    description:
+      '<p>Đèn màn hình LED Xiaomi Lymax L1 / L1 Plus bảo vệ mắt 3 chế độ sáng</p>',
     brand: 'Xiaomi',
     images: [
       'https://storage.googleapis.com/geardn-a6c28.appspot.com/1753711124667-xiaomi-lymax-l1.png',
@@ -106,7 +128,7 @@ const productSeedList = [
     categoryId: 5,
     createdAt: '2025-07-25T02:25:51.827Z',
     updatedAt: '2025-07-25T02:25:51.827Z',
-  }, 
+  },
   {
     name: 'Giá treo laptop NB-FP2',
     slug: 'gia-treo-laptop-nb-fp2',
@@ -151,7 +173,7 @@ const productSeedList = [
     categoryId: 2,
     createdAt: '2025-07-25T02:29:33.187Z',
     updatedAt: '2025-07-25T02:29:33.187Z',
-  }, 
+  },
   {
     name: 'NB-F160',
     slug: 'nb-f160',
@@ -183,13 +205,15 @@ const productSkuSeedList = [
     productId: 1,
     sku: 'GDN0001',
     sellingPrice: '315000',
-    imageUrl: 'https://storage.googleapis.com/geardn-a6c28.appspot.com/1753434405588-nb-f80-black.webp',
+    imageUrl:
+      'https://storage.googleapis.com/geardn-a6c28.appspot.com/1753434405588-nb-f80-black.webp',
   },
   {
     productId: 1,
     sku: 'GDN0002',
     sellingPrice: '319000',
-    imageUrl: 'https://storage.googleapis.com/geardn-a6c28.appspot.com/1753434418417-nb-f80-white.jpg',
+    imageUrl:
+      'https://storage.googleapis.com/geardn-a6c28.appspot.com/1753434418417-nb-f80-white.jpg',
   },
   {
     productId: 2,
@@ -201,13 +225,15 @@ const productSkuSeedList = [
     productId: 3,
     sku: 'GDN0004',
     sellingPrice: '790000',
-    imageUrl: 'https://storage.googleapis.com/geardn-a6c28.appspot.com/1753434359837-aula-f75-white-blue.webp',
+    imageUrl:
+      'https://storage.googleapis.com/geardn-a6c28.appspot.com/1753434359837-aula-f75-white-blue.webp',
   },
   {
     productId: 3,
     sku: 'GDN0005',
     sellingPrice: '890000',
-    imageUrl: 'https://storage.googleapis.com/geardn-a6c28.appspot.com/1753434378358-aula-f75-polar.jpg',
+    imageUrl:
+      'https://storage.googleapis.com/geardn-a6c28.appspot.com/1753434378358-aula-f75-polar.jpg',
   },
   {
     productId: 4,
@@ -219,13 +245,15 @@ const productSkuSeedList = [
     productId: 5,
     sku: 'GDN0007',
     sellingPrice: '290000',
-    imageUrl: 'https://storage.googleapis.com/geardn-a6c28.appspot.com/1753434194774-lymax-l1.webp',
+    imageUrl:
+      'https://storage.googleapis.com/geardn-a6c28.appspot.com/1753434194774-lymax-l1.webp',
   },
   {
     productId: 5,
     sku: 'GDN0008',
     sellingPrice: '469000',
-    imageUrl: 'https://storage.googleapis.com/geardn-a6c28.appspot.com/1753434286481-lymax-l1-plus.webp',
+    imageUrl:
+      'https://storage.googleapis.com/geardn-a6c28.appspot.com/1753434286481-lymax-l1-plus.webp',
   },
   {
     productId: 6,
@@ -255,52 +283,51 @@ const productSkuSeedList = [
     productId: 10,
     sku: 'GDN0013',
     sellingPrice: '490000',
-    imageUrl: 'https://storage.googleapis.com/geardn-a6c28.appspot.com/1758006898837-delux-m800-pro-full-hd.jpg',
+    imageUrl:
+      'https://storage.googleapis.com/geardn-a6c28.appspot.com/1758006898837-delux-m800-pro-full-hd.jpg',
   },
 ];
 
 const productSkuAttributeSeedList = [
   {
-    skuId: 1,             
-    attributeValueId: 1,  
+    skuId: 1,
+    attributeValueId: 1,
   },
   {
-    skuId: 2,             
-    attributeValueId: 2, 
-  },
-  {
-    skuId: 4,           
-    attributeValueId: 3,  
+    skuId: 2,
+    attributeValueId: 2,
   },
   {
     skuId: 4,
-    attributeValueId: 4, 
+    attributeValueId: 3,
   },
   {
-    skuId: 5,             
-    attributeValueId: 8, 
+    skuId: 4,
+    attributeValueId: 4,
   },
   {
     skuId: 5,
-    attributeValueId: 5,  
+    attributeValueId: 8,
   },
   {
-    skuId: 7,            
-    attributeValueId: 6,  
+    skuId: 5,
+    attributeValueId: 5,
   },
   {
-    skuId: 8,            
-    attributeValueId: 7,  
+    skuId: 7,
+    attributeValueId: 6,
   },
   {
-    skuId: 13,            
-    attributeValueId: 1,  
+    skuId: 8,
+    attributeValueId: 7,
+  },
+  {
+    skuId: 13,
+    attributeValueId: 1,
   },
 ];
 
-
 async function main() {
-
   await prisma.paymentMethod.create({
     data: {
       key: 'COD',
@@ -343,13 +370,11 @@ async function main() {
   });
 }
 
-// execute the main function
 main()
   .catch((e) => {
     console.error(e);
     process.exit(1);
   })
   .finally(async () => {
-    // close Prisma Client at the end
     await prisma.$disconnect();
   });

@@ -40,7 +40,6 @@ import { AnalyticsModule } from './modules/google-analytics/analytics.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [configuration],
       envFilePath: ['.env.local', '.env.production'],
     }),
     EventEmitterModule.forRoot(),

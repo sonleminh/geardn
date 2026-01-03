@@ -10,7 +10,7 @@ import {
   Grid2,
   List,
   ListItem,
-  Pagination,
+  Pagination as MuiPagination,
   Skeleton,
   Typography,
 } from "@mui/material";
@@ -27,6 +27,8 @@ import { IQueryParams } from "@/interfaces/IQuery";
 import { ICategory } from "@/interfaces/ICategory";
 import AppLink from "@/components/common/AppLink";
 import SkeletonImage from "@/components/common/SkeletonImage";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Pagination, Grid } from "swiper/modules";
 
 const ProductCatalog = ({
   products,
@@ -65,6 +67,7 @@ const ProductCatalog = ({
             >
               <Box
                 sx={{
+                  display: { xs: "none", md: "block" },
                   width: "100%",
                   p: { xs: "16px 0 16px 0", md: "16px 0 0 0" },
                   bgcolor: "#fff",
@@ -83,12 +86,7 @@ const ProductCatalog = ({
                 </Typography>
                 <List
                   sx={{
-                    display: { xs: "grid", md: "block" },
-                    gridTemplateColumns: {
-                      xs: "repeat(4, 1fr)",
-                      md: "unset",
-                    },
-                    overflowX: "auto",
+                    display: { xs: "none", md: "block" },
                   }}
                 >
                   {categories?.map((item: ICategory) => (
@@ -153,6 +151,96 @@ const ProductCatalog = ({
                     </AppLink>
                   ))}
                 </List>
+              </Box>
+              <Box sx={{ display: { xs: "block", md: "none" } }}>
+                <Swiper
+                  modules={[Grid, Pagination]}
+                  slidesPerView={5}
+                  grid={{ rows: 2, fill: "row" }}
+                  pagination={{
+                    el: ".swiper-pagination",
+                    clickable: true,
+                  }}
+                  breakpoints={{
+                    0: {
+                      slidesPerView: 4,
+                      grid: {
+                        rows: 2,
+                      },
+                    },
+                  }}
+                  className="mySwiper"
+                >
+                  {categories?.map((item, index) => (
+                    <SwiperSlide key={index}>
+                      <AppLink
+                        href={item?.slug}
+                        key={item?.id}
+                        sx={{
+                          color: "#000",
+                        }}
+                      >
+                        <ListItem
+                          sx={{
+                            display: "flex",
+                            justifyContent: {
+                              xs: "center",
+                              md: "space-between",
+                            },
+                            width: "100%",
+                            p: {
+                              xs: "8px 4px 8px 8px",
+                              md: "8px 8px 8px 16px",
+                            },
+                            textAlign: "center",
+                            "&:hover": {
+                              backgroundColor: "#eee",
+                              transition: "all 0.3s ease",
+                              svg: {
+                                display: { xs: "none", md: "block" },
+                              },
+                            },
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              display: "flex",
+                              flexDirection: { xs: "column", md: "row" },
+                              alignItems: "center",
+                            }}
+                          >
+                            <Box
+                              marginY={0.2}
+                              sx={{
+                                position: "relative",
+                                width: "28px",
+                                height: { xs: "28px" },
+                                mr: { xs: 0, md: 2 },
+                                overflow: "hidden",
+                                "& img": {
+                                  objectFit: "cover",
+                                },
+                              }}
+                            >
+                              <SkeletonImage src={item?.icon} alt={"geardn"} />
+                            </Box>
+                            <Typography
+                              sx={{
+                                fontSize: { xs: 10, md: 14 },
+                                fontWeight: 600,
+                              }}
+                            >
+                              {item.name}
+                            </Typography>
+                          </Box>
+                          <ChevronRightIcon
+                            sx={{ display: "none", color: "#696969" }}
+                          />
+                        </ListItem>
+                      </AppLink>
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
               </Box>
             </Grid2>
             <Grid2 size={{ xs: 12, md: 9 }} sx={{ py: { xs: 2, md: 0 } }}>
@@ -227,7 +315,7 @@ const ProductCatalog = ({
                         </Grid2>
                       ))}
                 </Grid2>
-                <Pagination
+                <MuiPagination
                   sx={{ display: "flex", justifyContent: "center" }}
                   count={Math.ceil(total / 9)}
                   page={page ?? 1}

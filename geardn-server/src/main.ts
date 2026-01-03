@@ -3,7 +3,6 @@ import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
-import { ValidationConfig } from './config/validation.config';
 import { ResponseInterceptor } from './interceptors/response.interceptor';
 import { AllExceptionFilter } from './filters/exception.filter';
 import { LoggerFactory } from './logger/custom.logger';
@@ -31,7 +30,7 @@ async function bootstrap() {
     .split(',')
     .map((val) => val.trim());
 
-    console.log('whiteList', whiteList);
+  console.log('whiteList', whiteList);
 
   app.enableCors({
     origin: (origin, callback) => {

@@ -1,4 +1,3 @@
-// src/common/controllers/enum.controller.ts
 import { Controller, Get, Param, NotFoundException } from '@nestjs/common';
 import { EnumService } from '../services/enum.service';
 

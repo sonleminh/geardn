@@ -54,7 +54,7 @@ export class AdminAuthService {
 
       this.storeToken(res, 'access_token', access_token, 2);
       this.storeToken(res, 'refresh_token', refresh_token, 48);
-      return user;
+      return { data: user };
     } catch (error) {
       throw error;
     }
