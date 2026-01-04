@@ -83,7 +83,7 @@ export class ProductService {
     }
 
     const where: Prisma.ProductWhereInput = {
-      AND: [{ isDeleted: false, isVisible: false }],
+      AND: [{ isDeleted: false, isVisible: true }],
     };
 
     const [products, total] = await this.prisma.$transaction([
