@@ -39,7 +39,7 @@ export const useCreateProduct = () => {
 const getProductList = async (query?: IGetProductListQuery) => {
   const result = await axiosInstance.get(`${productUrl}/admin`, {
     params: {
-      page: query?.page ?? 0,
+      page: query?.page,
       limit: query?.limit ?? 10,
       search: query?.search,
       categoryIds: query?.categoryIds?.join(","),

@@ -56,6 +56,7 @@ export class AuthService {
   async logout(req: expressRequest, res: Response) {
     res.clearCookie('access_token');
     res.clearCookie('refresh_token');
+    res.clearCookie('is_logged_in');
     res.clearCookie('GC');
     return { message: 'Logout successful!' };
   }
@@ -90,11 +91,22 @@ export class AuthService {
     const expires = new Date();
     expires.setHours(expires.getHours() + expiresInHours);
 
+    const isProduction =
+      this.configService.get<string>('NODE_ENV') === 'production';
+
     res.cookie(tokenName, token, {
-      // sameSite: 'none',
-      // httpOnly: true,
-      // secure: true,
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: 'lax',
       expires: expires,
+      path: '/',
+    });
+
+    res.cookie('is_logged_in', 'true', {
+      httpOnly: false, // QUAN TRỌNG: Để Client (JS) đọc được
+      secure: isProduction,
+      sameSite: 'lax',
+      expires: expires, // Cùng thời hạn với token chính
       path: '/',
     });
   }

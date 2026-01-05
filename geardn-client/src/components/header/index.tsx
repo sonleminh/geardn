@@ -52,6 +52,7 @@ const Header = ({ initialUser }: { initialUser?: IUser | null }) => {
 
   const { data } = useSession();
   const { mutateAsync: onLogout } = useLogout();
+
   const userData = data?.data ?? initialUser;
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -346,14 +347,16 @@ const Header = ({ initialUser }: { initialUser?: IUser | null }) => {
                         />
                       </ListItemButton>
                     </ListItem>
-                    <ListItem disablePadding onClick={handleLogout}>
-                      <ListItemButton>
-                        <ListItemIcon>
-                          <LogoutIcon />
-                        </ListItemIcon>
-                        <ListItemText primary={"Đăng xuất"} />
-                      </ListItemButton>
-                    </ListItem>
+                    {userData?.id && (
+                      <ListItem disablePadding onClick={handleLogout}>
+                        <ListItemButton>
+                          <ListItemIcon>
+                            <LogoutIcon />
+                          </ListItemIcon>
+                          <ListItemText primary={"Đăng xuất"} />
+                        </ListItemButton>
+                      </ListItem>
+                    )}
                     <Divider />
                     <ListItem disablePadding>
                       <ListItemButton>
