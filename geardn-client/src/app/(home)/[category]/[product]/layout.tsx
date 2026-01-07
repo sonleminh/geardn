@@ -1,14 +1,15 @@
 import React from "react";
 import { Metadata } from "next";
 import LayoutContainer from "@/components/layout-container";
-import { getProductBySlug } from "@/data/product.server";
+// import { getProductBySlug } from "@/data/product.server";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ product: string }>;
-}): Promise<Metadata> {
-  const { product } = await params;
+export async function generateMetadata(): Promise<Metadata> {
+  //   {
+  //   params,
+  // }: {
+  //   params: Promise<{ product: string }>;
+  // }
+  // const { product } = await params;
 
   // try {
   //   const res = await getProductBySlug(product);
