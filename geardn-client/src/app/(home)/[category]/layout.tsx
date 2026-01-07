@@ -1,6 +1,6 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { Metadata } from "next";
-// import { LoadingCircle } from "@/components/common/LoadingCircle";
+import { LoadingCircle } from "@/components/common/LoadingCircle";
 import { getCategoryBySlug } from "@/data/category.server";
 
 export async function generateMetadata({
@@ -51,8 +51,5 @@ export default async function CategoryLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <>{children}</>;
-  //  <Suspense fallback={<LoadingCircle />}>
-  //   {children}
-  //   </Suspense>;
+  return <Suspense fallback={<LoadingCircle />}>{children}</Suspense>;
 }
