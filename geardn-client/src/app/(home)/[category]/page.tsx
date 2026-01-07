@@ -7,7 +7,7 @@ import {
   parseProductListParams,
   toURLSearchParams,
 } from "@/lib/search/productList.params";
-import { Box, Skeleton } from "@mui/material";
+import { Box } from "@mui/material";
 import { Suspense } from "react";
 import ProductCount from "./ProductCount";
 import ProductListContainer from "./ProductListContainer";

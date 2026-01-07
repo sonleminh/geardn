@@ -1,4 +1,3 @@
-import { headers } from "next/headers";
 import { ICategory } from "@/interfaces/ICategory";
 import { BaseResponse, PageListResponse } from "@/types/response.type";
 import { getBackendBaseUrl } from "@/lib/backend-config";
