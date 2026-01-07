@@ -2,7 +2,6 @@ export const dynamic = "force-dynamic";
 
 import { Suspense } from "react";
 import { Box } from "@mui/material";
-import LayoutContainer from "@/components/layout-container";
 import ProductDetailContainer from "./ProductDetailContainer";
 import ProductDetailSkeleton from "./ProductDetailSkeleton";
 
@@ -15,12 +14,10 @@ export default async function ProductDetailPage({
   const { product: productSlug } = await params;
 
   return (
-    <LayoutContainer>
-      <Box sx={{ pb: 8 }}>
-        <Suspense fallback={<ProductDetailSkeleton />} key={productSlug}>
-          <ProductDetailContainer slug={productSlug} />
-        </Suspense>
-      </Box>
-    </LayoutContainer>
+    <Box sx={{ pb: 8 }}>
+      <Suspense fallback={<ProductDetailSkeleton />} key={productSlug}>
+        <ProductDetailContainer slug={productSlug} />
+      </Suspense>
+    </Box>
   );
 }
