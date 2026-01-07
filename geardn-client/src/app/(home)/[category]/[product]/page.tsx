@@ -1,4 +1,5 @@
-// src/app/(home)/[category]/[product]/page.tsx
+export const dynamic = "force-dynamic";
+
 import { Suspense } from "react";
 import { Box } from "@mui/material";
 import LayoutContainer from "@/components/layout-container";
