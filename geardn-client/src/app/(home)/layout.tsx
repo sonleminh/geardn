@@ -9,8 +9,8 @@ import "swiper/css/pagination";
 import "swiper/css/scrollbar";
 import "swiper/css/thumbs";
 import "swiper/css/grid";
-// import { Suspense } from "react";
-// import { LoadingCircle } from "@/components/common/LoadingCircle";
+import { Suspense } from "react";
+import { LoadingCircle } from "@/components/common/LoadingCircle";
 import { getUserOnServer } from "@/data/profile.server";
 
 export const metadata: Metadata = {
@@ -26,9 +26,7 @@ export default async function RootLayout({
   const user = await getUserOnServer();
   return (
     <Layout initialUser={user?.data}>
-      {/* <Suspense fallback={<LoadingCircle />}> */}
-      {children}
-      {/* </Suspense> */}
+      <Suspense fallback={<LoadingCircle />}>{children}</Suspense>
     </Layout>
   );
 }
