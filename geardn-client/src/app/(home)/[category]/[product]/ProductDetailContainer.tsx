@@ -12,5 +12,9 @@ export default async function ProductDetailContainer({
 
   if (!product) notFound();
 
-  return <ProductDetailClient initialProduct={product} />;
+  return (
+    <ProductDetailClient
+    //  initialProduct={product}
+    />
+  );
 }
