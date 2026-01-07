@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
 
-export const LoadingCircle = () => {
+export default function Loading() {
   return (
     <Box
       sx={{
@@ -16,4 +16,4 @@ export const LoadingCircle = () => {
       <CircularProgress color="inherit" />
     </Box>
   );
-};
+}

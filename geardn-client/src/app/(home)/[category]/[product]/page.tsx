@@ -1,20 +1,25 @@
-import { Box } from '@mui/material';
-import { notFound } from 'next/navigation';
-import { getProductBySlug } from '@/data/product.server';
-import ProductDetailClient from './ProductDetailClient';
+// src/app/(home)/[category]/[product]/page.tsx
+import { Suspense } from "react";
+import { Box } from "@mui/material";
+import LayoutContainer from "@/components/layout-container";
+import ProductDetailContainer from "./ProductDetailContainer";
+import ProductDetailSkeleton from "./ProductDetailSkeleton";
 
-export default async function ProductDetail({
+// Lưu ý: Type params trong Next 15 là Promise
+export default async function ProductDetailPage({
   params,
 }: {
-  params: Promise<{ product: string }>;
+  params: Promise<{ category: string; product: string }>;
 }) {
-  const { product } = await params;
-  const res = await getProductBySlug(product);
-  if (!res) notFound();
+  const { product: productSlug } = await params;
 
   return (
-    <Box>
-      <ProductDetailClient initialProduct={res} />
-    </Box>
+    <LayoutContainer>
+      <Box sx={{ pb: 8 }}>
+        <Suspense fallback={<ProductDetailSkeleton />}>
+          <ProductDetailContainer slug={productSlug} />
+        </Suspense>
+      </Box>
+    </LayoutContainer>
   );
 }

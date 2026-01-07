@@ -1,54 +1,101 @@
-import { IProduct } from '@/interfaces/IProduct';
-import { headers } from 'next/headers';
-import { BaseResponse, PageListResponse, ProductsByCategoryResponse, SearchProductsResponse } from '@/types/response.type';
+import { cache } from "react";
+import { IProduct } from "@/interfaces/IProduct";
+import { getBackendBaseUrl } from "@/lib/backend-config";
+import {
+  BaseResponse,
+  ProductsByCategoryResponse,
+  SearchProductsResponse,
+} from "@/types/response.type";
+export type PageMeta = { total: number; page: number; pageSize: number };
 
-export type PageMeta = { total: number; page: number; pageSize: number }
+const BE = getBackendBaseUrl();
 
 export async function getProducts(qs: URLSearchParams) {
- const h = await headers();
-  const origin = `${h.get('x-forwarded-proto') ?? 'http'}://${h.get('x-forwarded-host') ?? h.get('host')}`;
-  const r = await fetch(`${origin}/api/bff/products/homepage?${qs.toString()}`, {
-    headers: { cookie: h.get('cookie') ?? '', accept: 'application/json' },
-    next: { revalidate: 60 }             // ISR 60s             
+  const res = await fetch(`${BE}/products/homepage?${qs.toString()}`, {
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    next: { revalidate: 60 },
   });
-  if (r.status === 404) return null;
-  if (!r.ok) throw new Error(`Product list fetch failed: ${r.status}`);
-  return r.json() as Promise<PageListResponse<IProduct>>;
+  if (res.status === 404) return null;
+
+  if (!res.ok) {
+    console.error(`Error fetching product list`, res.status, await res.text());
+    throw new Error(`Failed to fetch search product list: ${res.status}`);
+  }
+  return res.json() as Promise<SearchProductsResponse<IProduct>>;
 }
 
 export async function searchProducts(qs: URLSearchParams) {
-  const h = await headers();
-  const origin = `${h.get('x-forwarded-proto') ?? 'http'}://${h.get('x-forwarded-host') ?? h.get('host')}`;
-  const r = await fetch(`${origin}/api/bff/products/search?${qs.toString()}`, {
-    headers: { cookie: h.get('cookie') ?? '', accept: 'application/json' },
-    next: { revalidate: 60 }             // ISR 60s                   
+  const res = await fetch(`${BE}/products/search?${qs.toString()}`, {
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    next: { revalidate: 60 },
   });
-  if (r.status === 404) return null;
-  if (!r.ok) throw new Error(`Search products fetch failed: ${r.status}`);
-  return r.json() as Promise<SearchProductsResponse<IProduct>>; 
+  if (res.status === 404) return null;
+
+  if (!res.ok) {
+    console.error(
+      `Error fetching search product`,
+      res.status,
+      await res.text()
+    );
+    throw new Error(`Failed to fetch search product list: ${res.status}`);
+  }
+  return res.json() as Promise<SearchProductsResponse<IProduct>>;
 }
 
-export async function getProductsByCategory(slug: string, qs?: URLSearchParams) {
-  const h = await headers();
-  const origin = `${h.get('x-forwarded-proto') ?? 'http'}://${h.get('x-forwarded-host') ?? h.get('host')}`;
-  const r = await fetch(`${origin}/api/bff/products/category/slug/${encodeURIComponent(slug)}${qs?.size?`?${qs}`:''}`, {
-    headers: { cookie: h.get('cookie') ?? '', accept: 'application/json' },
-    next: { revalidate: 60 }             // ISR 60s         
+export const getProductsByCategory = cache(
+  async (slug: string, qs?: URLSearchParams) => {
+    const res = await fetch(
+      `${BE}/products/category/slug/${encodeURIComponent(slug)}${
+        qs?.size ? `?${qs}` : ""
+      }`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        next: { revalidate: 60 },
+      }
+    );
+
+    if (res.status === 404) return null;
+
+    if (!res.ok) {
+      console.error(
+        `Error fetching product ${slug}:`,
+        res.status,
+        await res.text()
+      );
+      throw new Error(`Failed to fetch product list: ${res.status}`);
+    }
+    return res.json() as Promise<ProductsByCategoryResponse<IProduct>>;
+  }
+);
+
+export const getProductBySlug = cache(async (slug: string) => {
+  const res = await fetch(`${BE}/products/slug/${encodeURIComponent(slug)}`, {
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    next: { revalidate: 60 },
   });
 
-  if (r.status === 404) return null;
-  if (!r.ok) throw new Error(`Product list fetch failed: ${r.status}`);
-  return r.json() as Promise<ProductsByCategoryResponse<IProduct>>; 
-}
+  if (res.status === 404) return null;
 
-export async function getProductBySlug(slug: string) {
-  const h = await headers();
-  const origin = `${h.get('x-forwarded-proto') ?? 'http'}://${h.get('x-forwarded-host') ?? h.get('host')}`;
-  const r = await fetch(`${origin}/api/bff/products/slug/${encodeURIComponent(slug)}`, {
-    headers: { cookie: h.get('cookie') ?? '', accept: 'application/json' },
-    next: { revalidate: 60 }             // ISR 60s         
-  });
-  if (r.status === 404) return null;
-  if (!r.ok) throw new Error(`product fetch failed: ${r.status}`);
-  return r.json() as Promise<BaseResponse<IProduct>>; 
-}
+  if (!res.ok) {
+    console.error(
+      `Error fetching product ${slug}:`,
+      res.status,
+      await res.text()
+    );
+    throw new Error(`Failed to fetch product: ${res.status}`);
+  }
+
+  return res.json() as Promise<BaseResponse<IProduct>>;
+});

@@ -1,32 +1,24 @@
 "use client";
 
-import Breadcrumbs from "@/components/common/Breadcrumbs";
-import ProductCard from "@/components/common/ProductCard";
-import { ProductFilters } from "@/components/common/ProductFilters";
-import LayoutContainer from "@/components/layout-container";
-import { IProduct } from "@/interfaces/IProduct";
-import { IQueryParams } from "@/interfaces/IQuery";
 import { useProductsByCategoryInfinite } from "@/queries/product";
-import { ProductsByCategoryResponse } from "@/types/response.type";
+import ProductCard from "@/components/common/ProductCard";
+import { Grid2, Box, Button } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { Box, Button, Grid2, Typography } from "@mui/material";
-import { useSearchParams } from "next/navigation";
 import { useMemo } from "react";
+import { ProductsByCategoryResponse } from "@/types/response.type";
+import { IProduct } from "@/interfaces/IProduct";
+import { useSearchParams } from "next/navigation";
 
 type Props = {
   slug: string;
   initial: ProductsByCategoryResponse<IProduct> | null;
-  params: IQueryParams;
 };
 
-export default function ProductByCategoryClient({
-  slug,
-  initial,
-  params,
-}: Props) {
+export default function ProductListClient({ slug, initial }: Props) {
   const sp = useSearchParams();
   const q = useProductsByCategoryInfinite(slug, initial, sp);
   const total = q?.data?.meta?.total ?? 0;
+
   const products = useMemo(() => {
     const seen = new Set<number>();
     const out = [];
@@ -38,31 +30,8 @@ export default function ProductByCategoryClient({
     return out;
   }, [q.data]);
 
-  const breadcrumbsOptions = [
-    { href: "/", label: "Trang chủ" },
-    { href: "", label: q?.data?.category?.name as string },
-  ];
-
   return (
-    <LayoutContainer>
-      <Box sx={{ mb: 2 }}>
-        <Breadcrumbs options={breadcrumbsOptions} />
-      </Box>
-      <Box
-        sx={{
-          display: " flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          mb: 2,
-        }}
-      >
-        <Typography sx={{ fontSize: { xs: 13, md: 15 } }}>
-          Tìm thấy {total} sản phẩm
-        </Typography>
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <ProductFilters initial={params} />
-        </Box>
-      </Box>
+    <>
       <Grid2 container spacing={2}>
         {products?.map((item) => (
           <Grid2 size={{ xs: 6, md: 3 }} key={item.id}>
@@ -70,6 +39,7 @@ export default function ProductByCategoryClient({
           </Grid2>
         ))}
       </Grid2>
+
       {q.hasNextPage && (
         <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
           <Button
@@ -90,6 +60,6 @@ export default function ProductByCategoryClient({
           </Button>
         </Box>
       )}
-    </LayoutContainer>
+    </>
   );
 }

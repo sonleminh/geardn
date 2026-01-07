@@ -237,7 +237,7 @@ const ProductDetailClient = ({
 
   const handleBuyBtn = async () => {
     const skuId = await addCartCore();
-    if (!skuId) return; // add thất bại hoặc đã báo lỗi
+    if (!skuId) return;
 
     setLastBuyNowItemId(skuId);
     router.push("/cart");
@@ -251,6 +251,7 @@ const ProductDetailClient = ({
 
   const breadcrumbsOptions = [
     { href: "/", label: "Trang chủ" },
+    { href: "", label: product?.category?.name as string },
     { href: "", label: product?.name as string },
   ];
 

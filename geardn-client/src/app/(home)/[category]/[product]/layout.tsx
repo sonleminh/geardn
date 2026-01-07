@@ -1,9 +1,7 @@
-import React from 'react';
-import { Metadata } from 'next';
-import { Suspense } from 'react';
-import { LoadingCircle } from '@/components/common/LoadingCircle';
-import LayoutContainer from '@/components/layout-container';
-import { getProductBySlug } from '@/data/product.server';
+import React from "react";
+import { Metadata } from "next";
+import LayoutContainer from "@/components/layout-container";
+import { getProductBySlug } from "@/data/product.server";
 
 export async function generateMetadata({
   params,
@@ -14,7 +12,7 @@ export async function generateMetadata({
   const res = await getProductBySlug(product);
   const productData = res?.data;
 
-  const fallbackTitle = 'Sản phẩm';
+  const fallbackTitle = "Sản phẩm";
   const title = productData?.name
     ? `${productData.name} | GearDN`
     : `${fallbackTitle} | GearDN`;
@@ -38,7 +36,7 @@ export async function generateMetadata({
     description,
     alternates: { canonical: path },
     openGraph: {
-      type: 'website',
+      type: "website",
       url: path,
       title,
       description,
@@ -53,9 +51,5 @@ export default async function ProductDetailLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <Suspense fallback={<LoadingCircle />}>
-      <LayoutContainer>{children}</LayoutContainer>
-    </Suspense>
-  );
+  return <LayoutContainer>{children}</LayoutContainer>;
 }

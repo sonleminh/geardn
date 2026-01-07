@@ -21,7 +21,7 @@ export const HeaderStyle: (
     zIndex: 69,
 
     display: "block",
-    width: { xs: "100%", xl: 1200 },
+    width: { xs: "100%", lg: 1200, xl: 1200 },
     height: { xs: 68, md: 80 },
     px: { xs: 0.5, md: 3 },
 
