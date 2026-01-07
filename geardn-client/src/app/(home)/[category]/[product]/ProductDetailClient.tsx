@@ -52,7 +52,7 @@ const ProductDetailClient = ({
   const { showNotification } = useNotificationStore();
   const { data } = useGetProduct(initialProduct);
 
-  const product = data!.data;
+  const product = data?.data;
 
   const [count, setCount] = useState<number | null>(1);
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperClass | null>(null);
@@ -306,6 +306,14 @@ const ProductDetailClient = ({
     );
   }, [selectedSku]);
 
+  if (!product) {
+    return (
+      <Box sx={{ p: 5, display: "flex", justifyContent: "center" }}>
+        <Typography>Đang tải dữ liệu sản phẩm...</Typography>
+      </Box>
+    );
+  }
+
   return (
     <Box pt={2} pb={4}>
       <Box sx={{ mb: 2 }}>
@@ -539,7 +547,7 @@ const ProductDetailClient = ({
                       +
                     </Button>
                   </ButtonGroup>
-                  {totalStock > 0 && (
+                  {totalStock && totalStock > 0 && (
                     <Typography sx={{ fontSize: 14, lineHeight: "32px" }}>
                       {totalStock > 0 && selectedSku
                         ? selectedSku?.stocks?.reduce(
