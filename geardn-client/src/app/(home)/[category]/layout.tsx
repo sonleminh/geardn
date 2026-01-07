@@ -1,6 +1,6 @@
-import React, { Suspense } from "react";
+import React from "react";
 import { Metadata } from "next";
-import { LoadingCircle } from "@/components/common/LoadingCircle";
+// import { LoadingCircle } from "@/components/common/LoadingCircle";
 import { getCategoryBySlug } from "@/data/category.server";
 
 export async function generateMetadata({
