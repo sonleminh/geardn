@@ -51,5 +51,8 @@ export default async function CategoryLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <Suspense fallback={<LoadingCircle />}>{children}</Suspense>;
+  return <>{children}</>;
+  //  <Suspense fallback={<LoadingCircle />}>
+  //   {children}
+  //   </Suspense>;
 }
