@@ -17,7 +17,7 @@ export default async function ProductDetailPage({
   return (
     <LayoutContainer>
       <Box sx={{ pb: 8 }}>
-        <Suspense fallback={<ProductDetailSkeleton />}>
+        <Suspense fallback={<ProductDetailSkeleton />} key={productSlug}>
           <ProductDetailContainer slug={productSlug} />
         </Suspense>
       </Box>
