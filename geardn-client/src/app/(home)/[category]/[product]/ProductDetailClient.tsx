@@ -251,7 +251,10 @@ const ProductDetailClient = ({
 
   const breadcrumbsOptions = [
     { href: "/", label: "Trang chủ" },
-    { href: "", label: product?.category?.name as string },
+    {
+      href: `/${product?.category?.slug}`,
+      label: product?.category?.name as string,
+    },
     { href: "", label: product?.name as string },
   ];
 

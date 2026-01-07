@@ -271,6 +271,7 @@ export class ProductService {
           select: {
             id: true,
             name: true,
+            slug: true,
           },
         },
         skus: {
@@ -279,7 +280,6 @@ export class ProductService {
             productId: true,
             sku: true,
             sellingPrice: true,
-            // quantity: true,
             imageUrl: true,
             productSkuAttributes: {
               select: {
