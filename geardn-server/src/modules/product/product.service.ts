@@ -128,6 +128,7 @@ export class ProductService {
       AND: [
         dto.keyword ? { OR: [{ name: createSearchFilter(dto.keyword) }] } : {},
         { isDeleted: false },
+        { isVisible: true },
       ],
     };
 
@@ -385,6 +386,7 @@ export class ProductService {
     // where cơ bản
     const baseWhere: Prisma.ProductWhereInput = {
       isDeleted: false,
+      isVisible: true,
       categoryId,
     };
 
