@@ -550,7 +550,7 @@ const ProductDetailClient = ({
                       +
                     </Button>
                   </ButtonGroup>
-                  {totalStock && totalStock > 0 && (
+                  {totalStock && totalStock > 0 ? (
                     <Typography sx={{ fontSize: 14, lineHeight: "32px" }}>
                       {totalStock > 0 && selectedSku
                         ? selectedSku?.stocks?.reduce(
@@ -563,6 +563,8 @@ const ProductDetailClient = ({
                         : totalStock}{" "}
                       sản phẩm có sẵn
                     </Typography>
+                  ) : (
+                    ""
                   )}
                 </Grid2>
               </Grid2>
