@@ -178,7 +178,9 @@ const Header = ({ initialUser }: { initialUser?: IUser | null }) => {
                 <Typography onClick={scrollToProductList}>Shop</Typography>
               </ListItem>
               <ListItem>
-                <Typography>Liên hệ</Typography>
+                <AppLink href={"https://www.facebook.com/geardnha/"}>
+                  <Typography>Liên hệ</Typography>
+                </AppLink>
               </ListItem>
             </List>
           </Grid2>
