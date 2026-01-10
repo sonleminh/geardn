@@ -58,7 +58,7 @@ export class ProductService {
   }
 
   async getHomepageProducts(dto: ProductListQueryDto) {
-    const { page = 1, limit: rawLimit = 9, sortBy, order = 'desc' } = dto;
+    const { page = 1, limit: rawLimit = 12, sortBy, order = 'desc' } = dto;
 
     const limit = Math.min(Math.max(rawLimit, 1), 100);
     const skip = (page - 1) * limit;

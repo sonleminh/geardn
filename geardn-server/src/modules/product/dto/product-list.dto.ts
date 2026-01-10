@@ -5,5 +5,5 @@ import { ProductStatus } from '@prisma/client';
 
 export class ProductListQueryDto extends BaseQueryDto {
   @IsOptional()
-  limit: number = 9;
+  limit: number = 12;
 }

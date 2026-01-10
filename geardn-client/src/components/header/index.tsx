@@ -368,7 +368,12 @@ const Header = ({ initialUser }: { initialUser?: IUser | null }) => {
                         <ListItemText primary={"Danh mục"} />
                       </ListItemButton>
                     </ListItem>
-                    <ListItem disablePadding>
+                    <ListItem
+                      disablePadding
+                      onClick={() =>
+                        router.push("https://www.facebook.com/geardnha/")
+                      }
+                    >
                       <ListItemButton>
                         <ListItemIcon>
                           <InfoOutlinedIcon />
