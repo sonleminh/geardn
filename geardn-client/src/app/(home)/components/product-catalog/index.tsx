@@ -317,7 +317,7 @@ const ProductCatalog = ({
                 </Grid2>
                 <MuiPagination
                   sx={{ display: "flex", justifyContent: "center" }}
-                  count={Math.ceil(total / 9)}
+                  count={Math.ceil(total / 12)}
                   page={page ?? 1}
                   onChange={handlePageChange}
                   showFirstButton
