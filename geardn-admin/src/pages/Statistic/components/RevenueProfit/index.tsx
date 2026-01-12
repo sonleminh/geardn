@@ -1,9 +1,9 @@
-import React, { useMemo, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Line } from 'react-chartjs-2';
-import { format, subDays } from 'date-fns';
-import { vi } from 'date-fns/locale';
-import { RangeKeyDict } from 'react-date-range';
+import React, { useMemo, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { Line } from "react-chartjs-2";
+import { format, subDays } from "date-fns";
+import { vi } from "date-fns/locale";
+import { RangeKeyDict } from "react-date-range";
 
 import {
   Box,
@@ -14,21 +14,21 @@ import {
   Typography,
   Breadcrumbs,
   Link,
-} from '@mui/material';
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
-import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+} from "@mui/material";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 
-import DateRangeMenu from '@/components/DateRangeMenu';
-import { ROUTES } from '@/constants/route';
-import { formatPrice } from '@/utils/format-price';
+import DateRangeMenu from "@/components/DateRangeMenu";
+import { ROUTES } from "@/constants/route";
+import { formatPrice } from "@/utils/format-price";
 import {
   useGetRevenueProfitStats,
   useGetRevenueProfitSummaryStats,
-} from '@/services/statistic';
-import { IRevenueProfitDateStats } from '@/interfaces/IStats';
+} from "@/services/statistic";
+import { IRevenueProfitDateStats } from "@/interfaces/IStats";
 interface SummaryStatProps {
   label: string;
   value: React.ReactNode;
@@ -39,7 +39,7 @@ interface SummaryStatProps {
 const valueStyle = (value: number) => ({
   fontSize: 28,
   fontWeight: 500,
-  color: value < 0 ? 'red' : 'green',
+  color: value < 0 ? "red" : "green",
 });
 
 const SummaryStat: React.FC<SummaryStatProps> = ({
@@ -51,22 +51,24 @@ const SummaryStat: React.FC<SummaryStatProps> = ({
   return (
     <Box
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-      }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+      }}
+    >
+      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
         <Box
           sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
             width: 48,
             height: 48,
             mr: 2,
             bgcolor: iconBg,
-            borderRadius: '50%',
-          }}>
+            borderRadius: "50%",
+          }}
+        >
           {icon}
         </Box>
         <Typography sx={{ fontSize: 16, fontWeight: 500 }}>{label}</Typography>
@@ -85,7 +87,7 @@ const RevenueProfit: React.FC = () => {
     {
       startDate: new Date(new Date().setDate(new Date().getDate() - 7)),
       endDate: new Date(),
-      key: 'selection',
+      key: "selection",
     },
   ]);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -95,7 +97,7 @@ const RevenueProfit: React.FC = () => {
   const summaryStats = useMemo(
     () => [
       {
-        label: 'Tổng doanh thu',
+        label: "Tổng doanh thu",
         value: (
           <Typography sx={{ fontSize: 28, fontWeight: 500 }}>
             {formatPrice(
@@ -103,28 +105,29 @@ const RevenueProfit: React.FC = () => {
             )}
           </Typography>
         ),
-        icon: <AttachMoneyIcon sx={{ color: '#fff' }} />,
-        iconBg: '#000',
+        icon: <AttachMoneyIcon sx={{ color: "#fff" }} />,
+        iconBg: "#000",
       },
 
       {
-        label: 'Tăng trưởng tháng',
+        label: "Tăng trưởng tháng",
         value: (
           <Typography
             sx={valueStyle(
               revenueProfitSummaryStats?.data?.growth?.revenuePercent || 0
-            )}>
+            )}
+          >
             {revenueProfitSummaryStats?.data?.growth?.revenuePercent?.toFixed(
               2
-            ) || 0}{' '}
+            ) || 0}{" "}
             %
           </Typography>
         ),
-        icon: <TrendingUpIcon sx={{ color: '#fff' }} />,
-        iconBg: '#59b35c',
+        icon: <TrendingUpIcon sx={{ color: "#fff" }} />,
+        iconBg: "#59b35c",
       },
       {
-        label: 'Tổng lợi nhuận',
+        label: "Tổng lợi nhuận",
         value: (
           <Typography sx={{ fontSize: 28, fontWeight: 500 }}>
             {formatPrice(
@@ -132,24 +135,25 @@ const RevenueProfit: React.FC = () => {
             )}
           </Typography>
         ),
-        icon: <AttachMoneyIcon sx={{ color: '#fff' }} />,
-        iconBg: '#000',
+        icon: <AttachMoneyIcon sx={{ color: "#fff" }} />,
+        iconBg: "#000",
       },
       {
-        label: 'Tăng trưởng tháng',
+        label: "Tăng trưởng tháng",
         value: (
           <Typography
             sx={valueStyle(
               revenueProfitSummaryStats?.data?.growth?.profitPercent || 0
-            )}>
+            )}
+          >
             {revenueProfitSummaryStats?.data?.growth?.profitPercent?.toFixed(
               2
-            ) || 0}{' '}
+            ) || 0}{" "}
             %
           </Typography>
         ),
-        icon: <TrendingUpIcon sx={{ color: '#fff' }} />,
-        iconBg: '#59b35c',
+        icon: <TrendingUpIcon sx={{ color: "#fff" }} />,
+        iconBg: "#59b35c",
       },
     ],
     [revenueProfitSummaryStats]
@@ -166,19 +170,19 @@ const RevenueProfit: React.FC = () => {
         labels: [],
         datasets: [
           {
-            label: 'Doanh thu',
+            label: "Doanh thu",
             data: [],
             fill: false,
-            borderColor: '#000',
-            backgroundColor: '#fff',
+            borderColor: "#000",
+            backgroundColor: "#fff",
             tension: 0.1,
           },
           {
-            label: 'Lợi nhuận',
+            label: "Lợi nhuận",
             data: [],
             fill: false,
-            borderColor: 'rgb(255, 99, 132)',
-            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            borderColor: "rgb(255, 99, 132)",
+            backgroundColor: "rgba(255, 99, 132, 0.2)",
             tension: 0.1,
           },
         ],
@@ -187,7 +191,7 @@ const RevenueProfit: React.FC = () => {
 
     const labels = revenueProfitStats?.data?.revenueProfitStatsData.map(
       (item: IRevenueProfitDateStats) => {
-        return format(new Date(item.date), 'dd/MM', { locale: vi });
+        return format(new Date(item.date), "dd/MM", { locale: vi });
       }
     );
     const revenueData = revenueProfitStats?.data?.revenueProfitStatsData.map(
@@ -201,22 +205,22 @@ const RevenueProfit: React.FC = () => {
       labels,
       datasets: [
         {
-          label: 'Doanh thu (VNĐ)',
+          label: "Doanh thu (VNĐ)",
           data: revenueData,
           fill: false,
-          borderColor: '#000',
-          backgroundColor: '#fff',
+          borderColor: "#000",
+          backgroundColor: "#fff",
           tension: 0.4,
-          yAxisID: 'y',
+          yAxisID: "y",
         },
         {
-          label: 'Lợi nhuận (VNĐ)',
+          label: "Lợi nhuận (VNĐ)",
           data: profitData,
           fill: false,
-          borderColor: '#59b35c',
-          backgroundColor: '#fff',
+          borderColor: "#59b35c",
+          backgroundColor: "#fff",
           tension: 0.4,
-          yAxisID: 'y',
+          yAxisID: "y",
         },
       ],
     };
@@ -229,7 +233,7 @@ const RevenueProfit: React.FC = () => {
       plugins: {
         legend: {
           display: true,
-          position: 'top' as const,
+          position: "top" as const,
         },
         title: {
           display: true,
@@ -265,7 +269,7 @@ const RevenueProfit: React.FC = () => {
     (daysAgo: number) => {
       const endDate = new Date();
       const startDate = subDays(new Date(), daysAgo);
-      setDateRange([{ startDate, endDate, key: 'selection' }]);
+      setDateRange([{ startDate, endDate, key: "selection" }]);
       handleClose();
     },
     [handleClose]
@@ -277,7 +281,7 @@ const RevenueProfit: React.FC = () => {
         {
           startDate: selection.startDate,
           endDate: selection.endDate,
-          key: 'selection',
+          key: "selection",
         },
       ]);
     }
@@ -285,13 +289,13 @@ const RevenueProfit: React.FC = () => {
 
   const getDateDisplayText = useCallback(() => {
     const { startDate, endDate } = dateRange[0];
-    if (!startDate || !endDate) return 'Chọn ngày';
+    if (!startDate || !endDate) return "Chọn ngày";
     if (startDate.getTime() === endDate.getTime()) {
-      return format(startDate, 'dd/MM/yyyy', { locale: vi });
+      return format(startDate, "dd/MM/yyyy", { locale: vi });
     }
-    return `${format(startDate, 'dd/MM/yyyy', { locale: vi })} - ${format(
+    return `${format(startDate, "dd/MM/yyyy", { locale: vi })} - ${format(
       endDate,
-      'dd/MM/yyyy',
+      "dd/MM/yyyy",
       { locale: vi }
     )}`;
   }, [dateRange]);
@@ -299,62 +303,69 @@ const RevenueProfit: React.FC = () => {
   return (
     <>
       <Breadcrumbs
-        separator={<NavigateNextIcon fontSize='small' />}
-        aria-label='breadcrumb'
-        sx={{ mb: 3 }}>
+        separator={<NavigateNextIcon fontSize="small" />}
+        aria-label="breadcrumb"
+        sx={{ mb: 3 }}
+      >
         <Link
-          underline='hover'
-          color='inherit'
+          underline="hover"
+          color="inherit"
           onClick={() => navigate(ROUTES.DASHBOARD)}
-          sx={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+          sx={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+        >
           <HomeOutlinedIcon sx={{ fontSize: 24 }} />
         </Link>
-        <Typography color='text.primary'>Thống kê</Typography>
-        <Typography color='text.primary'>Doanh thu & Lợi nhuận</Typography>
+        <Typography color="text.primary">Thống kê</Typography>
+        <Typography color="text.primary">Doanh thu & Lợi nhuận</Typography>
       </Breadcrumbs>
       <Card>
         <CardContent>
           <>
             <Box
               sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
                 mb: 4,
-              }}>
+              }}
+            >
               <Typography sx={{ fontSize: 20, fontWeight: 500 }}>
                 Doanh thu và lợi nhuận
               </Typography>
               <Button
-                variant='outlined'
+                variant="outlined"
                 onClick={handleClick}
                 endIcon={<KeyboardArrowDownIcon />}
-                sx={{ minWidth: 150 }}>
+                sx={{ minWidth: 150 }}
+              >
                 {getDateDisplayText()}
               </Button>
             </Box>
             <Box
               sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-evenly',
-              }}>
-              <Box sx={{ textAlign: 'center' }}>
-                <Typography sx={{ color: '#696969' }}>Doanh thu</Typography>
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-evenly",
+              }}
+            >
+              <Box sx={{ textAlign: "center" }}>
+                <Typography sx={{ color: "#696969" }}>Doanh thu</Typography>
                 <Typography
-                  sx={{ fontSize: 20, fontWeight: 600, color: '#333' }}>
+                  sx={{ fontSize: 20, fontWeight: 600, color: "#333" }}
+                >
                   {formatPrice(
-                    revenueProfitSummaryStats?.data.totals.totalRevenue || 0
+                    revenueProfitStats?.data?.totals?.totalRevenue || 0
                   )}
                 </Typography>
               </Box>
-              <Divider orientation='vertical' flexItem />
-              <Box sx={{ textAlign: 'center' }}>
-                <Typography sx={{ color: '#696969' }}>Lợi nhuận</Typography>
+              <Divider orientation="vertical" flexItem />
+              <Box sx={{ textAlign: "center" }}>
+                <Typography sx={{ color: "#696969" }}>Lợi nhuận</Typography>
                 <Typography
-                  sx={{ fontSize: 20, fontWeight: 600, color: '#333' }}>
+                  sx={{ fontSize: 20, fontWeight: 600, color: "#333" }}
+                >
                   {formatPrice(
-                    revenueProfitSummaryStats?.data.totals.totalProfit || 0
+                    revenueProfitStats?.data.totals.totalProfit || 0
                   )}
                 </Typography>
               </Box>
@@ -367,18 +378,19 @@ const RevenueProfit: React.FC = () => {
               dateRange={dateRange}
               onRangeChange={handleDateRangeChange}
             />
-            <Box sx={{ width: '100%', height: 400, p: 0, m: 0 }}>
+            <Box sx={{ width: "100%", height: 400, p: 0, m: 0 }}>
               <Line data={chartData} options={chartOptions} />
             </Box>
           </>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
             {summaryStats.map((stat, idx) => (
               <Box
                 key={idx}
                 sx={{
-                  width: '25%',
-                  borderLeft: idx !== 0 ? '1px solid #e0e0e0' : 'none',
-                }}>
+                  width: "25%",
+                  borderLeft: idx !== 0 ? "1px solid #e0e0e0" : "none",
+                }}
+              >
                 <Box sx={{ px: 3 }}>
                   <SummaryStat {...stat} />
                 </Box>
