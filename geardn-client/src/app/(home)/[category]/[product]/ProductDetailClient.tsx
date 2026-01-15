@@ -58,7 +58,16 @@ const ProductDetailClient = ({
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperClass | null>(null);
   const [selectedAttributes, setSelectedAttributes] = useState<
     Record<string, string>
-  >({});
+  >(
+    product?.skus?.length === 1 &&
+      product.skus[0].productSkuAttributes.length > 0
+      ? {
+          [product.skus[0].productSkuAttributes[0].attributeValue.attribute
+            .name]:
+            product.skus[0].productSkuAttributes[0].attributeValue.value,
+        }
+      : {}
+  );
   const mainSwiperRef = useRef<SwiperClass | null>(null);
 
   const productImageList = useMemo(() => {
@@ -412,9 +421,16 @@ const ProductDetailClient = ({
               <Typography
                 sx={{ mb: 2, fontSize: { xs: 20, md: 24 }, fontWeight: 600 }}
               >
-                {product?.skus?.length && selectedSku !== null
-                  ? formatPrice(selectedSku?.sellingPrice ?? 0)
-                  : formatPrice(product?.priceMin ?? 0)}
+                {product?.skus?.length && selectedSku !== null ? (
+                  formatPrice(selectedSku?.sellingPrice ?? 0)
+                ) : (
+                  <>
+                    {formatPrice(product?.priceMin ?? 0)}
+                    {product?.skus?.length > 1 && (
+                      <>- {formatPrice(product?.priceMax ?? 0)}</>
+                    )}
+                  </>
+                )}
               </Typography>
               {Object.entries(attributeOptions).map(([type, values]) => (
                 <Box
