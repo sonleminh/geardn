@@ -1,8 +1,8 @@
-import { Injectable } from "@nestjs/common";
-import { PrismaService } from "../prisma/prisma.service";
-import { InjectQueue } from "@nestjs/bullmq";
-import { Queue } from "bullmq";
-import { Cron } from "@nestjs/schedule";
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
+import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class OutboxPoller {
@@ -11,8 +11,8 @@ export class OutboxPoller {
     @InjectQueue('outbox-sync') private q: Queue,
   ) {}
 
-  // chạy mỗi 5s
-  @Cron('*/5 * * * * *')
+  // chạy mỗi 60s
+  @Cron('0 * * * * *')
   async run() {
     const batch = await this.prisma.outbox.findMany({
       where: { status: 'PENDING' },
