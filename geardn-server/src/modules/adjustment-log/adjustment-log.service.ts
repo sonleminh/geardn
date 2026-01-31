@@ -45,9 +45,9 @@ export class AdjustmentLogService {
       }
     >();
     for (const item of items) {
-      if (item.quantityChange === 0) {
+      if (item.quantityChange < 0) {
         throw new BadRequestException(
-          `Quantity cannot be zero for SKU ${item.skuId}`,
+          `Quantity cannot be less than 0 for SKU ${item.skuId}`,
         );
       }
       if (mergedItemsMap.has(item.skuId)) {
@@ -95,7 +95,7 @@ export class AdjustmentLogService {
         });
 
         const referenceCode = `ADJ-${localToday}-${String(countToday + 1).padStart(4, '0')}`;
-        
+
         // Tạo adjustment log
         const adjustmentLog = await tx.adjustmentLog.create({
           data: {
