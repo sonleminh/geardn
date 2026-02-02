@@ -786,15 +786,12 @@ export class StatisticsService {
       },
     });
     const categoryIds = Array.from(new Set(products.map((p) => p.categoryId)));
-    // Get categoryId -> categoryName
     const categories = await this.prisma.category.findMany({
       where: { id: { in: categoryIds } },
       select: { id: true, name: true },
     });
-    // Build productId -> categoryId map
     const productToCategory = new Map<number, number>();
     for (const p of products) productToCategory.set(p.id, p.categoryId);
-    // Build categoryId -> { id, name, quantitySold, revenue }
     const categoryMap = new Map<
       number,
       {
