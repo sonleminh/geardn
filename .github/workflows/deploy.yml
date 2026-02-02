@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'geardn-server/**'
+      - "geardn-server/**"
 
 jobs:
   build-and-push:
@@ -38,19 +38,31 @@ jobs:
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.HOST_IP }}
+          port: ${{ secrets.SSH_PORT }}
           username: ${{ secrets.HOST_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: './geardn-server/docker-compose.yml'
-          target: '/var/www/geardn-server/'
+          source: "./geardn-server/docker-compose.yml"
+          target: "/var/www/geardn-server/"
+          strip_components: 1
 
       - name: SSH into VPS and Deploy
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST_IP }}
+          port: ${{ secrets.SSH_PORT }}
           username: ${{ secrets.HOST_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            # Tạo thư mục trước để tránh lỗi nếu chưa có
+            mkdir -p /var/www/geardn-server
+
             cd /var/www/geardn-server
+
+            # Pull image mới nhất về
             docker pull ${{ secrets.DOCKER_USERNAME }}/geardn-server:latest
+
+            # Chạy lại container (chỉ update cái nào thay đổi)
             docker compose up -d --remove-orphans
+
+            # Dọn dẹp image rác cho sạch ổ cứng
             docker image prune -f
