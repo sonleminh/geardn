@@ -20,26 +20,26 @@ import {
   TableHead,
   TableRow,
   Typography,
-} from '@mui/material';
+} from "@mui/material";
 
-import SuspenseLoader from '@/components/SuspenseLoader';
-import { QueryKeys } from '@/constants/query-key';
-import { ROUTES } from '@/constants/route';
-import { useAlertContext } from '@/contexts/AlertContext';
-import { IOrderItem } from '@/interfaces/IOrder';
+import SuspenseLoader from "@/components/SuspenseLoader";
+import { QueryKeys } from "@/constants/query-key";
+import { ROUTES } from "@/constants/route";
+import { useAlertContext } from "@/contexts/AlertContext";
+import { IOrderItem } from "@/interfaces/IOrder";
 import {
   useCompleteReturnRequest,
   useGetOrderReturnRequestById,
-} from '@/services/order-return-request';
-import { useGetWarehouseList } from '@/services/warehouse';
-import { truncateTextByLine } from '@/utils/css-helper.util';
-import { formatPrice } from '@/utils/format-price';
-import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import { useQueryClient } from '@tanstack/react-query';
-import moment from 'moment';
-import { useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+} from "@/services/order-return-request";
+import { useGetWarehouseList } from "@/services/warehouse";
+import { truncateTextByLine } from "@/utils/css-helper.util";
+import { formatPrice } from "@/utils/format-price";
+import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import { useQueryClient } from "@tanstack/react-query";
+import moment from "moment";
+import { useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 interface IExportItem {
   skuId: number;
@@ -88,14 +88,13 @@ const OrderReturnRequestConfirm = () => {
   const handleSubmit = () => {
     if (!id) return;
 
-    // Check if all order items have warehouse selected
     const orderItems = orderReturnRequestData?.data?.order?.orderItems || [];
     const hasAllWarehousesSelected = orderItems.every((item) =>
       exportItems.some((exportItem) => exportItem.skuId === item.skuId)
     );
 
     if (!hasAllWarehousesSelected) {
-      showAlert('Vui lòng chọn kho cho tất cả sản phẩm', 'error');
+      showAlert("Vui lòng chọn kho cho tất cả sản phẩm", "error");
       return;
     }
 
@@ -107,8 +106,8 @@ const OrderReturnRequestConfirm = () => {
       {
         onSuccess: () => {
           showAlert(
-            'Xác nhận hoàn thành yêu cầu hoàn đơn thành công',
-            'success'
+            "Xác nhận hoàn thành yêu cầu hoàn đơn thành công",
+            "success"
           );
           navigate(`${ROUTES.ORDER_RETURN_REQUEST}`);
           queryClient.invalidateQueries({
@@ -117,8 +116,8 @@ const OrderReturnRequestConfirm = () => {
         },
         onError: () => {
           showAlert(
-            'Có lỗi xảy ra khi xác nhận hoàn thành yêu cầu hoàn đơn',
-            'error'
+            "Có lỗi xảy ra khi xác nhận hoàn thành yêu cầu hoàn đơn",
+            "error"
           );
         },
       }
@@ -129,15 +128,15 @@ const OrderReturnRequestConfirm = () => {
     () => [
       {
         icon: <HomeOutlinedIcon sx={{ fontSize: 24 }} />,
-        label: '',
+        label: "",
         onClick: () => navigate(ROUTES.DASHBOARD),
       },
       {
-        label: 'Yêu cầu hoàn đơn',
+        label: "Yêu cầu hoàn đơn",
         onClick: () => navigate(ROUTES.ORDER_RETURN_REQUEST),
       },
       {
-        label: 'Xác nhận yêu cầu hoàn đơn',
+        label: "Xác nhận yêu cầu hoàn đơn",
       },
     ],
     [navigate]
@@ -146,19 +145,21 @@ const OrderReturnRequestConfirm = () => {
     <>
       <Box sx={{ mb: 3 }}>
         <Breadcrumbs
-          separator={<NavigateNextIcon fontSize='small' />}
-          aria-label='breadcrumb'>
+          separator={<NavigateNextIcon fontSize="small" />}
+          aria-label="breadcrumb"
+        >
           {breadcrumbs.map((crumb, index) => (
             <Link
               key={index}
-              underline='hover'
-              color='inherit'
+              underline="hover"
+              color="inherit"
               onClick={crumb.onClick}
               sx={{
-                cursor: crumb.onClick ? 'pointer' : 'default',
-                display: 'flex',
-                alignItems: 'center',
-              }}>
+                cursor: crumb.onClick ? "pointer" : "default",
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
               {crumb.icon}
               {crumb.label}
             </Link>
@@ -174,7 +175,7 @@ const OrderReturnRequestConfirm = () => {
         <Grid2 size={{ xs: 12, md: 6 }}>
           <Card sx={{ mb: 3 }}>
             <CardHeader
-              title='Thông tin đơn hàng'
+              title="Thông tin đơn hàng"
               sx={{
                 span: {
                   fontSize: 18,
@@ -188,18 +189,20 @@ const OrderReturnRequestConfirm = () => {
                 <Grid2 container spacing={3}>
                   <Grid2 size={{ xs: 12, md: 4 }}>
                     <Box
-                      sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                      <Skeleton variant='text' width={120} height={20} />
-                      <Skeleton variant='text' width={120} height={20} />
-                      <Skeleton variant='text' width={80} height={20} />
+                      sx={{ display: "flex", flexDirection: "column", gap: 1 }}
+                    >
+                      <Skeleton variant="text" width={120} height={20} />
+                      <Skeleton variant="text" width={120} height={20} />
+                      <Skeleton variant="text" width={80} height={20} />
                     </Box>
                   </Grid2>
                   <Grid2 size={{ xs: 12, md: 8 }}>
                     <Box
-                      sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                      <Skeleton variant='text' width={180} height={20} />
-                      <Skeleton variant='text' width={150} height={20} />
-                      <Skeleton variant='text' width={200} height={20} />
+                      sx={{ display: "flex", flexDirection: "column", gap: 1 }}
+                    >
+                      <Skeleton variant="text" width={180} height={20} />
+                      <Skeleton variant="text" width={150} height={20} />
+                      <Skeleton variant="text" width={200} height={20} />
                     </Box>
                   </Grid2>
                 </Grid2>
@@ -217,14 +220,14 @@ const OrderReturnRequestConfirm = () => {
                   <Grid2 size={{ xs: 12, md: 8 }}>
                     <Typography sx={{ mb: 1 }}>
                       {orderReturnRequestData?.data?.order?.fullName ??
-                        'Không có'}
+                        "Không có"}
                     </Typography>
                     <Typography sx={{ mb: 1 }}>
                       {orderReturnRequestData?.data?.order?.phoneNumber ??
-                        'Không có'}
+                        "Không có"}
                     </Typography>
                     <Typography>
-                      {orderReturnRequestData?.data?.order?.email ?? 'Không có'}
+                      {orderReturnRequestData?.data?.order?.email ?? "Không có"}
                     </Typography>
                   </Grid2>
                 </Grid2>
@@ -233,7 +236,7 @@ const OrderReturnRequestConfirm = () => {
           </Card>
           <Card sx={{ mb: 3 }}>
             <CardHeader
-              title='Thông tin vận chuyển'
+              title="Thông tin vận chuyển"
               sx={{
                 span: {
                   fontSize: 18,
@@ -247,20 +250,22 @@ const OrderReturnRequestConfirm = () => {
                 <Grid2 container spacing={3}>
                   <Grid2 size={{ xs: 12, md: 4 }}>
                     <Box
-                      sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                      <Skeleton variant='text' width={120} height={20} />
-                      <Skeleton variant='text' width={140} height={20} />
-                      <Skeleton variant='text' width={100} height={20} />
-                      <Skeleton variant='text' width={80} height={20} />
+                      sx={{ display: "flex", flexDirection: "column", gap: 1 }}
+                    >
+                      <Skeleton variant="text" width={120} height={20} />
+                      <Skeleton variant="text" width={140} height={20} />
+                      <Skeleton variant="text" width={100} height={20} />
+                      <Skeleton variant="text" width={80} height={20} />
                     </Box>
                   </Grid2>
                   <Grid2 size={{ xs: 12, md: 8 }}>
                     <Box
-                      sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                      <Skeleton variant='text' width={100} height={20} />
-                      <Skeleton variant='text' width={150} height={20} />
-                      <Skeleton variant='text' width={160} height={20} />
-                      <Skeleton variant='text' width={250} height={20} />
+                      sx={{ display: "flex", flexDirection: "column", gap: 1 }}
+                    >
+                      <Skeleton variant="text" width={100} height={20} />
+                      <Skeleton variant="text" width={150} height={20} />
+                      <Skeleton variant="text" width={160} height={20} />
+                      <Skeleton variant="text" width={250} height={20} />
                     </Box>
                   </Grid2>
                 </Grid2>
@@ -283,8 +288,8 @@ const OrderReturnRequestConfirm = () => {
                       {orderReturnRequestData?.data?.order?.completedAt
                         ? moment(
                             orderReturnRequestData?.data?.order?.completedAt
-                          ).format('DD/MM/YYYY')
-                        : 'Không có'}
+                          ).format("DD/MM/YYYY")
+                        : "Không có"}
                     </Typography>
                     <Typography sx={{ mb: 1 }}>
                       {orderReturnRequestData?.data?.order?.shipment
@@ -292,18 +297,18 @@ const OrderReturnRequestConfirm = () => {
                         ? moment(
                             orderReturnRequestData?.data?.order?.shipment
                               ?.deliveryDate
-                          ).format('DD/MM/YYYY HH:mm')
-                        : 'Không có'}
+                          ).format("DD/MM/YYYY HH:mm")
+                        : "Không có"}
                     </Typography>
                     <Typography sx={{ mb: 1 }}>
                       {orderReturnRequestData?.data?.order?.shipment?.method ==
                       1
-                        ? 'Giao hàng tận nơi'
-                        : 'Nhận tại cửa hàng'}
+                        ? "Giao hàng tận nơi"
+                        : "Nhận tại cửa hàng"}
                     </Typography>
                     <Typography>
                       {orderReturnRequestData?.data?.order?.shipment?.address ??
-                        ''}
+                        ""}
                     </Typography>
                   </Grid2>
                 </Grid2>
@@ -312,7 +317,7 @@ const OrderReturnRequestConfirm = () => {
           </Card>
           <Card>
             <CardHeader
-              title='Phương thức thanh toán'
+              title="Phương thức thanh toán"
               sx={{
                 span: {
                   fontSize: 18,
@@ -323,28 +328,29 @@ const OrderReturnRequestConfirm = () => {
             <Divider />
             <CardContent>
               {isLoadingOrderReturnRequest ? (
-                <Box display='flex' alignItems='center' sx={{ height: 40 }}>
+                <Box display="flex" alignItems="center" sx={{ height: 40 }}>
                   <Skeleton
-                    variant='rectangular'
+                    variant="rectangular"
                     width={40}
                     height={40}
                     sx={{ mr: 2 }}
                   />
-                  <Skeleton variant='text' width={120} height={20} />
+                  <Skeleton variant="text" width={120} height={20} />
                 </Box>
               ) : (
                 <Box
-                  display='flex'
-                  alignItems='center'
+                  display="flex"
+                  alignItems="center"
                   sx={{
                     height: 40,
                     img: {
                       width: 40,
                       height: 40,
                       mr: 2,
-                      objectFit: 'contain',
+                      objectFit: "contain",
                     },
-                  }}>
+                  }}
+                >
                   <img
                     src={
                       orderReturnRequestData?.data?.order?.paymentMethod?.image
@@ -364,7 +370,7 @@ const OrderReturnRequestConfirm = () => {
         <Grid2 size={{ xs: 12, md: 6 }}>
           <Card>
             <CardHeader
-              title='Chi tiết đơn hàng'
+              title="Chi tiết đơn hàng"
               sx={{
                 span: {
                   fontSize: 18,
@@ -380,16 +386,16 @@ const OrderReturnRequestConfirm = () => {
                     <TableHead>
                       <TableRow>
                         <TableCell>
-                          <Skeleton variant='text' width={30} height={20} />
+                          <Skeleton variant="text" width={30} height={20} />
                         </TableCell>
                         <TableCell>
-                          <Skeleton variant='text' width={40} height={20} />
+                          <Skeleton variant="text" width={40} height={20} />
                         </TableCell>
                         <TableCell>
-                          <Skeleton variant='text' width={80} height={20} />
+                          <Skeleton variant="text" width={80} height={20} />
                         </TableCell>
                         <TableCell>
-                          <Skeleton variant='text' width={40} height={20} />
+                          <Skeleton variant="text" width={40} height={20} />
                         </TableCell>
                       </TableRow>
                     </TableHead>
@@ -397,11 +403,11 @@ const OrderReturnRequestConfirm = () => {
                       {Array.from(new Array(3)).map((_, index) => (
                         <TableRow key={index}>
                           <TableCell>
-                            <Skeleton variant='text' width={20} height={20} />
+                            <Skeleton variant="text" width={20} height={20} />
                           </TableCell>
                           <TableCell>
                             <Skeleton
-                              variant='rectangular'
+                              variant="rectangular"
                               width={40}
                               height={40}
                             />
@@ -409,18 +415,19 @@ const OrderReturnRequestConfirm = () => {
                           <TableCell>
                             <Box
                               sx={{
-                                display: 'flex',
-                                flexDirection: 'column',
+                                display: "flex",
+                                flexDirection: "column",
                                 gap: 0.5,
-                              }}>
+                              }}
+                            >
                               <Skeleton
-                                variant='text'
+                                variant="text"
                                 width={120}
                                 height={20}
                               />
-                              <Skeleton variant='text' width={80} height={16} />
+                              <Skeleton variant="text" width={80} height={16} />
                               <Skeleton
-                                variant='text'
+                                variant="text"
                                 width={100}
                                 height={16}
                               />
@@ -428,7 +435,7 @@ const OrderReturnRequestConfirm = () => {
                           </TableCell>
                           <TableCell>
                             <Skeleton
-                              variant='rectangular'
+                              variant="rectangular"
                               width={170}
                               height={40}
                             />
@@ -462,9 +469,10 @@ const OrderReturnRequestConfirm = () => {
                                     width: 40,
                                     height: 40,
                                     mr: 1,
-                                    objectFit: 'contain',
+                                    objectFit: "contain",
                                   },
-                                }}>
+                                }}
+                              >
                                 <img
                                   src={item?.imageUrl}
                                   alt={item?.productName}
@@ -477,7 +485,8 @@ const OrderReturnRequestConfirm = () => {
                                   fontSize: 14,
                                   fontWeight: 500,
                                   ...truncateTextByLine(1),
-                                }}>
+                                }}
+                              >
                                 {item?.productName}
                               </Typography>
                               <Typography sx={{ fontSize: 13 }}>
@@ -488,15 +497,15 @@ const OrderReturnRequestConfirm = () => {
                               </Typography>
                             </TableCell>
                             <TableCell>
-                              {' '}
-                              <FormControl size='small' sx={{ width: 170 }}>
+                              {" "}
+                              <FormControl size="small" sx={{ width: 170 }}>
                                 <Select
                                   displayEmpty
                                   value={
                                     exportItems.find(
                                       (exportItem) =>
                                         exportItem.skuId === item?.skuId
-                                    )?.warehouseId ?? ''
+                                    )?.warehouseId ?? ""
                                   }
                                   onChange={(e) => {
                                     handleSelectWarehouse(
@@ -504,41 +513,44 @@ const OrderReturnRequestConfirm = () => {
                                       e as SelectChangeEvent<string>
                                     );
                                   }}
-                                  size='small'
+                                  size="small"
                                   sx={{
                                     minHeight: 40,
                                     height: 40,
                                     fontSize: 14,
-                                    '& .MuiFilledInput-root': {
-                                      overflow: 'hidden',
+                                    "& .MuiFilledInput-root": {
+                                      overflow: "hidden",
                                       borderRadius: 1,
-                                      backgroundColor: '#a77575 !important',
-                                      border: '1px solid',
-                                      borderColor: 'rgba(0,0,0,0.23)',
-                                      '&:hover': {
-                                        backgroundColor: 'transparent',
+                                      backgroundColor: "#a77575 !important",
+                                      border: "1px solid",
+                                      borderColor: "rgba(0,0,0,0.23)",
+                                      "&:hover": {
+                                        backgroundColor: "transparent",
                                       },
-                                      '&.Mui-focused': {
-                                        backgroundColor: 'transparent',
-                                        border: '2px solid',
+                                      "&.Mui-focused": {
+                                        backgroundColor: "transparent",
+                                        border: "2px solid",
                                       },
                                     },
-                                  }}>
-                                  <MenuItem value='' disabled>
+                                  }}
+                                >
+                                  <MenuItem value="" disabled>
                                     Chọn kho
                                   </MenuItem>
                                   {warehouseData?.data?.map((warehouse) => {
                                     return (
                                       <MenuItem
                                         key={warehouse?.id}
-                                        value={warehouse?.id}>
+                                        value={warehouse?.id}
+                                      >
                                         <Box
                                           sx={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'space-between',
-                                            width: '100%',
-                                          }}>
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "space-between",
+                                            width: "100%",
+                                          }}
+                                        >
                                           <Typography sx={{ fontSize: 14 }}>
                                             {warehouse?.name}
                                           </Typography>
@@ -564,16 +576,17 @@ const OrderReturnRequestConfirm = () => {
       <Grid2 size={{ xs: 12 }}>
         <Box
           sx={{
-            display: 'flex',
-            justifyContent: 'flex-end',
-            width: '100%',
+            display: "flex",
+            justifyContent: "flex-end",
+            width: "100%",
             mt: 2,
             gap: 2,
-          }}>
+          }}
+        >
           {isLoadingOrderReturnRequest || isLoadingWarehouse ? (
             <>
-              <Skeleton variant='rectangular' width={80} height={36} />
-              <Skeleton variant='rectangular' width={100} height={36} />
+              <Skeleton variant="rectangular" width={80} height={36} />
+              <Skeleton variant="rectangular" width={100} height={36} />
             </>
           ) : (
             <>
@@ -581,9 +594,10 @@ const OrderReturnRequestConfirm = () => {
                 Trở lại
               </Button>
               <Button
-                variant='contained'
+                variant="contained"
                 onClick={() => handleSubmit()}
-                sx={{ minWidth: 100 }}>
+                sx={{ minWidth: 100 }}
+              >
                 Xác nhận
               </Button>
             </>

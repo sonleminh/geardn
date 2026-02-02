@@ -1,7 +1,7 @@
 import {
   ConflictException,
   Injectable,
-  NotFoundException
+  NotFoundException,
 } from '@nestjs/common';
 import { Request } from 'express';
 import * as jwt from 'jsonwebtoken';
@@ -55,7 +55,6 @@ export class CartService {
         });
       }
 
-      // 4) Tạo mới hoặc cập nhật
       const created = !existing;
       created
         ? await tx.cartItem.create({
@@ -73,36 +72,7 @@ export class CartService {
             select: { id: true, skuId: true, quantity: true },
           });
 
-      // 5) Lấy snapshot giỏ hàng sau cập nhật
-      // const rawItems = await tx.cartItem.findMany({
-      //   where: { cartId: cart.id },
-      //   select: {
-      //     id: true,
-      //     productId: true,
-      //     skuId: true,
-      //     quantity: true,
-      //     product: true,
-      //   },
-      //   orderBy: { id: 'asc' },
-      // });
-
-      // const items = rawItems.map((r) => {
-      //   return {
-      //     id: r.id,
-      //     productId: r.productId,
-      //     skuId: r.skuId,
-      //     name: r.product?.name || '',
-      //     imageUrl: r.product?.images[0] || null,
-      //     quantity: r.quantity,
-      //   };
-      // });
-
       return {
-        // cart: {
-        //   id: cart.id,
-        //   userId: cart.userId,
-        //   items,
-        // },
         message: 'Item added to cart successfully',
       };
     });
@@ -212,7 +182,6 @@ export class CartService {
                 sku: true,
                 sellingPrice: true,
                 imageUrl: true,
-                // quantity: true,
                 productSkuAttributes: {
                   select: {
                     id: true,
@@ -227,13 +196,6 @@ export class CartService {
                         value: true,
                       },
                     },
-                    // {
-                    //   select: {
-                    //     id: true,
-                    //     type: true,
-                    //     value: true,
-                    //   },
-                    // },
                   },
                 },
               },
@@ -307,18 +269,10 @@ export class CartService {
                 sku: true,
                 sellingPrice: true,
                 imageUrl: true,
-                // quantity: true,
                 productSkuAttributes: {
                   select: {
                     id: true,
                     attributeValue: true,
-                    // {
-                    //   select: {
-                    //     id: true,
-                    //     type: true,
-                    //     value: true,
-                    //   },
-                    // },
                   },
                 },
               },

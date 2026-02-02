@@ -1,7 +1,7 @@
-import axios, { AxiosError } from 'axios';
-import { useFormik } from 'formik';
-import { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import axios, { AxiosError } from "axios";
+import { useFormik } from "formik";
+import { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 import {
   Box,
@@ -14,30 +14,30 @@ import {
   Grid2,
   Link,
   Typography,
-} from '@mui/material';
+} from "@mui/material";
 
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from "@tanstack/react-query";
 
-import { useAuthContext } from '@/contexts/AuthContext';
-import { useAlertContext } from '@/contexts/AlertContext';
+import { useAuthContext } from "@/contexts/AuthContext";
+import { useAlertContext } from "@/contexts/AlertContext";
 
 import {
   useCreateOrder,
   useGetOrderById,
   useUpdateOrder,
-} from '@/services/order';
+} from "@/services/order";
 
-import { QueryKeys } from '@/constants/query-key';
+import { QueryKeys } from "@/constants/query-key";
 
-import { ICheckoutItem, ICreateOrder, IOrder } from '@/interfaces/IOrder';
+import { ICheckoutItem, ICreateOrder, IOrder } from "@/interfaces/IOrder";
 
-import SuspenseLoader from '@/components/SuspenseLoader';
-import CustomerForm from './components/CustomerForm';
-import ProductSelector from './components/ProductSelector';
-import ShipmentForm from './components/ShipmentForm';
-import { ROUTES } from '@/constants/route';
-import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import SuspenseLoader from "@/components/SuspenseLoader";
+import CustomerForm from "./components/CustomerForm";
+import ProductSelector from "./components/ProductSelector";
+import ShipmentForm from "./components/ShipmentForm";
+import { ROUTES } from "@/constants/route";
+import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 
 interface AddressState {
   city: string;
@@ -65,17 +65,17 @@ interface OrderFormValues {
 const useOrderForm = (orderData: { data: IOrder } | undefined) => {
   const [orderItems, setOrderItems] = useState<ICheckoutItem[]>([]);
   const [address, setAddress] = useState<AddressState>({
-    city: '',
-    ward: '',
-    detailAddress: '',
-    shopAddress: '',
+    city: "",
+    ward: "",
+    detailAddress: "",
+    shopAddress: "",
   });
 
   const formik = useFormik<OrderFormValues>({
     initialValues: {
-      fullName: '',
-      phoneNumber: '',
-      email: '',
+      fullName: "",
+      phoneNumber: "",
+      email: "",
       shipment: {
         method: 1,
         deliveryDate: null,
@@ -84,40 +84,40 @@ const useOrderForm = (orderData: { data: IOrder } | undefined) => {
       flag: {
         isOnlineOrder: false,
       },
-      note: '',
+      note: "",
       completedAt: null,
     },
     validateOnChange: false,
-    onSubmit: () => {}, // Will be set in the component
+    onSubmit: () => {},
   });
 
   useEffect(() => {
     if (orderData) {
-      formik.setFieldValue('fullName', orderData.data.fullName);
-      formik.setFieldValue('phoneNumber', orderData.data.phoneNumber);
-      formik.setFieldValue('email', orderData.data.email);
+      formik.setFieldValue("fullName", orderData.data.fullName);
+      formik.setFieldValue("phoneNumber", orderData.data.phoneNumber);
+      formik.setFieldValue("email", orderData.data.email);
 
       if (orderData.data.shipment?.method === 1) {
-        const addressArr = orderData.data.shipment?.address?.split(', ');
+        const addressArr = orderData.data.shipment?.address?.split(", ");
         setAddress({
-          city: addressArr[2] || '',
-          ward: addressArr[1] || '',
-          detailAddress: addressArr[0] || '',
-          shopAddress: '',
+          city: addressArr[2] || "",
+          ward: addressArr[1] || "",
+          detailAddress: addressArr[0] || "",
+          shopAddress: "",
         });
       } else {
         setAddress((prev) => ({
           ...prev,
-          shopAddress: orderData.data.shipment?.address || '',
+          shopAddress: orderData.data.shipment?.address || "",
         }));
       }
 
-      formik.setFieldValue('shipment.method', orderData.data.shipment?.method);
+      formik.setFieldValue("shipment.method", orderData.data.shipment?.method);
       formik.setFieldValue(
-        'shipment.deliveryDate',
+        "shipment.deliveryDate",
         orderData.data.shipment?.deliveryDate
       );
-      formik.setFieldValue('note', orderData.data.note);
+      formik.setFieldValue("note", orderData.data.note);
       setOrderItems(orderData.data.orderItems);
     }
   }, [orderData]);
@@ -155,11 +155,11 @@ const OrderUpsert = () => {
   const handleSubmit = useCallback(
     (values: OrderFormValues) => {
       if (!user?.id) {
-        return showAlert('Không tìm thấy tài khoản', 'error');
+        return showAlert("Không tìm thấy tài khoản", "error");
       }
 
       if (!orderItems?.length) {
-        return showAlert('Không có sản phẩm nào để tạo đơn hàng', 'error');
+        return showAlert("Không có sản phẩm nào để tạo đơn hàng", "error");
       }
 
       const { city, ward, detailAddress, shopAddress } = address;
@@ -167,13 +167,12 @@ const OrderUpsert = () => {
         (values.shipment.method === 1 && !ward && !detailAddress) ||
         (values.shipment.method === 2 && !shopAddress)
       ) {
-        return showAlert('Vui lòng chọn địa chỉ nhận hàng', 'error');
+        return showAlert("Vui lòng chọn địa chỉ nhận hàng", "error");
       }
 
-      // Process form values - trim whitespace and convert empty strings to null for API
       const processField = (value: string) => {
         const trimmed = value?.trim();
-        return trimmed === '' ? null : trimmed;
+        return trimmed === "" ? null : trimmed;
       };
 
       const processedValues = {
@@ -214,7 +213,7 @@ const OrderUpsert = () => {
               queryClient.invalidateQueries({
                 queryKey: [QueryKeys.Order],
               });
-              showAlert('Cập nhật đơn hàng thành công', 'success');
+              showAlert("Cập nhật đơn hàng thành công", "success");
               navigate(-1);
             },
             onError: handleError,
@@ -224,7 +223,7 @@ const OrderUpsert = () => {
         createOrderMutate(payload as ICreateOrder, {
           onSuccess() {
             queryClient.invalidateQueries({ queryKey: [QueryKeys.Order] });
-            showAlert('Tạo đơn hàng thành công', 'success');
+            showAlert("Tạo đơn hàng thành công", "success");
             navigate(-1);
           },
           onError: handleError,
@@ -248,9 +247,9 @@ const OrderUpsert = () => {
   const handleError = useCallback(
     (err: Error | AxiosError) => {
       if (axios.isAxiosError(err)) {
-        showAlert(err.response?.data?.message, 'error');
+        showAlert(err.response?.data?.message, "error");
       } else {
-        showAlert(err.message, 'error');
+        showAlert(err.message, "error");
       }
     },
     [showAlert]
@@ -276,13 +275,13 @@ const OrderUpsert = () => {
 
   const handleCityChange = useCallback(
     (value: React.SetStateAction<string>) => {
-      if (typeof value === 'function') {
+      if (typeof value === "function") {
         setAddress((prev) => ({
           ...prev,
           city: value(prev.city),
         }));
       } else {
-        handleAddressChange('city', value);
+        handleAddressChange("city", value);
       }
     },
     [handleAddressChange]
@@ -290,13 +289,13 @@ const OrderUpsert = () => {
 
   const handleWardChange = useCallback(
     (value: React.SetStateAction<string>) => {
-      if (typeof value === 'function') {
+      if (typeof value === "function") {
         setAddress((prev) => ({
           ...prev,
           ward: value(prev.ward),
         }));
       } else {
-        handleAddressChange('ward', value);
+        handleAddressChange("ward", value);
       }
     },
     [handleAddressChange]
@@ -304,13 +303,13 @@ const OrderUpsert = () => {
 
   const handleDetailAddressChange = useCallback(
     (value: React.SetStateAction<string>) => {
-      if (typeof value === 'function') {
+      if (typeof value === "function") {
         setAddress((prev) => ({
           ...prev,
           detailAddress: value(prev.detailAddress),
         }));
       } else {
-        handleAddressChange('detailAddress', value);
+        handleAddressChange("detailAddress", value);
       }
     },
     [handleAddressChange]
@@ -318,13 +317,13 @@ const OrderUpsert = () => {
 
   const handleShopAddressChange = useCallback(
     (value: React.SetStateAction<string>) => {
-      if (typeof value === 'function') {
+      if (typeof value === "function") {
         setAddress((prev) => ({
           ...prev,
           shopAddress: value(prev.shopAddress),
         }));
       } else {
-        handleAddressChange('shopAddress', value);
+        handleAddressChange("shopAddress", value);
       }
     },
     [handleAddressChange]
@@ -334,15 +333,15 @@ const OrderUpsert = () => {
     () => [
       {
         icon: <HomeOutlinedIcon sx={{ fontSize: 24 }} />,
-        label: '',
+        label: "",
         onClick: () => navigate(ROUTES.DASHBOARD),
       },
       {
-        label: 'Danh sách đơn hàng',
+        label: "Danh sách đơn hàng",
         onClick: () => navigate(ROUTES.ORDER_LIST),
       },
       {
-        label: isEdit ? 'Chỉnh sửa đơn hàng' : 'Thêm đơn hàng mới',
+        label: isEdit ? "Chỉnh sửa đơn hàng" : "Thêm đơn hàng mới",
       },
     ],
     [isEdit, navigate]
@@ -356,19 +355,21 @@ const OrderUpsert = () => {
     <>
       <Box sx={{ mb: 3 }}>
         <Breadcrumbs
-          separator={<NavigateNextIcon fontSize='small' />}
-          aria-label='breadcrumb'>
+          separator={<NavigateNextIcon fontSize="small" />}
+          aria-label="breadcrumb"
+        >
           {breadcrumbs.map((crumb, index) => (
             <Link
               key={index}
-              underline='hover'
-              color='inherit'
+              underline="hover"
+              color="inherit"
               onClick={crumb.onClick}
               sx={{
-                cursor: crumb.onClick ? 'pointer' : 'default',
-                display: 'flex',
-                alignItems: 'center',
-              }}>
+                cursor: crumb.onClick ? "pointer" : "default",
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
               {crumb.icon}
               {crumb.label}
             </Link>
@@ -377,14 +378,14 @@ const OrderUpsert = () => {
       </Box>
 
       <Typography sx={{ mb: 2, fontSize: 20, fontWeight: 600 }}>
-        {isEdit ? 'Chỉnh sửa đơn hàng' : 'Thêm đơn hàng mới'}:
+        {isEdit ? "Chỉnh sửa đơn hàng" : "Thêm đơn hàng mới"}:
       </Typography>
 
       <Grid2 container spacing={4}>
         <Grid2 size={{ xs: 12, md: 6 }}>
           <Card sx={{ mb: 3 }}>
             <CardHeader
-              title='Thông tin khách hàng'
+              title="Thông tin khách hàng"
               sx={{
                 span: {
                   fontSize: 18,
@@ -437,7 +438,7 @@ const OrderUpsert = () => {
         <Grid2 size={{ xs: 12, md: 6 }}>
           <Card>
             <CardHeader
-              title='Thông tin vận chuyển'
+              title="Thông tin vận chuyển"
               sx={{
                 span: {
                   fontSize: 18,
@@ -476,19 +477,21 @@ const OrderUpsert = () => {
       <Grid2 size={{ xs: 12 }}>
         <Box
           sx={{
-            display: 'flex',
-            justifyContent: 'flex-end',
-            width: '100%',
+            display: "flex",
+            justifyContent: "flex-end",
+            width: "100%",
             mt: 2,
-          }}>
+          }}
+        >
           <Button onClick={() => navigate(ROUTES.ORDER_LIST)} sx={{ mr: 2 }}>
             Trở lại
           </Button>
           <Button
-            variant='contained'
+            variant="contained"
             onClick={() => handleSubmit(formik.values)}
-            sx={{ minWidth: 100 }}>
-            {isEdit ? 'Lưu' : 'Tạo'}
+            sx={{ minWidth: 100 }}
+          >
+            {isEdit ? "Lưu" : "Tạo"}
           </Button>
         </Box>
       </Grid2>

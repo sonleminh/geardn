@@ -136,8 +136,6 @@ export const useGetProductInitial = () => {
   });
 };
 
-// Update
-
 const updateProduct = async (payload: IUpdateProductPayload) => {
   const { id, ...rest } = payload;
   const result = await axiosInstance.patch(`${productUrl}/${id}`, rest);
@@ -174,7 +172,7 @@ export const useUpdateProductIsVisible = () => {
 
       const prevData = allProductQueries.map(([queryKey, data]) => [
         queryKey,
-        data ? JSON.parse(JSON.stringify(data)) : data, // Deep clone
+        data ? JSON.parse(JSON.stringify(data)) : data,
       ]);
 
       allProductQueries.forEach(([queryKey, data]) => {
@@ -198,7 +196,6 @@ export const useUpdateProductIsVisible = () => {
     },
     onError: (_err, _payload, ctx) => {
       if (!ctx?.prevData) return;
-      // Rollback all affected queries to their previous values
       (ctx.prevData as Array<[unknown, unknown]>).forEach(
         ([queryKey, data]) => {
           queryClient.setQueryData(queryKey as any, data);
@@ -206,7 +203,6 @@ export const useUpdateProductIsVisible = () => {
       );
     },
     onSettled: () => {
-      // Ensure server state sync after success or error
       queryClient.invalidateQueries({ queryKey: [QueryKeys.Product] });
     },
   });

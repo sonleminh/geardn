@@ -1,6 +1,5 @@
-// React and React Router
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import {
   Box,
@@ -23,25 +22,25 @@ import {
   TableRow,
   TextField,
   Typography,
-} from '@mui/material';
+} from "@mui/material";
 
-import DateRangeOutlinedIcon from '@mui/icons-material/DateRangeOutlined';
-import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
-import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import SearchIcon from '@mui/icons-material/Search';
+import DateRangeOutlinedIcon from "@mui/icons-material/DateRangeOutlined";
+import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
+import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import SearchIcon from "@mui/icons-material/Search";
 
-import { addDays } from 'date-fns';
-import moment from 'moment';
-import { DateRangePicker, RangeKeyDict } from 'react-date-range';
+import { addDays } from "date-fns";
+import moment from "moment";
+import { DateRangePicker, RangeKeyDict } from "react-date-range";
 
-import { TableSkeleton } from '@/components/TableSkeleton';
+import { TableSkeleton } from "@/components/TableSkeleton";
 
-import { useGetEnumByContext } from '@/services/enum';
+import { useGetEnumByContext } from "@/services/enum";
 
-import { ROUTES } from '@/constants/route';
-import { ColumnAlign, TableColumn } from '@/interfaces/ITableColumn';
-import { useGetOrderUpdateHistoryList } from '@/services/order';
+import { ROUTES } from "@/constants/route";
+import { ColumnAlign, TableColumn } from "@/interfaces/ITableColumn";
+import { useGetOrderUpdateHistoryList } from "@/services/order";
 
 interface Data {
   stt: number;
@@ -68,77 +67,77 @@ interface ColumnFilters {
 
 const INITIAL_COLUMN_FILTERS: ColumnFilters = {
   order: [],
-  date: { fromDate: '', toDate: '' },
+  date: { fromDate: "", toDate: "" },
 };
 
 const INITIAL_DATE_STATE = [
   {
     startDate: new Date(),
     endDate: addDays(new Date(), 7),
-    key: 'selection',
+    key: "selection",
   },
 ];
 
 const headCells: readonly HeadCell[] = [
   {
-    align: 'center',
-    id: 'stt',
+    align: "center",
+    id: "stt",
     disablePadding: false,
-    label: 'STT',
+    label: "STT",
     isFilter: false,
-    width: '7%',
+    width: "7%",
   },
   {
-    id: 'order',
+    id: "order",
     disablePadding: false,
-    label: 'Đơn hàng',
-    width: '18%',
+    label: "Đơn hàng",
+    width: "18%",
   },
   {
-    align: 'center',
-    id: 'user',
+    align: "center",
+    id: "user",
     disablePadding: false,
-    label: 'Người cập nhật',
-    width: '15%',
+    label: "Người cập nhật",
+    width: "15%",
   },
   {
-    align: 'center',
-    id: 'newStatus',
+    align: "center",
+    id: "newStatus",
     disablePadding: false,
-    label: 'Trạng thái cũ',
-    width: '13%',
+    label: "Trạng thái cũ",
+    width: "13%",
   },
   {
-    align: 'center',
-    id: 'oldStatus',
+    align: "center",
+    id: "oldStatus",
     disablePadding: false,
-    label: 'Trạng thái mới',
-    width: '13%',
+    label: "Trạng thái mới",
+    width: "13%",
   },
   {
-    align: 'center',
-    id: 'note',
+    align: "center",
+    id: "note",
     disablePadding: false,
-    label: 'Ghi chú',
-    width: '20%',
+    label: "Ghi chú",
+    width: "20%",
   },
   {
-    align: 'center',
-    id: 'createdAt',
+    align: "center",
+    id: "createdAt",
     disablePadding: false,
-    label: 'Ngày cập nhật',
-    width: '14%',
+    label: "Ngày cập nhật",
+    width: "14%",
   },
 ];
 
 const columns: TableColumn[] = [
-  { width: '60px', align: 'center', type: 'text' },
-  { width: '120px', type: 'text' },
-  { width: '120px', align: 'center', type: 'text' },
-  { width: '120px', align: 'center', type: 'text' },
-  { width: '120px', align: 'center', type: 'text' },
-  { width: '120px', align: 'center', type: 'text' },
-  { width: '100px', align: 'center', type: 'text' },
+  { width: "60px", align: "center", type: "text" },
+  { width: "120px", type: "text" },
+  { width: "120px", align: "center", type: "text" },
+  { width: "120px", align: "center", type: "text" },
+  { width: "120px", align: "center", type: "text" },
+  { width: "120px", align: "center", type: "text" },
+  { width: "100px", align: "center", type: "text" },
 ];
 
 const useFilterState = () => {
@@ -171,7 +170,7 @@ const useFilterState = () => {
       {
         startDate: selection.startDate,
         endDate: selection.endDate,
-        key: 'selection',
+        key: "selection",
       },
     ]);
 
@@ -202,8 +201,8 @@ const useFilterState = () => {
     setColumnFilters((prev) => ({
       ...prev,
       date: {
-        fromDate: fromDate.toISOString().split('T')[0],
-        toDate: toDate.toISOString().split('T')[0],
+        fromDate: fromDate.toISOString().split("T")[0],
+        toDate: toDate.toISOString().split("T")[0],
       },
     }));
   }, []);
@@ -258,7 +257,7 @@ const usePagination = () => {
 
 const OrderUpdateHistoryList = () => {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
 
   const {
     filterAnchorEl,
@@ -272,7 +271,7 @@ const OrderUpdateHistoryList = () => {
     handleDateFilterClose,
   } = useFilterState();
 
-  const { data: orderStatusEnumData } = useGetEnumByContext('order-status');
+  const { data: orderStatusEnumData } = useGetEnumByContext("order-status");
 
   const { page, rowsPerPage, handleChangePage, handleChangeRowsPerPage } =
     usePagination();
@@ -308,17 +307,19 @@ const OrderUpdateHistoryList = () => {
   return (
     <>
       <Breadcrumbs
-        separator={<NavigateNextIcon fontSize='small' />}
-        aria-label='breadcrumb'
-        sx={{ mb: 3 }}>
+        separator={<NavigateNextIcon fontSize="small" />}
+        aria-label="breadcrumb"
+        sx={{ mb: 3 }}
+      >
         <Link
-          underline='hover'
-          color='inherit'
+          underline="hover"
+          color="inherit"
           onClick={() => navigate(ROUTES.DASHBOARD)}
-          sx={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+          sx={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+        >
           <HomeOutlinedIcon sx={{ fontSize: 24 }} />
         </Link>
-        <Typography color='text.primary'>Lịch sử cập nhật</Typography>
+        <Typography color="text.primary">Lịch sử cập nhật</Typography>
       </Breadcrumbs>
       <Card>
         <CardHeader
@@ -329,7 +330,7 @@ const OrderUpdateHistoryList = () => {
           }
         />
         <Divider />
-        <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <CardContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <TableContainer>
             <Table>
               <TableHead>
@@ -337,59 +338,62 @@ const OrderUpdateHistoryList = () => {
                   <TableCell colSpan={headCells.length}>
                     <Box
                       sx={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                      }}>
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
                       <Box
                         sx={{
-                          display: 'flex',
-                          justifyContent: 'end',
-                          width: '100%',
+                          display: "flex",
+                          justifyContent: "end",
+                          width: "100%",
                           mb: 2,
-                        }}>
+                        }}
+                      >
                         <Button
-                          variant='outlined'
-                          size='small'
+                          variant="outlined"
+                          size="small"
                           onClick={handleDateFilterClick}
                           startIcon={<DateRangeOutlinedIcon />}
                           sx={{
-                            textTransform: 'none',
+                            textTransform: "none",
                             borderColor: columnFilters.date.fromDate
-                              ? 'primary.main'
-                              : 'inherit',
+                              ? "primary.main"
+                              : "inherit",
                             color: columnFilters.date.fromDate
-                              ? 'primary.main'
-                              : 'inherit',
-                            '&:hover': {
-                              borderColor: 'primary.main',
+                              ? "primary.main"
+                              : "inherit",
+                            "&:hover": {
+                              borderColor: "primary.main",
                             },
-                          }}>
+                          }}
+                        >
                           {columnFilters.date.fromDate
                             ? `${moment(columnFilters.date.fromDate).format(
-                                'DD/MM/YYYY'
+                                "DD/MM/YYYY"
                               )} - ${moment(columnFilters.date.toDate).format(
-                                'DD/MM/YYYY'
+                                "DD/MM/YYYY"
                               )}`
-                            : 'Chọn ngày'}
+                            : "Chọn ngày"}
                         </Button>
                       </Box>
                     </Box>
                     <Box>
                       <TextField
                         fullWidth
-                        size='small'
-                        placeholder='Tìm kiếm đơn hàng...'
+                        size="small"
+                        placeholder="Tìm kiếm đơn hàng..."
                         value={searchQuery}
                         onChange={handleSearchChange}
                         sx={{
-                          '& .MuiInputBase-root': {
+                          "& .MuiInputBase-root": {
                             minHeight: 40,
                           },
                         }}
                         InputProps={{
                           startAdornment: (
-                            <InputAdornment position='start'>
+                            <InputAdornment position="start">
                               <SearchIcon />
                             </InputAdornment>
                           ),
@@ -402,13 +406,14 @@ const OrderUpdateHistoryList = () => {
                   {headCells?.map((headCell) => (
                     <TableCell
                       key={headCell.id}
-                      align={headCell.align ?? 'left'}
-                      padding={headCell.disablePadding ? 'none' : 'normal'}
-                      sx={{ width: headCell.width }}>
+                      align={headCell.align ?? "left"}
+                      padding={headCell.disablePadding ? "none" : "normal"}
+                      sx={{ width: headCell.width }}
+                    >
                       {headCell.label}
                       {headCell.isFilter ? (
                         <>
-                          {' '}
+                          {" "}
                           {(() => {
                             const filterValue =
                               columnFilters[
@@ -420,15 +425,16 @@ const OrderUpdateHistoryList = () => {
                             ) {
                               return (
                                 <Typography
-                                  component='span'
-                                  sx={{ fontSize: 14 }}>
+                                  component="span"
+                                  sx={{ fontSize: 14 }}
+                                >
                                   ({filterValue.length})
                                 </Typography>
                               );
                             }
                             return null;
                           })()}
-                          <IconButton size='small' onClick={handleFilterClick}>
+                          <IconButton size="small" onClick={handleFilterClick}>
                             <FilterAltOutlinedIcon sx={{ fontSize: 18 }} />
                           </IconButton>
                         </>
@@ -444,80 +450,82 @@ const OrderUpdateHistoryList = () => {
                   orderUpdateHistoryListData?.data?.map(
                     (orderUpdateHistory, index) => (
                       <TableRow key={orderUpdateHistory?.id || index}>
-                        <TableCell align='center'>
+                        <TableCell align="center">
                           {page * rowsPerPage + index + 1}
                         </TableCell>
 
                         <TableCell>
-                          <Typography component='span' sx={{ fontSize: 14 }}>
+                          <Typography component="span" sx={{ fontSize: 14 }}>
                             {orderUpdateHistory?.order?.orderCode}
                           </Typography>
                         </TableCell>
-                        <TableCell align='center'>
+                        <TableCell align="center">
                           {orderUpdateHistory?.user?.name}
                         </TableCell>
-                        <TableCell align='center'>
+                        <TableCell align="center">
                           <Button
-                            variant='outlined'
+                            variant="outlined"
                             color={
-                              orderUpdateHistory?.oldStatus === 'PENDING'
-                                ? 'warning'
-                                : orderUpdateHistory?.oldStatus === 'PROCESSING'
-                                ? 'info'
-                                : orderUpdateHistory?.oldStatus === 'SHIPPED'
-                                ? 'success'
-                                : orderUpdateHistory?.oldStatus === 'DELIVERED'
-                                ? 'success'
-                                : orderUpdateHistory?.oldStatus === 'CANCELLED'
-                                ? 'error'
-                                : 'error'
+                              orderUpdateHistory?.oldStatus === "PENDING"
+                                ? "warning"
+                                : orderUpdateHistory?.oldStatus === "PROCESSING"
+                                ? "info"
+                                : orderUpdateHistory?.oldStatus === "SHIPPED"
+                                ? "success"
+                                : orderUpdateHistory?.oldStatus === "DELIVERED"
+                                ? "success"
+                                : orderUpdateHistory?.oldStatus === "CANCELLED"
+                                ? "error"
+                                : "error"
                             }
                             sx={{
-                              width: '120px',
+                              width: "120px",
                               fontSize: 13,
-                              textTransform: 'none',
-                              cursor: 'pointer',
-                            }}>
+                              textTransform: "none",
+                              cursor: "pointer",
+                            }}
+                          >
                             {statusMap?.[orderUpdateHistory?.oldStatus] ||
-                              'Không xác định'}
+                              "Không xác định"}
                           </Button>
                         </TableCell>
-                        <TableCell align='center'>
+                        <TableCell align="center">
                           <Button
-                            variant='outlined'
+                            variant="outlined"
                             color={
-                              orderUpdateHistory?.newStatus === 'PENDING'
-                                ? 'warning'
-                                : orderUpdateHistory?.newStatus === 'PROCESSING'
-                                ? 'info'
-                                : orderUpdateHistory?.newStatus === 'SHIPPED'
-                                ? 'success'
-                                : orderUpdateHistory?.newStatus === 'DELIVERED'
-                                ? 'success'
-                                : orderUpdateHistory?.newStatus === 'CANCELLED'
-                                ? 'error'
-                                : 'error'
+                              orderUpdateHistory?.newStatus === "PENDING"
+                                ? "warning"
+                                : orderUpdateHistory?.newStatus === "PROCESSING"
+                                ? "info"
+                                : orderUpdateHistory?.newStatus === "SHIPPED"
+                                ? "success"
+                                : orderUpdateHistory?.newStatus === "DELIVERED"
+                                ? "success"
+                                : orderUpdateHistory?.newStatus === "CANCELLED"
+                                ? "error"
+                                : "error"
                             }
                             sx={{
-                              width: '120px',
+                              width: "120px",
                               fontSize: 13,
-                              textTransform: 'none',
-                              cursor: 'pointer',
-                              '&:hover': {
-                                backgroundColor: 'rgba(0, 0, 0, 0.02)',
+                              textTransform: "none",
+                              cursor: "pointer",
+                              "&:hover": {
+                                backgroundColor: "rgba(0, 0, 0, 0.02)",
                               },
                               gap: 1,
-                            }}>
+                            }}
+                          >
                             {statusMap?.[orderUpdateHistory?.newStatus] ||
-                              'Không xác định'}
+                              "Không xác định"}
                           </Button>
                         </TableCell>
-                        <TableCell align='center'>
-                          {orderUpdateHistory?.note ?? 'Không có'}
+                        <TableCell align="center">
+                          {orderUpdateHistory?.note ?? "Không có"}
                         </TableCell>
-                        <TableCell align='center'>
+                        <TableCell align="center">
                           {moment(orderUpdateHistory?.createdAt).format(
-                            'DD/MM/YYYY'
+                            "DD/MM/YYYY"
                           )}
                         </TableCell>
                       </TableRow>
@@ -525,7 +533,7 @@ const OrderUpdateHistoryList = () => {
                   )
                 ) : (
                   <TableRow>
-                    <TableCell align='center' colSpan={7}>
+                    <TableCell align="center" colSpan={7}>
                       Không có dữ liệu
                     </TableCell>
                   </TableRow>
@@ -534,14 +542,14 @@ const OrderUpdateHistoryList = () => {
             </Table>
           </TableContainer>
           <TablePagination
-            component='div'
+            component="div"
             count={orderUpdateHistoryListData?.meta?.total || 0}
             page={page}
             onPageChange={handleChangePage}
             rowsPerPage={rowsPerPage}
             onRowsPerPageChange={handleChangeRowsPerPage}
             rowsPerPageOptions={[10, 20, 30, 50]}
-            labelRowsPerPage='Số hàng mỗi trang'
+            labelRowsPerPage="Số hàng mỗi trang"
             labelDisplayedRows={({ from, to, count }) =>
               `${from}-${to} của ${count !== -1 ? count : `hơn ${to}`}`
             }
@@ -553,13 +561,14 @@ const OrderUpdateHistoryList = () => {
           anchorEl={filterAnchorEl}
           onClose={handleFilterClose}
           anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'left',
+            vertical: "bottom",
+            horizontal: "left",
           }}
           transformOrigin={{
-            vertical: 'top',
-            horizontal: 'left',
-          }}>
+            vertical: "top",
+            horizontal: "left",
+          }}
+        >
           {/* {renderFilterContent()} */}
         </Popover>
 
@@ -568,25 +577,26 @@ const OrderUpdateHistoryList = () => {
           anchorEl={dateFilterAnchorEl}
           onClose={handleDateFilterClose}
           anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'right',
+            vertical: "bottom",
+            horizontal: "right",
           }}
           transformOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
+            vertical: "top",
+            horizontal: "right",
           }}
           PaperProps={{
             sx: {
               p: 2,
               mt: 1,
             },
-          }}>
+          }}
+        >
           <DateRangePicker
             onChange={handleDateRangeChange}
             moveRangeOnFirstSelection={false}
             months={2}
             ranges={dateState}
-            direction='horizontal'
+            direction="horizontal"
           />
         </Popover>
       </Card>

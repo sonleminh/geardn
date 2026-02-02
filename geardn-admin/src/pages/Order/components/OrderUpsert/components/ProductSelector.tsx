@@ -95,8 +95,6 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({
         ? selectedSku?.imageUrl ?? ""
         : productData?.data?.images[0] ?? "",
       productName: productData?.data?.name ?? "",
-      // productSlug: productData?.data?.slug ?? '',
-      // skuCode: selectedSku?.sku ?? '',
       skuAttributes:
         selectedSku?.productSkuAttributes?.map((attribute) => ({
           attribute: attribute?.attributeValue?.attribute?.label,

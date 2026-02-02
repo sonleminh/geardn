@@ -123,12 +123,6 @@ export class AuthService {
       ?.split('; ')
       ?.find((tokens) => tokens.startsWith('refresh_token='))
       ?.split('=')[1];
-    // if (!refreshToken) {
-    //   throw new HttpException(
-    //     'Refresh token has expired or does not exist',
-    //     HttpStatus.BAD_REQUEST,
-    //   );
-    // }
     try {
       const payload = await this.jwtService.verify(refreshToken, {
         secret: this.configService.get<string>('JWT_SECRET_KEY'),

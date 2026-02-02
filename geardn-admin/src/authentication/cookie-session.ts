@@ -57,5 +57,3 @@ export async function removeSession() {
     // secure: process.env.NODE_ENV !== "development"
   });
 }
-
-// Example usage of axiosInstance with token

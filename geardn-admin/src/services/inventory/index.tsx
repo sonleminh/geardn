@@ -1,15 +1,15 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from "@tanstack/react-query";
 
-import { axiosInstance } from '../axiosInstance';
-import { QueryKeys } from '@/constants/query-key';
+import { axiosInstance } from "../axiosInstance";
+import { QueryKeys } from "@/constants/query-key";
 
-import { ICreateImportLog, IImportLog } from '@/interfaces/IInventorytLog';
-import { ICreateExportLog, IExportLog } from '@/interfaces/IInventorytLog';
+import { ICreateImportLog, IImportLog } from "@/interfaces/IInventorytLog";
+import { ICreateExportLog, IExportLog } from "@/interfaces/IInventorytLog";
 import {
   ICreateAdjustmentLog,
   IAdjustmentLog,
-} from '@/interfaces/IInventorytLog';
-import { TBaseResponse, TPaginatedResponse } from '@/types/response.type';
+} from "@/interfaces/IInventorytLog";
+import { TBaseResponse, TPaginatedResponse } from "@/types/response.type";
 
 interface IGetLogListParams {
   warehouseIds?: string[];
@@ -22,11 +22,9 @@ interface IGetLogListParams {
   limit?: number;
 }
 
-const importLogUrl = '/import-logs';
-const exportLogUrl = '/export-logs';
-const adjustmentLogUrl = '/adjustment-logs';
-
-//IMPORT LOG
+const importLogUrl = "/import-logs";
+const exportLogUrl = "/export-logs";
+const adjustmentLogUrl = "/adjustment-logs";
 
 const createImportLog = async (payload: ICreateImportLog) => {
   const result = await axiosInstance.post(importLogUrl, payload);
@@ -42,9 +40,9 @@ export const useCreateImportLog = () => {
 const getImportLogList = async (params?: IGetLogListParams) => {
   const result = await axiosInstance.get(`${importLogUrl}`, {
     params: {
-      warehouseIds: params?.warehouseIds?.join(','),
-      productIds: params?.productIds?.join(','),
-      types: params?.types?.join(','),
+      warehouseIds: params?.warehouseIds?.join(","),
+      productIds: params?.productIds?.join(","),
+      types: params?.types?.join(","),
       fromDate: params?.fromDate,
       toDate: params?.toDate,
       page: params?.page,
@@ -77,8 +75,6 @@ export const useGetImportLogById = (id: string) => {
   });
 };
 
-//EXPORT LOG
-
 const createExportLog = async (payload: ICreateExportLog) => {
   const result = await axiosInstance.post(exportLogUrl, payload);
   return result.data;
@@ -93,9 +89,9 @@ export const useCreateExportLog = () => {
 const getExportLogList = async (params?: IGetLogListParams) => {
   const result = await axiosInstance.get(`${exportLogUrl}`, {
     params: {
-      warehouseIds: params?.warehouseIds?.join(','),
-      productIds: params?.productIds?.join(','),
-      types: params?.types?.join(','),
+      warehouseIds: params?.warehouseIds?.join(","),
+      productIds: params?.productIds?.join(","),
+      types: params?.types?.join(","),
       fromDate: params?.fromDate,
       toDate: params?.toDate,
       page: params?.page,
@@ -128,8 +124,6 @@ export const useGetExportLogById = (id: string) => {
   });
 };
 
-//ADJUSTMENT LOG
-
 const createAdjustmentLog = async (payload: ICreateAdjustmentLog) => {
   const result = await axiosInstance.post(adjustmentLogUrl, payload);
   return result.data;
@@ -144,10 +138,10 @@ export const useCreateAdjustmentLog = () => {
 const getAdjustmentLogList = async (params?: IGetLogListParams) => {
   const result = await axiosInstance.get(`${adjustmentLogUrl}`, {
     params: {
-      warehouseIds: params?.warehouseIds?.join(','),
-      productIds: params?.productIds?.join(','),
-      types: params?.types?.join(','),
-      reasons: params?.reasons?.join(','),
+      warehouseIds: params?.warehouseIds?.join(","),
+      productIds: params?.productIds?.join(","),
+      types: params?.types?.join(","),
+      reasons: params?.reasons?.join(","),
       fromDate: params?.fromDate,
       toDate: params?.toDate,
       page: params?.page,

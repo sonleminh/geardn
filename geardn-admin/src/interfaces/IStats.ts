@@ -35,7 +35,7 @@ export interface IOrderStatisticResponse {
   orderStats: IOrderDailyStat[];
   totals: {
     totalOrders: number;
-    pendingOrders?: number; // Có thể có hoặc không
+    pendingOrders?: number;
   };
 }
 
@@ -60,26 +60,23 @@ export interface IDailyViewStat extends IBaseDateStat {
 }
 
 export interface IViewStatisticResponse {
-  viewStats: IDailyViewStat[]; // Mảng dữ liệu biểu đồ
+  viewStats: IDailyViewStat[];
   totals: {
-    views: number; // Tổng số view
+    views: number;
   };
 }
 
-// Item cho Top Page/Product
 export interface ITopPageStat {
   path: string;
   title: string;
   views: number;
 }
 
-// Item cho Source/Device/Location (Generic)
 export interface ICommonStat {
-  name: string; // Tên nguồn (Google, Facebook) hoặc Tên thiết bị (Mobile, Desktop)
-  value: number; // Số lượng session hoặc user
+  name: string;
+  value: number;
 }
 
-// Response tổng
 export interface ISummaryStatsResponse {
   topPages: ITopPageStat[];
   topSources: ICommonStat[];

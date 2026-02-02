@@ -3,13 +3,13 @@ import {
   useMutation,
   useQueryClient,
   useInfiniteQuery,
-} from '@tanstack/react-query';
-import { axiosInstance } from '../axiosInstance';
-import { Notification } from '@/types/type.notification';
-import { QueryKeys } from '@/constants/query-key';
-import { TBaseResponse } from '@/types/response.type';
+} from "@tanstack/react-query";
+import { axiosInstance } from "../axiosInstance";
+import { Notification } from "@/types/type.notification";
+import { QueryKeys } from "@/constants/query-key";
+import { TBaseResponse } from "@/types/response.type";
 
-const notificationUrl = '/admin/notifications';
+const notificationUrl = "/admin/notifications";
 
 interface IGetNotificationListResponse {
   items: Notification[];
@@ -46,10 +46,9 @@ export const useGetNotifications = () =>
     },
   });
 
-// Add this new hook for unread count
 export const useGetStats = () => {
   return useQuery({
-    queryKey: [QueryKeys.Notification, 'stats'],
+    queryKey: [QueryKeys.Notification, "stats"],
     queryFn: async () => {
       const response = await axiosInstance.get(`${notificationUrl}/stats`);
       return response.data as TBaseResponse<{
@@ -57,7 +56,6 @@ export const useGetStats = () => {
         unreadCount: number;
       }>;
     },
-    // Refresh every 30 seconds for real-time updates
     refetchInterval: 30000,
   });
 };
@@ -71,14 +69,14 @@ export const useMarkNotificationSeen = () => {
     },
     onMutate: async () => {
       await queryClient.cancelQueries({
-        queryKey: [QueryKeys.Notification, 'stats'],
+        queryKey: [QueryKeys.Notification, "stats"],
       });
       const prevStats = queryClient.getQueryData<IStatsData>([
         QueryKeys.Notification,
-        'stats',
+        "stats",
       ]);
       queryClient.setQueryData(
-        [QueryKeys.Notification, 'stats'],
+        [QueryKeys.Notification, "stats"],
         (old: IStatsData | undefined) => {
           if (!old?.data) return old;
           return { ...old, data: { ...old.data, unseenCount: 0 } };
@@ -88,10 +86,10 @@ export const useMarkNotificationSeen = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [QueryKeys.Notification, 'stats'],
+        queryKey: [QueryKeys.Notification, "stats"],
       });
       queryClient.invalidateQueries({
-        queryKey: [QueryKeys.Notification, 'infinite'],
+        queryKey: [QueryKeys.Notification, "infinite"],
       });
     },
   });
@@ -99,7 +97,7 @@ export const useMarkNotificationSeen = () => {
 
 export const useMarkNotificationsRead = () => {
   const queryClient = useQueryClient();
-  const listKey = [QueryKeys.Notification, 'infinite'];
+  const listKey = [QueryKeys.Notification, "infinite"];
   return useMutation({
     mutationFn: async (ids: string[]) => {
       const response = await axiosInstance.post(`${notificationUrl}/read`, {
@@ -141,25 +139,24 @@ export const useMarkAllRead = () => {
       return response.data;
     },
     onMutate: async () => {
-      // Cancel any outgoing refetches
       await queryClient.cancelQueries({
-        queryKey: [QueryKeys.Notification, 'infinite'],
+        queryKey: [QueryKeys.Notification, "infinite"],
       });
       await queryClient.cancelQueries({
-        queryKey: [QueryKeys.Notification, 'stats'],
+        queryKey: [QueryKeys.Notification, "stats"],
       });
 
       const prevInfiniteData = queryClient.getQueryData<IInfiniteQueryData>([
         QueryKeys.Notification,
-        'infinite',
+        "infinite",
       ]);
       const prevStatsData = queryClient.getQueryData<IStatsData>([
         QueryKeys.Notification,
-        'stats',
+        "stats",
       ]);
 
       queryClient.setQueryData(
-        [QueryKeys.Notification, 'infinite'],
+        [QueryKeys.Notification, "infinite"],
         (old: IInfiniteQueryData | undefined) => {
           if (!old?.pages) return old;
           const pages = old.pages.map((p) => {
@@ -179,7 +176,7 @@ export const useMarkAllRead = () => {
       );
 
       queryClient.setQueryData(
-        [QueryKeys.Notification, 'stats'],
+        [QueryKeys.Notification, "stats"],
         (old: IStatsData | undefined) => {
           if (!old?.data) return old;
           return {
@@ -194,23 +191,23 @@ export const useMarkAllRead = () => {
     onError: (_err, _variables, context) => {
       if (context?.prevInfiniteData) {
         queryClient.setQueryData(
-          [QueryKeys.Notification, 'infinite'],
+          [QueryKeys.Notification, "infinite"],
           context.prevInfiniteData
         );
       }
       if (context?.prevStatsData) {
         queryClient.setQueryData(
-          [QueryKeys.Notification, 'stats'],
+          [QueryKeys.Notification, "stats"],
           context.prevStatsData
         );
       }
     },
     onSettled: () => {
       queryClient.invalidateQueries({
-        queryKey: [QueryKeys.Notification, 'infinite'],
+        queryKey: [QueryKeys.Notification, "infinite"],
       });
       queryClient.invalidateQueries({
-        queryKey: [QueryKeys.Notification, 'stats'],
+        queryKey: [QueryKeys.Notification, "stats"],
       });
     },
   });
@@ -230,7 +227,7 @@ async function getNotifications(cursor?: Cursor) {
 
 export function useNotiInfinite() {
   return useInfiniteQuery({
-    queryKey: [QueryKeys.Notification, 'infinite'],
+    queryKey: [QueryKeys.Notification, "infinite"],
     initialPageParam: {} as Cursor,
     queryFn: ({ pageParam }) => getNotifications(pageParam),
     getNextPageParam: (last): Cursor | undefined =>

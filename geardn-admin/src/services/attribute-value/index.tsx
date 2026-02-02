@@ -1,15 +1,15 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { axiosInstance } from '../axiosInstance';
-import { QueryKeys } from '@/constants/query-key';
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { axiosInstance } from "../axiosInstance";
+import { QueryKeys } from "@/constants/query-key";
 
 import {
   IAttributeValue,
   ICreateAttributeValue,
   IUpdateAttributeValuePayload,
-} from '@/interfaces/IAttributeValue';
-import { TBaseResponse } from '@/types/response.type';
+} from "@/interfaces/IAttributeValue";
+import { TBaseResponse } from "@/types/response.type";
 
-const attributeValueUrl = '/attribute-values';
+const attributeValueUrl = "/attribute-values";
 
 const createAttribute = async (payload: ICreateAttributeValue) => {
   const result = await axiosInstance.post(`${attributeValueUrl}`, payload);
@@ -71,8 +71,6 @@ export const useGetAttributeValueList = () => {
     refetchInterval: false,
   });
 };
-
-// Update
 
 const updateAttributeValue = async (payload: IUpdateAttributeValuePayload) => {
   const { id, ...rest } = payload;

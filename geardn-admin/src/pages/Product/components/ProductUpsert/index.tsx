@@ -1,25 +1,25 @@
-import { ChangeEvent, useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { ChangeEvent, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
-import CKEditor from '@/components/CKEditor';
-import Input from '@/components/Input';
-import MultipleFileUpload from '@/components/MultipleImageUpload';
-import SuspenseLoader from '@/components/SuspenseLoader';
+import CKEditor from "@/components/CKEditor";
+import Input from "@/components/Input";
+import MultipleFileUpload from "@/components/MultipleImageUpload";
+import SuspenseLoader from "@/components/SuspenseLoader";
 
-import { QueryKeys } from '@/constants/query-key';
-import { useAlertContext } from '@/contexts/AlertContext';
-import { IProductPayload, ITagOptions } from '@/interfaces/IProduct';
+import { QueryKeys } from "@/constants/query-key";
+import { useAlertContext } from "@/contexts/AlertContext";
+import { IProductPayload, ITagOptions } from "@/interfaces/IProduct";
 import {
   useCreateProduct,
   useGetProductById,
   useGetProductInitial,
   useUpdateProduct,
-} from '@/services/product';
-import { useQueryClient } from '@tanstack/react-query';
-import { useFormik } from 'formik';
+} from "@/services/product";
+import { useQueryClient } from "@tanstack/react-query";
+import { useFormik } from "formik";
 
-import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import {
   Autocomplete,
   AutocompleteRenderInputParams,
@@ -44,11 +44,11 @@ import {
   TextField,
   Theme,
   Typography,
-} from '@mui/material';
+} from "@mui/material";
 
-import { ROUTES } from '@/constants/route';
-import { useGetCategoryList } from '@/services/category';
-import { useGetEnumByContext } from '@/services/enum';
+import { ROUTES } from "@/constants/route";
+import { useGetCategoryList } from "@/services/category";
+import { useGetEnumByContext } from "@/services/enum";
 
 interface FormValues {
   name: string;
@@ -81,8 +81,8 @@ const ProductUpsert = () => {
   const { data: initData } = useGetProductInitial();
   const { data: productData } = useGetProductById(id ? +id : 0);
   const { data: categoryList } = useGetCategoryList();
-  const { data: tagData } = useGetEnumByContext('product-tag');
-  const { data: statusData } = useGetEnumByContext('product-status');
+  const { data: tagData } = useGetEnumByContext("product-tag");
+  const { data: statusData } = useGetEnumByContext("product-status");
 
   const { mutate: createProductMutate, isPending: isCreatePending } =
     useCreateProduct();
@@ -91,19 +91,19 @@ const ProductUpsert = () => {
 
   const formik = useFormik({
     initialValues: {
-      name: '',
-      categoryId: '',
+      name: "",
+      categoryId: "",
       tags: [],
       images: [],
-      brand: '',
+      brand: "",
       details: {
-        guarantee: '',
-        weight: '',
-        material: '',
+        guarantee: "",
+        weight: "",
+        material: "",
       },
-      description: '',
-      slug: '',
-      status: '',
+      description: "",
+      slug: "",
+      status: "",
       isVisible: true,
     } as FormValues,
     // validationSchema: isEdit ? updateSchema : createSchema,
@@ -126,8 +126,8 @@ const ProductUpsert = () => {
           {
             onSuccess() {
               queryClient.invalidateQueries({ queryKey: [QueryKeys.Product] });
-              showAlert('Cập nhật sản phẩm thành công', 'success');
-              navigate('/product');
+              showAlert("Cập nhật sản phẩm thành công", "success");
+              navigate("/product");
             },
           }
         );
@@ -135,15 +135,14 @@ const ProductUpsert = () => {
         createProductMutate(payload, {
           onSuccess() {
             queryClient.invalidateQueries({ queryKey: [QueryKeys.Product] });
-            showAlert('Tạo sản phẩm thành công', 'success');
-            navigate('/product');
+            showAlert("Tạo sản phẩm thành công", "success");
+            navigate("/product");
           },
         });
       }
     },
   });
 
-  // Function to check if form has changes
   const checkFormChanges = () => {
     if (!initialValues) return false;
 
@@ -152,13 +151,11 @@ const ProductUpsert = () => {
       tags: tags,
     };
 
-    // Deep comparison of form values
     const hasFormChanges =
       JSON.stringify(currentValues) !== JSON.stringify(initialValues);
     setHasChanges(hasFormChanges);
   };
 
-  // Check for changes whenever form values or tags change
   useEffect(() => {
     checkFormChanges();
   }, [formik.values, tags]);
@@ -166,40 +163,38 @@ const ProductUpsert = () => {
   useEffect(() => {
     if (productData) {
       const formValues: FormValues = {
-        name: productData?.data?.name || '',
-        categoryId: String(productData?.data?.categoryId || ''),
+        name: productData?.data?.name || "",
+        categoryId: String(productData?.data?.categoryId || ""),
         tags: productData?.data?.tags || [],
         images: productData?.data?.images || [],
-        brand: productData?.data?.brand || '',
+        brand: productData?.data?.brand || "",
         details: {
-          guarantee: String(productData?.data?.details?.guarantee || ''),
-          weight: productData?.data?.details?.weight || '',
-          material: productData?.data?.details?.material || '',
+          guarantee: String(productData?.data?.details?.guarantee || ""),
+          weight: productData?.data?.details?.weight || "",
+          material: productData?.data?.details?.material || "",
         },
-        description: productData?.data?.description || '',
-        slug: productData?.data?.slug || '',
-        status: productData?.data?.status || '',
+        description: productData?.data?.description || "",
+        slug: productData?.data?.slug || "",
+        status: productData?.data?.status || "",
         isVisible: productData?.data?.isVisible ?? true,
       };
 
-      formik.setFieldValue('name', formValues.name);
-      formik.setFieldValue('categoryId', formValues.categoryId);
-      formik.setFieldValue('tags', formValues.tags);
-      formik.setFieldValue('images', formValues.images);
-      formik.setFieldValue('brand', formValues.brand);
-      formik.setFieldValue('description', formValues.description);
-      formik.setFieldValue('details.guarantee', formValues.details.guarantee);
-      formik.setFieldValue('details.weight', formValues.details.weight);
-      formik.setFieldValue('details.material', formValues.details.material);
-      formik.setFieldValue('slug', formValues.slug);
+      formik.setFieldValue("name", formValues.name);
+      formik.setFieldValue("categoryId", formValues.categoryId);
+      formik.setFieldValue("tags", formValues.tags);
+      formik.setFieldValue("images", formValues.images);
+      formik.setFieldValue("brand", formValues.brand);
+      formik.setFieldValue("description", formValues.description);
+      formik.setFieldValue("details.guarantee", formValues.details.guarantee);
+      formik.setFieldValue("details.weight", formValues.details.weight);
+      formik.setFieldValue("details.material", formValues.details.material);
+      formik.setFieldValue("slug", formValues.slug);
       setTags(formValues.tags);
-      formik.setFieldValue('status', formValues.status);
-      formik.setFieldValue('isVisible', formValues.isVisible);
+      formik.setFieldValue("status", formValues.status);
+      formik.setFieldValue("isVisible", formValues.isVisible);
 
-      // Set initial values for change tracking
       setInitialValues(formValues);
     } else if (!isEdit && initData) {
-      // For new product, set initial values to current form values
       const formValues: FormValues = {
         ...formik.values,
         tags: tags,
@@ -208,7 +203,6 @@ const ProductUpsert = () => {
     }
   }, [productData, initData]);
 
-  // Set initial values for new products when component mounts
   useEffect(() => {
     if (!isEdit && !initialValues) {
       const defaultValues: FormValues = {
@@ -229,7 +223,7 @@ const ProductUpsert = () => {
     val: ITagOptions[]
   ) => {
     setTags(val);
-    formik.setFieldValue('tags', val);
+    formik.setFieldValue("tags", val);
   };
 
   const handleSelectChange = (e: SelectChangeEvent<unknown>) => {
@@ -238,47 +232,50 @@ const ProductUpsert = () => {
   };
 
   const handleSwitchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    formik.setFieldValue('isVisible', e.target.checked);
+    formik.setFieldValue("isVisible", e.target.checked);
   };
 
   const handleUploadResult = (result: string[]) => {
-    formik.setFieldValue('images', result);
+    formik.setFieldValue("images", result);
   };
 
   return (
     <>
       <Breadcrumbs
-        separator={<NavigateNextIcon fontSize='small' />}
-        aria-label='breadcrumb'
-        sx={{ mb: 3 }}>
+        separator={<NavigateNextIcon fontSize="small" />}
+        aria-label="breadcrumb"
+        sx={{ mb: 3 }}
+      >
         <Link
-          underline='hover'
-          color='inherit'
+          underline="hover"
+          color="inherit"
           onClick={() => navigate(ROUTES.DASHBOARD)}
-          sx={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+          sx={{ cursor: "pointer", display: "flex", alignItems: "center" }}
+        >
           <HomeOutlinedIcon sx={{ fontSize: 24 }} />
         </Link>
         <Link
-          underline='hover'
-          color='inherit'
+          underline="hover"
+          color="inherit"
           onClick={() => navigate(ROUTES.PRODUCT)}
-          sx={{ cursor: 'pointer' }}>
+          sx={{ cursor: "pointer" }}
+        >
           Sản phẩm
         </Link>
-        <Typography color='text.primary'>
-          {isEdit ? 'Chỉnh sửa sản phẩm' : 'Thêm sản phẩm mới'}
+        <Typography color="text.primary">
+          {isEdit ? "Chỉnh sửa sản phẩm" : "Thêm sản phẩm mới"}
         </Typography>
       </Breadcrumbs>
 
       <Typography sx={{ mb: 2, fontSize: 20, fontWeight: 600 }}>
-        {isEdit ? 'Chỉnh sửa sản phẩm' : 'Thêm sản phẩm mới'}:
+        {isEdit ? "Chỉnh sửa sản phẩm" : "Thêm sản phẩm mới"}:
       </Typography>
 
       <Grid2 container spacing={3}>
         <Grid2 size={6}>
           <Card sx={{ mb: 3 }}>
             <CardHeader
-              title='Thông tin chung'
+              title="Thông tin chung"
               sx={{
                 span: {
                   fontSize: 18,
@@ -288,15 +285,15 @@ const ProductUpsert = () => {
             />
             <Divider />
             <CardContent>
-              <FormControl fullWidth margin='normal'>
+              <FormControl fullWidth margin="normal">
                 <Input
-                  label='Tên sản phẩm'
-                  name='name'
-                  variant='filled'
-                  size='small'
+                  label="Tên sản phẩm"
+                  name="name"
+                  variant="filled"
+                  size="small"
                   required
                   helperText={
-                    <Box component={'span'} sx={helperTextStyle}>
+                    <Box component={"span"} sx={helperTextStyle}>
                       {formik.errors.name}
                     </Box>
                   }
@@ -304,15 +301,16 @@ const ProductUpsert = () => {
                   onChange={handleChangeValue}
                 />
               </FormControl>
-              <FormControl fullWidth margin='normal'>
-                <FormControl variant='filled' fullWidth>
+              <FormControl fullWidth margin="normal">
+                <FormControl variant="filled" fullWidth>
                   <InputLabel>Danh mục</InputLabel>
                   <Select
                     disableUnderline
-                    size='small'
-                    name='categoryId'
+                    size="small"
+                    name="categoryId"
                     onChange={handleSelectChange}
-                    value={formik?.values?.categoryId}>
+                    value={formik?.values?.categoryId}
+                  >
                     {categoryList?.data?.map((item) => (
                       <MenuItem key={item.id} value={item?.id}>
                         {item.name}
@@ -320,22 +318,22 @@ const ProductUpsert = () => {
                     ))}
                   </Select>
                   <FormHelperText>
-                    <Box component={'span'} sx={helperTextStyle}>
+                    <Box component={"span"} sx={helperTextStyle}>
                       {formik.errors?.categoryId}
                     </Box>
                   </FormHelperText>
                 </FormControl>
               </FormControl>
-              <FormControl fullWidth margin='normal'>
+              <FormControl fullWidth margin="normal">
                 <Typography mb={1}>
                   Ảnh:
-                  <Typography component={'span'} color='red'>
+                  <Typography component={"span"} color="red">
                     *
                   </Typography>
                 </Typography>
                 <MultipleFileUpload
                   helperText={
-                    <Box component={'span'} sx={helperTextStyle}>
+                    <Box component={"span"} sx={helperTextStyle}>
                       {formik.errors.images}
                     </Box>
                   }
@@ -343,15 +341,16 @@ const ProductUpsert = () => {
                   onUploadChange={handleUploadResult}
                 />
               </FormControl>
-              <FormControl fullWidth margin='normal'>
-                <FormControl variant='filled' fullWidth>
+              <FormControl fullWidth margin="normal">
+                <FormControl variant="filled" fullWidth>
                   <InputLabel>Trạng thái</InputLabel>
                   <Select
                     disableUnderline
-                    size='small'
-                    name='status'
+                    size="small"
+                    name="status"
                     onChange={handleSelectChange}
-                    value={formik?.values?.status}>
+                    value={formik?.values?.status}
+                  >
                     {statusData?.data?.map((item) => (
                       <MenuItem key={item.value} value={item?.value}>
                         {item.label}
@@ -359,13 +358,13 @@ const ProductUpsert = () => {
                     ))}
                   </Select>
                   <FormHelperText>
-                    <Box component={'span'} sx={helperTextStyle}>
+                    <Box component={"span"} sx={helperTextStyle}>
                       {formik.errors?.status}
                     </Box>
                   </FormHelperText>
                 </FormControl>
               </FormControl>
-              <FormControl fullWidth margin='normal'>
+              <FormControl fullWidth margin="normal">
                 <Autocomplete
                   multiple
                   fullWidth
@@ -383,56 +382,56 @@ const ProductUpsert = () => {
                   renderInput={(params: AutocompleteRenderInputParams) => (
                     <TextField
                       {...params}
-                      placeholder='Tag ...'
+                      placeholder="Tag ..."
                       InputLabelProps={{
                         shrink: true,
                       }}
                       sx={{
-                        bgcolor: '#fff',
-                        color: 'red',
-                        borderRadius: '10px',
+                        bgcolor: "#fff",
+                        color: "red",
+                        borderRadius: "10px",
                       }}
                     />
                   )}
-                  size='small'
+                  size="small"
                 />
                 <FormHelperText>
-                  <Box component={'span'} sx={helperTextStyle}>
+                  <Box component={"span"} sx={helperTextStyle}>
                     {Array.isArray(formik.errors?.tags)
-                      ? formik.errors.tags.join(', ')
+                      ? formik.errors.tags.join(", ")
                       : formik.errors?.tags}
                   </Box>
                 </FormHelperText>
               </FormControl>
-              <FormControl fullWidth margin='normal'>
-                <Box sx={{ textAlign: 'start' }}>
+              <FormControl fullWidth margin="normal">
+                <Box sx={{ textAlign: "start" }}>
                   <FormControlLabel
                     value={formik?.values?.isVisible}
                     control={
                       <Switch
-                        color='primary'
+                        color="primary"
                         checked={formik?.values?.isVisible}
                         onChange={handleSwitchChange}
                       />
                     }
-                    label='Hiển thị:'
-                    labelPlacement='start'
+                    label="Hiển thị:"
+                    labelPlacement="start"
                     sx={{ ml: 0 }}
                   />
                 </Box>
               </FormControl>
-              <FormControl fullWidth margin='normal'>
+              <FormControl fullWidth margin="normal">
                 <Typography mb={1}>
                   Mô tả:
-                  <Typography component={'span'} color='red'>
+                  <Typography component={"span"} color="red">
                     *
                   </Typography>
                 </Typography>
                 <CKEditor
                   onChange={(value: string) =>
-                    formik.setFieldValue('description', value)
+                    formik.setFieldValue("description", value)
                   }
-                  value={formik.values.description ?? ''}
+                  value={formik.values.description ?? ""}
                   helperText={formik?.errors?.description}
                 />
               </FormControl>
@@ -442,7 +441,7 @@ const ProductUpsert = () => {
         <Grid2 size={6}>
           <Card>
             <CardHeader
-              title='Thông tin chi tiết'
+              title="Thông tin chi tiết"
               sx={{
                 span: {
                   fontSize: 18,
@@ -452,52 +451,52 @@ const ProductUpsert = () => {
             />
             <Divider />
             <CardContent>
-              <FormControl fullWidth margin='normal'>
+              <FormControl fullWidth margin="normal">
                 <Input
-                  label='Hãng'
-                  name='brand'
-                  variant='filled'
-                  size='small'
+                  label="Hãng"
+                  name="brand"
+                  variant="filled"
+                  size="small"
                   value={formik?.values.brand}
                   onChange={handleChangeValue}
                 />
               </FormControl>
-              <FormControl fullWidth margin='normal'>
+              <FormControl fullWidth margin="normal">
                 <Input
-                  label='Bảo hành'
-                  name='details.guarantee'
-                  variant='filled'
-                  size='small'
+                  label="Bảo hành"
+                  name="details.guarantee"
+                  variant="filled"
+                  size="small"
                   value={formik?.values.details.guarantee}
                   onChange={handleChangeValue}
                 />
               </FormControl>
-              <FormControl fullWidth margin='normal'>
+              <FormControl fullWidth margin="normal">
                 <Input
-                  label='Trọng lượng'
-                  name='details.weight'
-                  variant='filled'
-                  size='small'
+                  label="Trọng lượng"
+                  name="details.weight"
+                  variant="filled"
+                  size="small"
                   value={formik?.values.details.weight}
                   onChange={handleChangeValue}
                 />
               </FormControl>
-              <FormControl fullWidth margin='normal'>
+              <FormControl fullWidth margin="normal">
                 <Input
-                  label='Chất liệu'
-                  name='details.material'
-                  variant='filled'
-                  size='small'
+                  label="Chất liệu"
+                  name="details.material"
+                  variant="filled"
+                  size="small"
                   value={formik?.values.details.material}
                   onChange={handleChangeValue}
                 />
               </FormControl>
-              <FormControl fullWidth margin='normal'>
+              <FormControl fullWidth margin="normal">
                 <Input
-                  label='Slug'
-                  name='slug'
-                  variant='filled'
-                  size='small'
+                  label="Slug"
+                  name="slug"
+                  variant="filled"
+                  size="small"
                   disabled
                   value={formik?.values?.slug}
                 />
@@ -507,19 +506,21 @@ const ProductUpsert = () => {
         </Grid2>
         <Box
           sx={{
-            display: 'flex',
-            justifyContent: 'flex-end',
-            width: '100%',
+            display: "flex",
+            justifyContent: "flex-end",
+            width: "100%",
             mt: 2,
-          }}>
+          }}
+        >
           <Button onClick={() => navigate(-1)} sx={{ mr: 2 }}>
             Trở lại
           </Button>
           <Button
-            variant='contained'
+            variant="contained"
             onClick={() => formik.handleSubmit()}
             disabled={!hasChanges}
-            sx={{ minWidth: 100 }}>
+            sx={{ minWidth: 100 }}
+          >
             Lưu
           </Button>
         </Box>
@@ -532,6 +533,6 @@ const ProductUpsert = () => {
 export default ProductUpsert;
 
 const helperTextStyle: SxProps<Theme> = {
-  color: 'red',
+  color: "red",
   fontSize: 13,
 };

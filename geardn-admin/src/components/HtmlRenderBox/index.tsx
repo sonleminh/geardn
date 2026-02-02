@@ -1,35 +1,35 @@
-import { memo } from 'react';
-import { Box } from '@mui/material';
+import { memo } from "react";
+import { Box } from "@mui/material";
 
 const HtmlRenderBox = ({ html }: { html: string | TrustedHTML }) => {
   return (
     <Box
       sx={{
-        maxHeight: '100%', // Limit the maximum height to the viewport height
-        maxWidth: '100%', // Limit the maximum width to the viewport width
-        '*:has(table)': {
-          overflowX: 'auto',
-          '&::-webkit-scrollbar': {
-            height: '8px',
+        maxHeight: "100%",
+        maxWidth: "100%",
+        "*:has(table)": {
+          overflowX: "auto",
+          "&::-webkit-scrollbar": {
+            height: "8px",
           },
         },
 
-        'figure.image': {
-          textAlign: 'center',
+        "figure.image": {
+          textAlign: "center",
         },
 
-        '& table, th, td': {
-          borderCollapse: 'collapse', // Optional: Improve table appearance
-          border: '1px solid #ddd', // Optional: Add borders to table cells
+        "& table, th, td": {
+          borderCollapse: "collapse",
+          border: "1px solid #ddd",
         },
 
-        '& img': {
-          maxWidth: '100%', // Make images fill the container
-          height: 'auto', // Maintain aspect ratio
+        "& img": {
+          maxWidth: "100%",
+          height: "auto",
         },
       }}
       dangerouslySetInnerHTML={{
-        __html: html ? String(html) : 'Đang cập nhật...',
+        __html: html ? String(html) : "Đang cập nhật...",
       }}
     />
   );

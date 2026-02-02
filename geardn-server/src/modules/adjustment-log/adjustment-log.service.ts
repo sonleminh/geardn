@@ -28,7 +28,6 @@ export class AdjustmentLogService {
       throw new BadRequestException('At least one item is required.');
     }
 
-    // Validate warehouse
     const existedWarehouse = await this.prisma.warehouse.findUnique({
       where: { id: warehouseId, isDeleted: false },
     });
@@ -36,7 +35,6 @@ export class AdjustmentLogService {
       throw new NotFoundException('Warehouse not found');
     }
 
-    // Merge SKU adjustment nếu bị trùng
     const mergedItemsMap = new Map<
       number,
       {
@@ -71,7 +69,6 @@ export class AdjustmentLogService {
 
     try {
       await this.prisma.$transaction(async (tx) => {
-        // Validate SKU có tồn tại không
         for (const item of mergedItems) {
           const sku = await tx.productSKU.findUnique({
             where: { id: item.skuId },
@@ -96,7 +93,6 @@ export class AdjustmentLogService {
 
         const referenceCode = `ADJ-${localToday}-${String(countToday + 1).padStart(4, '0')}`;
 
-        // Tạo adjustment log
         const adjustmentLog = await tx.adjustmentLog.create({
           data: {
             warehouseId,
@@ -109,7 +105,6 @@ export class AdjustmentLogService {
           },
         });
 
-        // Tạo adjustment log item
         const adjustmentLogItems = mergedItems.map((item) => ({
           adjustmentLogId: adjustmentLog.id,
           skuId: item.skuId,
@@ -122,7 +117,6 @@ export class AdjustmentLogService {
           data: adjustmentLogItems,
         });
 
-        // Cập nhật stock
         for (const item of mergedItems) {
           const existingStock = await tx.stock.findUnique({
             where: {

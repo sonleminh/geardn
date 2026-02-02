@@ -1,12 +1,12 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { axiosInstance } from '../axiosInstance';
-import { QueryKeys } from '@/constants/query-key';
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { axiosInstance } from "../axiosInstance";
+import { QueryKeys } from "@/constants/query-key";
 
 import {
   IPayment,
   ICreatePayment,
   IUpdatePaymentPayload,
-} from '@/interfaces/IPayment';
+} from "@/interfaces/IPayment";
 type TPaymentsRes = {
   status: number;
   message: string;
@@ -19,7 +19,7 @@ type TPaymentById = {
   data: IPayment;
 };
 
-const paymentUrl = '/payment-methods';
+const paymentUrl = "/payment-methods";
 
 const getPaymentList = async () => {
   const result = await axiosInstance.get(`${paymentUrl}`);
@@ -60,8 +60,6 @@ export const useCreatePayment = () => {
     mutationFn: createPayment,
   });
 };
-
-// Update
 
 const updatePayment = async (payload: IUpdatePaymentPayload) => {
   const { id, ...rest } = payload;

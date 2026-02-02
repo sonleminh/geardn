@@ -8,7 +8,6 @@ import { useNavigate } from "react-router-dom";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-// Import thêm icon cho Summary
 import DevicesIcon from "@mui/icons-material/Devices";
 import LanguageIcon from "@mui/icons-material/Language";
 import LinkIcon from "@mui/icons-material/Link";
@@ -42,13 +41,12 @@ import {
   useGetViewSummaryStats,
 } from "@/services/statistic";
 
-// --- 1. COMPONENT CON ĐỂ HIỂN THỊ BẢNG (REUSABLE) ---
 interface SummaryTableProps {
   title: string;
   icon: React.ReactNode;
   data: any[];
-  type: "page" | "common"; // 'page' có title+path, 'common' chỉ có name
-  metricLabel: string; // Ví dụ: "Lượt xem" hoặc "Người dùng"
+  type: "page" | "common";
+  metricLabel: string;
 }
 
 const SummaryTable: React.FC<SummaryTableProps> = ({
@@ -67,7 +65,7 @@ const SummaryTable: React.FC<SummaryTableProps> = ({
               mr: 1.5,
               display: "flex",
               p: 1,
-              bgcolor: "primary.light", // Hoặc màu tùy chỉnh
+              bgcolor: "primary.light",
               color: "primary.main",
               borderRadius: 1,
               opacity: 0.8,
@@ -119,7 +117,7 @@ const SummaryTable: React.FC<SummaryTableProps> = ({
                               whiteSpace: "nowrap",
                               maxWidth: 200,
                             }}
-                            title={row.title} // Tooltip native
+                            title={row.title}
                           >
                             {row.title || "(Không có tiêu đề)"}
                           </Typography>
@@ -156,11 +154,9 @@ const SummaryTable: React.FC<SummaryTableProps> = ({
   );
 };
 
-// --- 2. MAIN COMPONENT ---
 const ViewStats: React.FC = () => {
   const navigate = useNavigate();
 
-  // ... (Giữ nguyên state dateRange, anchorEl)
   const [dateRange, setDateRange] = useState<
     [{ startDate: Date; endDate: Date; key: string }]
   >([
@@ -173,7 +169,6 @@ const ViewStats: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
-  // ... (Giữ nguyên logic API Call)
   const { data: dailyViewStatsData } = useGetDailyViewStats({
     fromDate: dateRange[0].startDate,
     toDate: dateRange[0].endDate,
@@ -184,7 +179,6 @@ const ViewStats: React.FC = () => {
     toDate: dateRange[0].endDate,
   });
 
-  // ... (Giữ nguyên chartData và chartOptions)
   const chartData = useMemo(() => {
     if (!dailyViewStatsData) {
       return {
@@ -219,7 +213,7 @@ const ViewStats: React.FC = () => {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: { display: false }, // Ẩn legend nếu chỉ có 1 line
+        legend: { display: false },
         title: { display: false },
       },
       scales: {
@@ -230,7 +224,6 @@ const ViewStats: React.FC = () => {
     []
   );
 
-  // ... (Giữ nguyên các handler handleClick, handleClose, ...)
   const handleClick = useCallback(
     (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget),
     []
@@ -259,7 +252,6 @@ const ViewStats: React.FC = () => {
   }, []);
 
   const getDateDisplayText = useCallback(() => {
-    // ... (Giữ nguyên logic text)
     const { startDate, endDate } = dateRange[0];
     if (!startDate || !endDate) return "Chọn ngày";
     return `${format(startDate, "dd/MM/yyyy", { locale: vi })} - ${format(

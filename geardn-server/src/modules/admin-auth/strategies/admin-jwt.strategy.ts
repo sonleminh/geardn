@@ -23,35 +23,31 @@ export class JwtAdminStrategy extends PassportStrategy(Strategy, 'admin-jwt') {
   async validate(payload: any) {
     const userResponse = await this.userService.findById(payload?.id);
     const user = userResponse.data;
-    
+
     if (!user) {
       throw new UnauthorizedException('User no longer exists');
     }
-    
+
     if (user.role !== UserRole.ADMIN) {
       throw new UnauthorizedException('Access denied. Admin role required.');
     }
-    
+
     return payload;
   }
 
   private static extractJWTFromCookie(req: Request): string | null {
     const cookies = req.headers?.cookie;
-    // Make sure there are cookies in the request
     if (!cookies) {
       return null;
     }
-    // Parse the cookies
     const jwtCookie = cookies
       .split('; ')
       .find((cookie) => cookie.startsWith('access_token='));
 
-    // If no JWT cookie is found, return null
     if (!jwtCookie) {
       return null;
     }
 
-    // Return only the JWT token value (after 'jwt=')
     return jwtCookie.split('=')[1];
   }
 }

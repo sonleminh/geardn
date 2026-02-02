@@ -31,7 +31,6 @@ export class ExportLogService {
       throw new BadRequestException('At least one item is required.');
     }
 
-    // Merge duplicated SKU
     const mergedItemsMap = new Map<
       number,
       { quantity: number; costPrice: Decimal; note?: string }
@@ -152,7 +151,16 @@ export class ExportLogService {
     page?: number;
     limit?: number;
   }) {
-    const { warehouseIds, types, sort, productIds, fromDate, toDate, page = 1, limit = 10 } = params;
+    const {
+      warehouseIds,
+      types,
+      sort,
+      productIds,
+      fromDate,
+      toDate,
+      page = 1,
+      limit = 10,
+    } = params;
 
     const skip = (page - 1) * limit;
 
