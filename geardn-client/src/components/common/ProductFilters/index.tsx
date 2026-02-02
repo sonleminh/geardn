@@ -9,7 +9,7 @@ type UIValue = "" | "asc" | "desc";
 
 function toUIValue(q: IQueryParams): UIValue {
   if (q.sortBy === "price") return q.order === "asc" ? "asc" : "desc";
-  // coi các sort khác là "Mới nhất"
+
   return "";
 }
 
@@ -17,7 +17,7 @@ function fromUIValue(v: UIValue): {
   sortBy?: "createdAt" | "price";
   order?: "asc" | "desc";
 } {
-  if (v === "") return {}; // hoặc {} nếu BE có default
+  if (v === "") return {};
   return { sortBy: "price", order: v };
 }
 
