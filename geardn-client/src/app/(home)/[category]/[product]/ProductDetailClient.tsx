@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useMemo } from "react";
 
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import StarRateIcon from "@mui/icons-material/StarRate";
@@ -14,30 +14,25 @@ import {
   ToggleButtonGroup,
   Typography,
 } from "@mui/material";
-import { SwiperClass } from "swiper/react";
 
 import AppLink from "@/components/common/AppLink";
 import Breadcrumbs from "@/components/common/Breadcrumbs";
 import HtmlRenderBox from "@/components/common/HtmlRenderBox";
 
-import MainSwiper from "./components/main-swiper";
-import ThumbSwiper from "./components/thumb-swiper";
-
 import { attributeLabels } from "@/constants/attributeLabels";
-import { IProductSku, IProductSkuAttributes } from "@/interfaces/IProductSku";
 import { formatPrice } from "@/utils/format-price";
 
-import SkeletonImage from "@/components/common/SkeletonImage";
-import { ATTRIBUTE_ORDER } from "@/constants/attributeOrder";
 import { useSession } from "@/hooks/useSession";
 import { IProduct } from "@/interfaces/IProduct";
 import { AppError } from "@/lib/errors/app-error";
 import { useAddCartItem } from "@/queries/cart";
+import { useGetProduct } from "@/queries/product";
 import { useCartStore } from "@/stores/cart-store";
 import { useNotificationStore } from "@/stores/notification-store";
-import { useGetProduct } from "@/queries/product";
-import { useRouter } from "next/navigation";
 import { BaseResponse } from "@/types/response.type";
+import { useRouter } from "next/navigation";
+import ProductImageGallery from "./components/ProductGallery";
+import { useProductSkuSelection } from "./hooks/useProductSkuSelection";
 
 const ProductDetailClient = ({
   initialProduct,
@@ -48,208 +43,75 @@ const ProductDetailClient = ({
   const router = useRouter();
   const { cartItems, addToCart, syncCart, setLastBuyNowItemId } =
     useCartStore();
+
   const { mutateAsync: onAddToCart } = useAddCartItem();
   const { showNotification } = useNotificationStore();
   const { data } = useGetProduct(initialProduct);
 
   const product = data?.data;
 
-  const [count, setCount] = useState<number | null>(1);
-  const [thumbsSwiper, setThumbsSwiper] = useState<SwiperClass | null>(null);
-  const [selectedAttributes, setSelectedAttributes] = useState<
-    Record<string, string>
-  >(
-    product?.skus?.length === 1 &&
-      product.skus[0].productSkuAttributes.length > 0
-      ? {
-          [product.skus[0].productSkuAttributes[0].attributeValue.attribute
-            .name]:
-            product.skus[0].productSkuAttributes[0].attributeValue.value,
-        }
-      : {}
-  );
-  const mainSwiperRef = useRef<SwiperClass | null>(null);
+  const {
+    selectedAttributes,
+    selectedSku,
+    count,
+    setCount,
+    attributeOptions,
+    attributesStatusMap,
+    handleAttributeChange,
+    totalStock,
+  } = useProductSkuSelection(product);
 
-  const productImageList = useMemo(() => {
-    return [
-      ...(product?.images || []),
-      ...(product && product?.skus?.length > 1
-        ? product?.skus.map((sku) => sku.imageUrl).filter(Boolean)
-        : []),
-    ];
-  }, [product]);
+  const handleAddToCartProcess = async (isBuyNow: boolean = false) => {
+    if (!selectedSku)
+      return showNotification("Vui lòng chọn phân loại hàng", "error");
+    const oldCartItems = [...cartItems];
+    // 1. Tạo payload chung (DRY - Don't Repeat Yourself)
+    const cartItemPayload = {
+      productId: selectedSku?.productId,
+      skuId: selectedSku.id,
+      productName: product?.name ?? "",
+      imageUrl: (selectedSku.imageUrl || product?.images?.[0]) ?? "",
+      sellingPrice: selectedSku.sellingPrice,
+      quantity: count ?? 1,
+      attributes: selectedSku.productSkuAttributes.map((attr) => ({
+        attribute: attr.attributeValue.attribute.name,
+        attributeValue: attr.attributeValue.value,
+      })),
+    };
 
-  const attributeOptions = useMemo(() => {
-    if (!product) return {};
-
-    const options: Record<string, string[]> = {};
-    product?.skus?.forEach((sku) => {
-      sku?.productSkuAttributes?.forEach(
-        (productSkuAttributes: IProductSkuAttributes) => {
-          if (!options[productSkuAttributes?.attributeValue?.attribute?.name]) {
-            options[productSkuAttributes?.attributeValue?.attribute?.name] = [];
-          }
-          if (
-            !options[
-              productSkuAttributes?.attributeValue?.attribute?.name
-            ].includes(productSkuAttributes?.attributeValue?.value)
-          ) {
-            options[productSkuAttributes?.attributeValue?.attribute?.name].push(
-              productSkuAttributes?.attributeValue?.value
-            );
-          }
-        }
-      );
-    });
-
-    const order =
-      ATTRIBUTE_ORDER[product?.category?.name] ?? Object.keys(options);
-
-    const sortedOptions: Record<string, string[]> = {};
-    order.forEach((key) => {
-      if (options[key]) {
-        sortedOptions[key] = options[key];
-      }
-    });
-
-    return sortedOptions;
-  }, [product]);
-
-  const selectedSku = useMemo<IProductSku | null>(() => {
-    const hasNullValue = Object.values(selectedAttributes).some(
-      (value) => value === null
-    );
+    // 2. Validate số lượng tồn kho (Client side check)
+    const itemInCart = cartItems.find((i) => i.skuId === selectedSku.id);
+    const currentQtyInCart = !user ? itemInCart?.quantity || 0 : 0; // Nếu user login thì API sẽ check, nhưng check client vẫn tốt hơn
 
     if (
-      hasNullValue ||
-      Object.keys(selectedAttributes).length !==
-        Object.keys(attributeOptions).length
-    )
-      return null;
-
-    return (
-      product?.skus?.find((sku) =>
-        Object.entries(selectedAttributes).every(([key, value]) =>
-          sku.productSkuAttributes.some(
-            (productSkuAttributes: IProductSkuAttributes) =>
-              productSkuAttributes.attributeValue.attribute.name === key &&
-              productSkuAttributes.attributeValue.value === value
-          )
-        )
-      ) ?? null
-    );
-  }, [selectedAttributes, attributeOptions, product?.skus]);
-
-  const availableCombinations = product?.skus?.map((sku) =>
-    sku.productSkuAttributes.reduce(
-      (
-        acc: Record<string, string>,
-        productSkuAttributes: IProductSkuAttributes
-      ) => {
-        acc[productSkuAttributes.attributeValue.attribute.name] =
-          productSkuAttributes.attributeValue.value;
-        return acc;
-      },
-      {} as Record<string, string>
-    )
-  );
-
-  const handleAttributeChange = (type: string, value: string) => {
-    setSelectedAttributes((prev) => {
-      const newAttributes = { ...prev };
-
-      if (newAttributes[type] === value) {
-        delete newAttributes[type]; // Nếu đã chọn, thì bỏ chọn
-      } else {
-        newAttributes[type] = value; // Nếu chưa chọn, thì chọn
-      }
-      setCount(1);
-      return newAttributes;
-    });
-  };
-
-  const addCartCore = async () => {
-    if (selectedSku === null) {
-      return showNotification("Vui lòng chọn phân loại hàng", "error");
-    }
-    const itemAdded = cartItems.find((item) => item.skuId === selectedSku?.id);
-    const oldCartItems = [...cartItems];
-    if (!user && product) {
-      if (
-        itemAdded &&
-        itemAdded?.quantity + (count ?? 1) > (selectedSkuStock ?? 0)
-      ) {
-        return showNotification(
-          `Bạn đã có ${itemAdded?.quantity} trong giỏ hàng. Không thể thêm số lượng đã chọn vào giỏ hàng vì sẽ vượt quá số lượng trong kho.`,
-          "error"
-        );
-      }
-
-      addToCart({
-        productId: selectedSku?.productId,
-        skuId: selectedSku?.id,
-        productName: product?.name,
-        imageUrl: selectedSku?.imageUrl
-          ? selectedSku?.imageUrl
-          : product?.images?.[0],
-        sellingPrice: selectedSku?.sellingPrice,
-        quantity: count ?? 1,
-        attributes: selectedSku?.productSkuAttributes.map(
-          (productSkuAttributes: IProductSkuAttributes) => ({
-            attribute: productSkuAttributes.attributeValue.attribute.name,
-            attributeValue: productSkuAttributes.attributeValue.value,
-          })
-        ),
-      });
-      showNotification(`Thêm vào giỏ hàng thành công.`, "success");
-      return selectedSku.id;
+      selectedSkuStock &&
+      currentQtyInCart + (count ?? 1) > selectedSkuStock
+    ) {
+      return showNotification(`Số lượng vượt quá tồn kho...`, "error");
     }
 
-    if (user && product) {
-      const newItem = {
-        productId: selectedSku?.productId,
-        skuId: selectedSku?.id,
-        productName: product?.name,
-        imageUrl: selectedSku?.imageUrl
-          ? selectedSku?.imageUrl
-          : product?.images?.[0],
-        sellingPrice: selectedSku?.sellingPrice,
-        quantity: count ?? 1,
-        attributes: selectedSku?.productSkuAttributes.map(
-          (productSkuAttributes: IProductSkuAttributes) => ({
-            attribute: productSkuAttributes.attributeValue.attribute.name,
-            attributeValue: productSkuAttributes.attributeValue.value,
-          })
-        ),
-      };
+    // 3. Xử lý phân nhánh
+    try {
+      addToCart(cartItemPayload); // Update Local Store UI trước cho mượt (Optimistic UI)
 
-      try {
-        addToCart(newItem);
+      if (user) {
         await onAddToCart({
-          productId: selectedSku?.productId,
-          skuId: selectedSku?.id,
+          productId: selectedSku.productId,
+          skuId: selectedSku.id,
           quantity: count ?? 1,
         });
-        showNotification(`Thêm vào giỏ hàng thành công.`, "success");
-        return selectedSku.id;
-      } catch (error) {
-        const e = AppError.fromUnknown(error);
-        syncCart(oldCartItems);
-        showNotification(e?.message, "error");
       }
+
+      if (isBuyNow) {
+        setLastBuyNowItemId(selectedSku.id);
+        router.push("/cart");
+      } else {
+        showNotification("Thêm vào giỏ hàng thành công", "success");
+      }
+    } catch (error) {
+      syncCart(oldCartItems);
+      showNotification(AppError.fromUnknown(error).message, "error");
     }
-  };
-
-  const handleAddCartItem = async () => {
-    await addCartCore();
-  };
-
-  const handleBuyBtn = async () => {
-    const skuId = await addCartCore();
-    if (!skuId) return;
-
-    setLastBuyNowItemId(skuId);
-    router.push("/cart");
   };
 
   const handleCountChange = (value: number | null) => {
@@ -266,49 +128,6 @@ const ProductDetailClient = ({
     },
     { href: "", label: product?.name as string },
   ];
-
-  const totalStock = product?.skus?.reduce(
-    (acc, sku) =>
-      acc +
-      (sku.stocks?.reduce(
-        (acc: number, stock: { id: number; quantity: number }) =>
-          acc + stock.quantity,
-        0
-      ) || 0),
-    0
-  );
-
-  const handleDisableAttribute = useMemo(() => {
-    return (type: string, value: string) => {
-      if (totalStock === 0) return true;
-      if (Object.keys(selectedAttributes).length === 0) return false;
-      // Tạo bản sao tránh mutate state gốc
-      const simulatedSelection = { ...selectedAttributes };
-
-      // Nếu đã chọn, loại bỏ thuộc tính khỏi danh sách chọn
-      if (simulatedSelection[type] === value) {
-        delete simulatedSelection[type]; // Xóa hẳn key
-      } else {
-        simulatedSelection[type] = value; // Chọn mới
-      }
-
-      const filteredSelection = Object.fromEntries(
-        Object.entries(simulatedSelection).filter(([, val]) => val)
-      );
-
-      // Nếu không còn gì trong selectedAttributes, không disable gì cả
-      if (Object.keys(filteredSelection).length === 0) return false;
-
-      // Kiểm tra nếu tổ hợp mới này có hợp lệ
-      const isValid = availableCombinations?.some((combo) =>
-        Object.entries(filteredSelection).every(
-          ([key, val]) => combo[key] === val
-        )
-      );
-
-      return !isValid;
-    };
-  }, [availableCombinations, selectedAttributes, totalStock]);
 
   const selectedSkuStock = useMemo(() => {
     return selectedSku?.stocks?.reduce(
@@ -341,51 +160,7 @@ const ProductDetailClient = ({
       >
         <Grid2 container columnSpacing={4}>
           <Grid2 size={{ xs: 12, md: 5 }} sx={{ py: 3 }}>
-            <Box sx={{ position: "relative", height: "400px" }}>
-              <Box
-                sx={{
-                  position: "relative",
-                  width: "100%",
-                  height: "100%",
-                }}
-              >
-                {selectedSku?.imageUrl ? (
-                  <SkeletonImage
-                    src={selectedSku?.imageUrl}
-                    alt="Selected Option"
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "contain",
-                    }}
-                  />
-                ) : null}
-                <Box
-                  sx={{
-                    position: "absolute",
-                    top: 0,
-                    width: "100%",
-                    height: "400px",
-                    display: selectedSku?.imageUrl ? "none" : "block",
-                  }}
-                >
-                  <MainSwiper
-                    data={productImageList}
-                    thumbsSwiper={thumbsSwiper}
-                    setMainSwiper={mainSwiperRef}
-                  />
-                </Box>
-              </Box>
-            </Box>
-            <Box mb={1} />
-            <Box>
-              <ThumbSwiper
-                images={productImageList}
-                setThumbsSwiper={setThumbsSwiper}
-              />
-            </Box>
+            <ProductImageGallery product={product} selectedSku={selectedSku} />
           </Grid2>
           <Grid2
             size={{ xs: 12, md: 7 }}
@@ -480,7 +255,7 @@ const ProductDetailClient = ({
                         size="small"
                         key={value}
                         value={value}
-                        disabled={handleDisableAttribute(type, value)}
+                        disabled={attributesStatusMap[`${type}-${value}`]}
                       >
                         {value}
                       </ToggleButton>
@@ -599,7 +374,7 @@ const ProductDetailClient = ({
                   variant="outlined"
                   size="large"
                   disabled={!selectedSku || selectedSkuStock === 0}
-                  onClick={handleAddCartItem}
+                  onClick={() => handleAddToCartProcess(false)}
                 >
                   <ShoppingCartOutlinedIcon />
                 </Button>
@@ -608,7 +383,7 @@ const ProductDetailClient = ({
                   variant="contained"
                   size="large"
                   disabled={!selectedSku || selectedSkuStock === 0}
-                  onClick={handleBuyBtn}
+                  onClick={() => handleAddToCartProcess(true)}
                 >
                   {(!!totalStock && !selectedSku) ||
                   (!!totalStock && selectedSku && selectedSkuStock)

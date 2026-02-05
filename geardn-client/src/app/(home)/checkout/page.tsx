@@ -76,7 +76,8 @@ const Checkout = () => {
   const { data: provinces } = useProvinces();
   const { data: provinceData } = useProvince(province?.code);
   const { data: paymentMethods } = usePaymentMethods();
-  const { mutate: onCreateOrder } = useCreateOrder();
+  const { mutate: onCreateOrder, isPending: isCreateOrderLoading } =
+    useCreateOrder();
 
   const provinceOptions = Object.values(provinces ?? {})
     .filter((p) => p && typeof p === "object" && p.code != null && p.name)
@@ -801,9 +802,10 @@ const Checkout = () => {
                 variant="contained"
                 size="large"
                 fullWidth
+                disabled={isCreateOrderLoading}
                 onClick={() => formik.handleSubmit()}
               >
-                Thanh toán
+                {isCreateOrderLoading ? "Đang xử lý..." : "Thanh toán"}
               </Button>
               <Button
                 sx={{ fontWeight: 600 }}
