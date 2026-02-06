@@ -1,11 +1,10 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Box } from "@mui/material";
 import { SwiperClass } from "swiper/react";
 
 import { IProduct } from "@/interfaces/IProduct";
 import { IProductSku } from "@/interfaces/IProductSku";
 
-import SkeletonImage from "@/components/common/SkeletonImage";
 import MainSwiper from "./MainSwiper";
 import ThumbSwiper from "./ThumbSwiper";
 
@@ -26,6 +25,18 @@ const ProductImageGallery = ({ product, selectedSku }: IProps) => {
         : []),
     ];
   }, [product]);
+
+  useEffect(() => {
+    if (selectedSku?.imageUrl && mainSwiperRef.current) {
+      const index = productImageList.findIndex(
+        (img) => img === selectedSku.imageUrl
+      );
+
+      if (index !== -1) {
+        mainSwiperRef.current.slideTo(index);
+      }
+    }
+  }, [selectedSku, productImageList]);
   return (
     <div>
       <Box sx={{ position: "relative", height: "400px" }}>
@@ -36,26 +47,13 @@ const ProductImageGallery = ({ product, selectedSku }: IProps) => {
             height: "100%",
           }}
         >
-          {selectedSku?.imageUrl ? (
-            <SkeletonImage
-              src={selectedSku?.imageUrl}
-              alt="Selected Option"
-              style={{
-                position: "absolute",
-                top: 0,
-                width: "100%",
-                height: "100%",
-                objectFit: "contain",
-              }}
-            />
-          ) : null}
           <Box
             sx={{
               position: "absolute",
               top: 0,
               width: "100%",
               height: "400px",
-              display: selectedSku?.imageUrl ? "none" : "block",
+              display: "block",
             }}
           >
             <MainSwiper
