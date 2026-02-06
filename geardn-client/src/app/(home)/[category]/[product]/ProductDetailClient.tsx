@@ -86,19 +86,17 @@ const ProductDetailClient = ({
 
     const itemInCart = cartItems.find((i) => i.skuId === selectedSku.id);
     const currentQtyInCart = !user ? itemInCart?.quantity || 0 : 0;
-
-    if (
-      selectedSkuStock &&
-      currentQtyInCart + (count ?? 1) > selectedSkuStock
-    ) {
+    const isCurrentQtyExceedStock =
+      currentQtyInCart + (count ?? 1) > (selectedSkuStock ?? 0);
+    if (selectedSkuStock && isCurrentQtyExceedStock && !isBuyNow) {
       return showNotification(`Số lượng vượt quá tồn kho...`, "error");
     }
 
     try {
       if (isBuyNow) setIsBuyingNow(true);
-      addToCart(cartItemPayload);
 
       if (user) {
+        addToCart(cartItemPayload);
         await onAddToCart({
           productId: selectedSku.productId,
           skuId: selectedSku.id,
@@ -107,6 +105,10 @@ const ProductDetailClient = ({
       }
 
       if (isBuyNow) {
+        if (!isCurrentQtyExceedStock) {
+          addToCart(cartItemPayload);
+        }
+
         setLastBuyNowItemId(selectedSku.id);
         router.push("/cart");
       } else {
