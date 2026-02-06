@@ -95,7 +95,6 @@ const CartClient = ({
     name: string;
   }>();
 
-  // ... (Keep existing Logic handlers: getDisplayQty, handleFocus, handleChange, etc.) ...
   const getDisplayQty = (row: ICartStoreItem) =>
     editing[row.skuId] ? draftQty[row.skuId] ?? row.quantity : row.quantity;
 
@@ -145,6 +144,10 @@ const CartClient = ({
       return nextState;
     });
   };
+
+  useEffect(() => {
+    router.prefetch(ROUTES.CHECKOUT);
+  }, [router]);
 
   useEffect(() => {
     if (userSession?.data && cartServer?.data?.items) {
