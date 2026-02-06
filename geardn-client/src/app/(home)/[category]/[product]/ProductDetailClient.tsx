@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import StarRateIcon from "@mui/icons-material/StarRate";
@@ -39,14 +39,16 @@ const ProductDetailClient = ({
 }: {
   initialProduct: BaseResponse<IProduct>;
 }) => {
-  const { data: user } = useSession();
   const router = useRouter();
+  const { data: user } = useSession();
   const { cartItems, addToCart, syncCart, setLastBuyNowItemId } =
     useCartStore();
-
-  const { mutateAsync: onAddToCart } = useAddCartItem();
   const { showNotification } = useNotificationStore();
+
   const { data } = useGetProduct(initialProduct);
+  const { mutateAsync: onAddToCart } = useAddCartItem();
+
+  const [isBuyingNow, setIsBuyingNow] = useState(false);
 
   const product = data?.data;
 
@@ -61,11 +63,14 @@ const ProductDetailClient = ({
     totalStock,
   } = useProductSkuSelection(product);
 
+  useEffect(() => {
+    router.prefetch("/cart");
+  }, [router]);
+
   const handleAddToCartProcess = async (isBuyNow: boolean = false) => {
     if (!selectedSku)
       return showNotification("Vui lòng chọn phân loại hàng", "error");
     const oldCartItems = [...cartItems];
-    // 1. Tạo payload chung (DRY - Don't Repeat Yourself)
     const cartItemPayload = {
       productId: selectedSku?.productId,
       skuId: selectedSku.id,
@@ -79,9 +84,8 @@ const ProductDetailClient = ({
       })),
     };
 
-    // 2. Validate số lượng tồn kho (Client side check)
     const itemInCart = cartItems.find((i) => i.skuId === selectedSku.id);
-    const currentQtyInCart = !user ? itemInCart?.quantity || 0 : 0; // Nếu user login thì API sẽ check, nhưng check client vẫn tốt hơn
+    const currentQtyInCart = !user ? itemInCart?.quantity || 0 : 0;
 
     if (
       selectedSkuStock &&
@@ -90,9 +94,9 @@ const ProductDetailClient = ({
       return showNotification(`Số lượng vượt quá tồn kho...`, "error");
     }
 
-    // 3. Xử lý phân nhánh
     try {
-      addToCart(cartItemPayload); // Update Local Store UI trước cho mượt (Optimistic UI)
+      if (isBuyNow) setIsBuyingNow(true);
+      addToCart(cartItemPayload);
 
       if (user) {
         await onAddToCart({
@@ -107,8 +111,10 @@ const ProductDetailClient = ({
         router.push("/cart");
       } else {
         showNotification("Thêm vào giỏ hàng thành công", "success");
+        if (isBuyNow) setIsBuyingNow(false);
       }
     } catch (error) {
+      setIsBuyingNow(false);
       syncCart(oldCartItems);
       showNotification(AppError.fromUnknown(error).message, "error");
     }
@@ -382,6 +388,7 @@ const ProductDetailClient = ({
                   sx={{ width: { xs: "69%", md: 200 } }}
                   variant="contained"
                   size="large"
+                  loading={isBuyingNow}
                   disabled={!selectedSku || selectedSkuStock === 0}
                   onClick={() => handleAddToCartProcess(true)}
                 >
