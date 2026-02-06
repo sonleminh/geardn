@@ -276,6 +276,9 @@ export class ProductService {
           },
         },
         skus: {
+          orderBy: {
+            id: 'asc',
+          },
           select: {
             id: true,
             productId: true,

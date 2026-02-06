@@ -1,7 +1,7 @@
+import { useState, useMemo } from "react";
 import { ATTRIBUTE_ORDER } from "@/constants/attributeOrder";
 import { IProduct } from "@/interfaces/IProduct";
 import { IProductSku, IProductSkuAttributes } from "@/interfaces/IProductSku";
-import { useState, useMemo } from "react";
 
 export const useProductSkuSelection = (product: IProduct | undefined) => {
   const [selectedAttributes, setSelectedAttributes] = useState<
@@ -140,13 +140,8 @@ export const useProductSkuSelection = (product: IProduct | undefined) => {
         const isDisabledAttBtn = checkIsDisableAttributeValue(value);
         const isNotSelected = Object.keys(selectedAttributes).length === 0;
         const isValueExtistedInSelected = selectedAttributes[type] === value;
-
-        if (
-          isDisabledAttBtn &&
-          isNotSelected &&
-          isValueExtistedInSelected &&
-          totalStock === 0
-        ) {
+        if (isDisabledAttBtn) isDisabled = true;
+        if (isNotSelected && isValueExtistedInSelected && totalStock === 0) {
           isDisabled = true;
         } else {
           // Copy logic giả lập selection
