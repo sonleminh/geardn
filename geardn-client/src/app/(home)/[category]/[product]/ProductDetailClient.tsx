@@ -255,7 +255,7 @@ const ProductDetailClient = ({
                         sx={{
                           minWidth: 69,
                           maxWidth: 400,
-                          height: { xs: "36px", md: "40px" },
+                          height: { xs: "40px", md: "40px" },
                           px: { xs: 0.5, md: 1.5 },
                           mt: { xs: 0.5, md: 1 },
                           mr: { xs: 1, md: 1.5 },
