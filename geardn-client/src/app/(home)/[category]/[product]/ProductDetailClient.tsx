@@ -33,6 +33,7 @@ import { BaseResponse } from "@/types/response.type";
 import { useRouter } from "next/navigation";
 import ProductImageGallery from "./components/ProductGallery";
 import { useProductSkuSelection } from "./hooks/useProductSkuSelection";
+import { truncateTextByLine } from "@/utils/css-helper.util";
 
 const ProductDetailClient = ({
   initialProduct,
@@ -223,7 +224,7 @@ const ProductDetailClient = ({
                   <Typography
                     component={"h3"}
                     sx={{
-                      width: { xs: 80, md: 100 },
+                      width: { xs: 80, md: 90 },
                       flexShrink: 0,
                       fontSize: 14,
                       color: "#757575",
@@ -253,12 +254,16 @@ const ProductDetailClient = ({
                       <ToggleButton
                         sx={{
                           minWidth: 69,
-                          px: 1.5,
+                          maxWidth: 400,
+                          px: { xs: 0.5, md: 1.5 },
                           mt: { xs: 0.5, md: 1 },
-                          mr: 1.5,
+                          mr: { xs: 1, md: 1.5 },
                           color: "rgba(0,0,0,.8)",
                           fontSize: "14px",
                           textTransform: "capitalize",
+                          cursor: "pointer",
+                          lineHeight: "30px",
+                          ...truncateTextByLine(1),
                         }}
                         size="small"
                         key={value}
@@ -274,7 +279,7 @@ const ProductDetailClient = ({
 
               <Grid2 container mt={{ xs: 3, md: 4 }} mb={{ xs: 2, md: 3 }}>
                 <Grid2 size={{ xs: 2.5, md: 2 }}>
-                  <Typography sx={{ fontSize: { xs: 14, md: 16 } }}>
+                  <Typography sx={{ fontSize: 14, color: "#757575" }}>
                     Số lượng:
                   </Typography>
                 </Grid2>
