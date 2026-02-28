@@ -7,6 +7,7 @@ import { formatPrice } from "@/utils/format-price";
 
 import AppLink from "../AppLink";
 import SkeletonImage from "../SkeletonImage";
+import { getTagStyle } from "@/utils/getTagStyle";
 
 const ProductCard = ({ data }: { data: IProduct }) => {
   return (
@@ -14,6 +15,7 @@ const ProductCard = ({ data }: { data: IProduct }) => {
       <Box
         sx={{
           bgcolor: "#fff",
+          border: "1px solid rgba(234, 236, 240, 1)",
           borderRadius: "8px",
           overflow: "hidden",
           ":hover": {
@@ -32,7 +34,7 @@ const ProductCard = ({ data }: { data: IProduct }) => {
             height: { xs: "250px" },
             overflow: "hidden",
             "& img": {
-              objectFit: "contain",
+              objectFit: "cover",
               transition: "all 0.5s ease",
             },
           }}
@@ -40,6 +42,7 @@ const ProductCard = ({ data }: { data: IProduct }) => {
         >
           <SkeletonImage src={data?.images[0]} alt="geardn" fill />
         </Box>
+
         <Box sx={{ p: "12px" }}>
           <Typography
             sx={{
@@ -52,6 +55,41 @@ const ProductCard = ({ data }: { data: IProduct }) => {
           >
             {data?.name}
           </Typography>
+          {data?.tags && data.tags.length > 0 && (
+            <Box
+              sx={{
+                display: "flex",
+                mb: 1,
+              }}
+            >
+              {data.tags.map((tag, index) => {
+                const style = getTagStyle(tag.value);
+                return (
+                  <Typography
+                    key={index}
+                    component="span"
+                    sx={{
+                      padding: "2px 4px",
+                      marginLeft: index > 0 ? "4px" : 0,
+                      bgcolor: style.bgcolor,
+                      color: style.color,
+                      lineHeight: "16px",
+                      fontSize: "10px",
+                      fontWeight: 600,
+                      textTransform: "capitalize",
+                      borderWidth: "1px",
+                      borderStyle: "solid",
+                      borderColor: style.borderColor,
+                      borderRadius: "2px",
+                      boxShadow: "0 2px 4px rgba(0,0,0,0.15)",
+                    }}
+                  >
+                    {tag.label}
+                  </Typography>
+                );
+              })}
+            </Box>
+          )}
           <Box
             sx={{
               display: "flex",

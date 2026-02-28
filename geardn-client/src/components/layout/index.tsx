@@ -39,7 +39,7 @@ const Layout = ({
     }
   };
   return (
-    <>
+    <Box sx={{ bgcolor: "#f3f4f6" }}>
       <Header initialUser={initialUser} />
       <ScrollToTopBtn
         showScrollTop={showScrollTop}
@@ -67,7 +67,7 @@ const Layout = ({
       >
         <Footer />
       </Box>
-    </>
+    </Box>
   );
 };
 
