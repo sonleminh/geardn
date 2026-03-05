@@ -31,9 +31,7 @@ export default async function ProductByCategoryPage({
     { href: "", label: categoryName },
   ];
   return (
-    <Box
-      sx={{ pt: { xs: 0, md: 2 }, pb: { xs: 4, md: 4 }, bgcolor: "#F3F4F6" }}
-    >
+    <Box sx={{ pt: 2, pb: { xs: 4, md: 4 }, bgcolor: "#F3F4F6" }}>
       <LayoutContainer>
         <Box sx={{ mb: 2 }}>
           <Breadcrumbs options={breadcrumbsOptions} />

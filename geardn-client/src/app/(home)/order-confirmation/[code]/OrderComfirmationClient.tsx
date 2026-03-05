@@ -401,7 +401,7 @@ const OrderConfirmationClient = ({ data }: { data: IOrder }) => {
                 }}
               >
                 <Typography sx={{ fontSize: 13 }}>Phí vận chuyển:</Typography>
-                <Typography sx={{ fontSize: 13 }}>Miễn phí (5km)</Typography>
+                <Typography sx={{ fontSize: 13 }}>{"Miễn phí <3km"}</Typography>
               </Box>
               <Button
                 sx={{ fontWeight: 600 }}

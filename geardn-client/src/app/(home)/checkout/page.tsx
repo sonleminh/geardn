@@ -795,7 +795,7 @@ const Checkout = () => {
                 }}
               >
                 <Typography sx={{ fontSize: 13 }}>Phí vận chuyển:</Typography>
-                <Typography sx={{ fontSize: 13 }}>Miễn phí (5km)</Typography>
+                <Typography sx={{ fontSize: 13 }}>{"Miễn phí <3km"}</Typography>
               </Box>
               <Button
                 sx={{ mb: 1.5, fontWeight: 600 }}
