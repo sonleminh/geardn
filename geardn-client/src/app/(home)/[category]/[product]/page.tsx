@@ -13,7 +13,7 @@ export default async function ProductDetailPage({
   const { product: productSlug } = await params;
 
   return (
-    <Box sx={{ pb: 8 }}>
+    <Box sx={{ pb: { xs: 4, md: 8 } }}>
       <Suspense fallback={<ProductDetailSkeleton />}>
         <ProductDetailContainer slug={productSlug} />
       </Suspense>

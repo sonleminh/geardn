@@ -12,7 +12,7 @@ const Footer = () => {
   return (
     <Box sx={FooterStyle}>
       <LayoutContainer>
-        <Grid2 container sx={{ mb: 4 }}>
+        <Grid2 container sx={{ mb: { xs: 2, md: 4 } }}>
           <Grid2 size={{ xs: 4, md: 2 }}>
             <Box
               sx={{
@@ -70,7 +70,9 @@ const Footer = () => {
           </Grid2>
           <Grid2 size={3.5}></Grid2>
           <Grid2 size={{ xs: 12, md: 2.5 }}>
-            <Typography sx={{ mt: 6, mb: 1 }}>Social Media</Typography>
+            <Typography sx={{ mt: { xs: 2, md: 6 }, mb: 1 }}>
+              Social Media
+            </Typography>
             <List
               sx={{
                 display: "flex",

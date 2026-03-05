@@ -48,7 +48,7 @@ const Layout = ({
       <DarkModeBtn />
       <Box
         sx={{
-          pt: pathname !== "/" ? { xs: "20px", md: "80px" } : "0",
+          pt: pathname !== "/" ? { xs: "0", md: "80px" } : "0",
           bgcolor: "#F3F4F6",
         }}
       ></Box>

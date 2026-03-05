@@ -1,7 +1,7 @@
 import { SxProps, Theme } from "@mui/material";
 
 export const ProductListStyle: SxProps<Theme> = {
-  p: { xs: "0px 0 40px", md: "32px 0 40px" },
+  p: { xs: "0px 0 20px", md: "32px 0 40px" },
   ".category": {
     ".category-heading": {
       mb: 0.5,

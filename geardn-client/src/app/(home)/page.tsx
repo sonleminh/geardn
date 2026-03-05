@@ -28,7 +28,7 @@ export default async function Homepage({
   }
 
   return (
-    <Box sx={{ pb: 10 }}>
+    <Box sx={{ pb: { xs: 5, md: 10 } }}>
       <Box
         sx={{
           position: "relative",

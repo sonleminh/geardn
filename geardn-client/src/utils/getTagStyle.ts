@@ -7,9 +7,9 @@ export const getTagStyle = (value: string) => {
     case "new":
       return { bgcolor: "#fff", color: "#1780fc", borderColor: "#1780fc" }; // Xanh lá
     case "sale":
-      return { bgcolor: "#363636", color: "#fff", borderColor: "#000" }; // Xanh lá
+      return { bgcolor: "#242424", color: "#fff", borderColor: "#000" }; // Xanh lá
     case "coming_soon":
-      return { bgcolor: "#363636", color: "#FFF", borderColor: "#000" }; // Xanh lá
+      return { bgcolor: "#242424", color: "#FFF", borderColor: "#000" }; // Xanh lá
     default:
       return { bgcolor: "#757575", color: "#FFF", borderColor: "#D32F2F" }; // Xám (mặc định)
   }

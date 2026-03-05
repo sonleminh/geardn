@@ -31,7 +31,7 @@ const ProductCard = ({ data }: { data: IProduct }) => {
           sx={{
             position: "relative",
             width: "100%",
-            height: { xs: "250px" },
+            height: { xs: "180px", sm: "250px", md: "250px" },
             overflow: "hidden",
             "& img": {
               objectFit: "cover",

@@ -13,7 +13,7 @@ import { IProduct } from "@/interfaces/IProduct";
 
 const Explore = ({ exploreData }: { exploreData: IProduct[] | undefined }) => {
   return (
-    <Box sx={{ mb: 10 }}>
+    <Box sx={{ mb: { xs: 5, md: 10 } }}>
       <LayoutContainer>
         <Box
           sx={{
