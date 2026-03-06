@@ -104,7 +104,7 @@ const SwiperStyle: SxProps<Theme> = {
   },
 
   ".swiper-slide-thumb-active .slide-item": {
-    borderColor: "#f06 !important",
+    borderColor: "#000000 !important",
     borderWidth: "1px",
   },
 
