@@ -99,6 +99,7 @@ const Account = () => {
               }}
             />
             <Button
+              aria-label="Chọn ảnh"
               variant="outlined"
               disabled
               sx={{

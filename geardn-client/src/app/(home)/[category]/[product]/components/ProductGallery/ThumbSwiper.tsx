@@ -41,7 +41,9 @@ const ThumbSwiper = ({ images, setThumbsSwiper }: IProps) => {
             >
               <SkeletonImage
                 src={src}
-                alt={`test-${index}`}
+                alt={`Hình ảnh sản phẩm chi tiết ${index + 1}`}
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
                 style={{
                   width: "100%",
                   height: "100%",

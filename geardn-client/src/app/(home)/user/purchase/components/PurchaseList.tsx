@@ -115,7 +115,10 @@ const PurchaseList = ({ orders }: { orders: IOrder[] }) => {
                     },
                   }}
                 >
-                  <SkeletonImage src={item?.imageUrl} alt="geardn" />
+                  <SkeletonImage
+                    src={item?.imageUrl}
+                    alt={`Hình ảnh sản phẩm ${item.productName}`}
+                  />
                 </Box>
                 <Box sx={{ ml: { xs: 1, md: 2 } }}>
                   <Typography

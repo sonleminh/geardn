@@ -84,7 +84,10 @@ export default function SignUp() {
                 },
               }}
             >
-              <SkeletonImage src={"/setup-background.jpg"} alt="geardn" />
+              <SkeletonImage
+                src={"/setup-background.jpg"}
+                alt="Hình ảnh background setup GearDN"
+              />
             </Box>
           </Grid2>
           <Grid2

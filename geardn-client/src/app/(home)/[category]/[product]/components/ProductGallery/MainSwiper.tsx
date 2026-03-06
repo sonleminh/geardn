@@ -1,10 +1,15 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { Swiper, SwiperClass, SwiperSlide } from 'swiper/react';
-import { FreeMode, Navigation, Thumbs } from 'swiper/modules';
-import { Box, SxProps, Theme } from '@mui/material';
-import SkeletonImage from '@/components/common/SkeletonImage';
+import React from "react";
+import { Swiper, SwiperClass, SwiperSlide } from "swiper/react";
+import { FreeMode, Navigation, Thumbs } from "swiper/modules";
+import { Box, SxProps, Theme } from "@mui/material";
+import SkeletonImage from "@/components/common/SkeletonImage";
+
+import "swiper/css";
+import "swiper/css/free-mode";
+import "swiper/css/navigation";
+import "swiper/css/thumbs";
 
 interface IProps {
   data: string[];
@@ -24,20 +29,27 @@ const MainSwiper = ({ data, thumbsSwiper, setMainSwiper }: IProps) => {
         }}
         modules={[FreeMode, Navigation, Thumbs]}
         navigation={true}
-        className='mainSwiper'>
-        {data?.map((item: string) => (
+        className="mainSwiper"
+      >
+        {data?.map((item: string, index: number) => (
           <SwiperSlide key={item}>
             <Box
               sx={{
-                position: 'relative',
-                width: '100%',
-                height: { xs: '400px' },
-                overflow: 'hidden',
-                '& img': {
-                  objectFit: 'contain !important',
+                position: "relative",
+                width: "100%",
+                height: { xs: "400px" },
+                overflow: "hidden",
+                "& img": {
+                  objectFit: "contain !important",
                 },
-              }}>
-              <SkeletonImage src={item} alt='geardn' />
+              }}
+            >
+              <SkeletonImage
+                src={item}
+                alt={`Hình ảnh sản phẩm chi tiết ${index + 1}`}
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
             </Box>
           </SwiperSlide>
         ))}
@@ -49,22 +61,22 @@ const MainSwiper = ({ data, thumbsSwiper, setMainSwiper }: IProps) => {
 export default MainSwiper;
 
 const SwiperStyle: SxProps<Theme> = {
-  '.swiper': {
-    width: '100%',
-    height: '100%',
+  ".swiper": {
+    width: "100%",
+    height: "100%",
   },
-  '.swiper-button-prev, .swiper-button-next': {
+  ".swiper-button-prev, .swiper-button-next": {
     width: 36,
     height: 36,
-    border: '1px solid #696969',
-    borderRadius: '50%',
-    bgcolor: 'rgba(24, 24, 24, 0.7)',
-    color: '#fff',
-    ':after': {
+    border: "1px solid #696969",
+    borderRadius: "50%",
+    bgcolor: "rgba(24, 24, 24, 0.7)",
+    color: "#fff",
+    ":after": {
       fontSize: 12,
     },
-    ':hover': {
-      bgcolor: 'rgba(24, 24, 24, 0.3)',
+    ":hover": {
+      bgcolor: "rgba(24, 24, 24, 0.3)",
     },
   },
 };

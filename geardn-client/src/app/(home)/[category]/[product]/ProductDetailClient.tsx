@@ -290,6 +290,7 @@ const ProductDetailClient = ({
                     sx={{ mr: 2, height: 32 }}
                   >
                     <Button
+                      aria-label="Giảm số lượng"
                       onClick={() => handleCountChange((count ?? 0) - 1)}
                       disabled={!selectedSku || count === 1}
                     >
@@ -344,6 +345,7 @@ const ProductDetailClient = ({
                       size="small"
                     />
                     <Button
+                      aria-label="Tăng số lượng"
                       onClick={() => handleCountChange((count ?? 0) + 1)}
                       disabled={
                         !selectedSku ||
@@ -384,6 +386,7 @@ const ProductDetailClient = ({
                     mr: { xs: 0, md: 2 },
                     bgcolor: "#f0f0f0",
                   }}
+                  aria-label="Thêm vào giỏ hàng"
                   variant="outlined"
                   size="large"
                   disabled={!selectedSku || selectedSkuStock === 0}
@@ -393,6 +396,7 @@ const ProductDetailClient = ({
                 </Button>
                 <Button
                   sx={{ width: { xs: "69%", md: 200 } }}
+                  aria-label="Mua ngay"
                   variant="contained"
                   size="large"
                   loading={isBuyingNow}

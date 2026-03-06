@@ -30,7 +30,6 @@ import {
 
 import SkeletonImage from "../common/SkeletonImage";
 
-import LOGO from "@/assets/geardn-logo.png";
 import { ROUTES } from "@/constants/route";
 import { useSession } from "@/hooks/useSession";
 import { IUser } from "@/interfaces/IUser";
@@ -125,8 +124,8 @@ const Header = ({ initialUser }: { initialUser?: IUser | null }) => {
             <AppLink href={"/"}>
               <Box className="header-logo">
                 <SkeletonImage
-                  src={LOGO}
-                  alt="geardn"
+                  src={"/geardn-logo.png"}
+                  alt="Hình ảnh logo thương hiệu GearDN"
                   fill
                   quality={90}
                   priority
@@ -204,6 +203,7 @@ const Header = ({ initialUser }: { initialUser?: IUser | null }) => {
                 debounceMs={1000}
               />
               <Button
+                aria-label="Xem giỏ hàng"
                 sx={{
                   position: "relative",
                   minWidth: 40,
@@ -239,6 +239,7 @@ const Header = ({ initialUser }: { initialUser?: IUser | null }) => {
                 {userData !== null ? (
                   userData?.picture ? (
                     <Button
+                      aria-label="Xem user menu / Đăng nhập"
                       sx={{}}
                       onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
                         handleUserClick(e)
@@ -259,7 +260,7 @@ const Header = ({ initialUser }: { initialUser?: IUser | null }) => {
                       >
                         <SkeletonImage
                           src={userData?.picture}
-                          alt="geardn"
+                          alt="Hình ảnh đại diện của người dùng"
                           fill
                         />
                       </Box>
@@ -271,6 +272,7 @@ const Header = ({ initialUser }: { initialUser?: IUser | null }) => {
                     <Button
                       disableRipple
                       disableFocusRipple
+                      aria-label="Xem user menu / Đăng nhập"
                       sx={{
                         minWidth: 40,
                         height: 40,
@@ -289,6 +291,7 @@ const Header = ({ initialUser }: { initialUser?: IUser | null }) => {
                   )
                 ) : (
                   <Button
+                    aria-label="Đăng nhập / Đăng ký"
                     sx={{ width: 40, minWidth: 40, height: 40, ml: 1 }}
                     className="user-icon"
                     onClick={handleUserClick}
@@ -316,7 +319,10 @@ const Header = ({ initialUser }: { initialUser?: IUser | null }) => {
                 </Menu>
               </Box>
 
-              <IconButton onClick={toggleMenuDrawer(true)}>
+              <IconButton
+                aria-label="Mở menu điều hướng"
+                onClick={toggleMenuDrawer(true)}
+              >
                 <MenuIcon
                   sx={{ display: { xs: "block", md: "none" }, mr: 1 }}
                 />

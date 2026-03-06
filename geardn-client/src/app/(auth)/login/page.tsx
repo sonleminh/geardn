@@ -21,7 +21,6 @@ import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import { useFormik } from "formik";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 
-import LOGO from "@/assets/geardn-logo.png";
 import SkeletonImage from "@/components/common/SkeletonImage";
 import { ROUTES } from "@/constants/route";
 import { loginSchema } from "@/features/auth/schemas/login.schema";
@@ -165,7 +164,10 @@ const LoginPage = () => {
                 },
               }}
             >
-              <SkeletonImage src={"/setup-background.jpg"} alt="geardn" />
+              <SkeletonImage
+                src={"/setup-background.jpg"}
+                alt="Hình ảnh background mô tả không gian setup GearDN"
+              />
             </Box>
           </Grid2>
           <Grid2
@@ -207,8 +209,8 @@ const LoginPage = () => {
                     }}
                   >
                     <SkeletonImage
-                      src={LOGO}
-                      alt="geardn"
+                      src={"/geardn-logo.png"}
+                      alt="Hình ảnh logo thương hiệu GearDN"
                       fill
                       quality={90}
                       priority

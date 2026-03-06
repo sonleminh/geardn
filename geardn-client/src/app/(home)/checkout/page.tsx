@@ -180,7 +180,11 @@ const Checkout = () => {
         <Box sx={{}}>
           <Breadcrumbs options={breadcrumbsOptions} />
         </Box>
-        <Button component={Link} href={ROUTES.CART}>
+        <Button
+          aria-label="Quay lại giỏ hàng"
+          component={Link}
+          href={ROUTES.CART}
+        >
           <ChevronLeftOutlinedIcon />
           Quay lại giỏ hàng
         </Button>
@@ -527,6 +531,7 @@ const Checkout = () => {
                           />
                         </FormControl>
                         <Button
+                          aria-label="Xác nhận"
                           sx={{ width: "100%" }}
                           variant="contained"
                           disabled={
@@ -799,6 +804,7 @@ const Checkout = () => {
               </Box>
               <Button
                 sx={{ mb: 1.5, fontWeight: 600 }}
+                aria-label="Thanh toán"
                 variant="contained"
                 size="large"
                 fullWidth
@@ -808,6 +814,7 @@ const Checkout = () => {
                 {isCreateOrderLoading ? "Đang xử lý..." : "Thanh toán"}
               </Button>
               <Button
+                aria-label="Tiếp tục mua hàng"
                 sx={{ fontWeight: 600 }}
                 component={Link}
                 href="/"

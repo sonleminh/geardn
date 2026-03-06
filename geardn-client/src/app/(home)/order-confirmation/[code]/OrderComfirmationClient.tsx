@@ -10,7 +10,6 @@ import LayoutContainer from "@/components/layout-container";
 import { formatPrice } from "@/utils/format-price";
 
 import ORDER_SUCCESS from "@/assets/order-success.png";
-import BANNER_BG from "@/assets/geardn.jpg";
 import { IOrder } from "@/interfaces/IOrder";
 import { truncateTextByLine } from "@/utils/css-helper.util";
 
@@ -44,8 +43,8 @@ const OrderConfirmationClient = ({ data }: { data: IOrder }) => {
             }}
           >
             <SkeletonImage
-              src={BANNER_BG}
-              alt="geardn"
+              src={"/geardn.webp"}
+              alt="Hình ảnh banner chính của trang web GearDN"
               fill
               quality={90}
               priority
@@ -88,7 +87,7 @@ const OrderConfirmationClient = ({ data }: { data: IOrder }) => {
             >
               <SkeletonImage
                 src={ORDER_SUCCESS}
-                alt="geardn"
+                alt="Hình ảnh mô tả đơn hàng đã đặt thành công"
                 fill
                 quality={90}
                 priority
@@ -404,6 +403,7 @@ const OrderConfirmationClient = ({ data }: { data: IOrder }) => {
                 <Typography sx={{ fontSize: 13 }}>{"Miễn phí <3km"}</Typography>
               </Box>
               <Button
+                aria-label="Về trang chủ"
                 sx={{ fontWeight: 600 }}
                 component={Link}
                 href="/"

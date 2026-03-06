@@ -1,9 +1,9 @@
 // app/error.tsx
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { Button, Container, Stack, Typography, Box } from '@mui/material';
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { Button, Container, Stack, Typography, Box } from "@mui/material";
 
 export default function Error({
   error,
@@ -23,7 +23,7 @@ export default function Error({
       () =>
         setCountdown((s) => {
           if (s <= 1) {
-            window.location.assign('/');
+            window.location.assign("/");
             return 0;
           }
           return s - 1;
@@ -33,53 +33,68 @@ export default function Error({
     return () => clearInterval(t);
   }, [countdown]);
 
-  const isDev = process.env.NODE_ENV !== 'production';
+  const isDev = process.env.NODE_ENV !== "production";
 
   return (
     <Container
-      maxWidth='sm'
-      sx={{ minHeight: '100dvh', display: 'flex', alignItems: 'center' }}>
-      <Stack spacing={3} sx={{ width: '100%', py: 6, textAlign: 'center' }}>
-        <Typography variant='h3' fontWeight={700}>
+      maxWidth="sm"
+      sx={{ minHeight: "100dvh", display: "flex", alignItems: "center" }}
+    >
+      <Stack spacing={3} sx={{ width: "100%", py: 6, textAlign: "center" }}>
+        <Typography variant="h3" fontWeight={700}>
           Đã xảy ra lỗi
         </Typography>
 
-        <Typography variant='body1' color='text.secondary'>
+        <Typography variant="body1" color="text.secondary">
           Rất tiếc, có vấn đề khi tải trang. Bạn có thể thử lại hoặc quay về
           trang chủ.
         </Typography>
 
         {isDev && (
           <Box
-            component='pre'
+            component="pre"
             sx={{
-              textAlign: 'left',
+              textAlign: "left",
               p: 2,
-              bgcolor: 'grey.900',
-              color: 'grey.100',
+              bgcolor: "grey.900",
+              color: "grey.100",
               borderRadius: 2,
-              overflow: 'auto',
+              overflow: "auto",
               maxHeight: 240,
-            }}>
-            {error?.message || 'Unknown error'}
-            {error?.digest ? `\n\ndigest: ${error.digest}` : ''}
+            }}
+          >
+            {error?.message || "Unknown error"}
+            {error?.digest ? `\n\ndigest: ${error.digest}` : ""}
           </Box>
         )}
 
         {countdown > 0 && (
-          <Typography variant='caption' color='text.secondary'>
+          <Typography variant="caption" color="text.secondary">
             Tự chuyển về trang chủ sau {countdown}s
           </Typography>
         )}
 
-        <Stack direction='row' spacing={2} justifyContent='center'>
-          <Button variant='contained' onClick={() => reset()}>
+        <Stack direction="row" spacing={2} justifyContent="center">
+          <Button
+            aria-label="Thử lại"
+            variant="contained"
+            onClick={() => reset()}
+          >
             Thử lại
           </Button>
-          <Button variant='outlined' onClick={() => window.location.reload()}>
+          <Button
+            aria-label="Tải lại trang"
+            variant="outlined"
+            onClick={() => window.location.reload()}
+          >
             Tải lại trang
           </Button>
-          <Button component={Link} href='/' variant='text'>
+          <Button
+            aria-label="Về trang chủ"
+            component={Link}
+            href="/"
+            variant="text"
+          >
             Về trang chủ
           </Button>
         </Stack>

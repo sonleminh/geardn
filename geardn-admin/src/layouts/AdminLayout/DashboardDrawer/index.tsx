@@ -321,7 +321,11 @@ const DashboardDrawer = ({
               },
             }}
           >
-            <img src={LOGO} alt="geardn" className="header-logo" />
+            <img
+              src={LOGO}
+              alt="Hình ảnh logo thương hiệu GearDN"
+              className="header-logo"
+            />
           </Box>
         </Link>
         <IconButton onClick={handleDrawerToggle} sx={{ color: "#fff" }}>

@@ -1,6 +1,5 @@
 import LayoutContainer from "../layout-container";
 
-import LOGO from "@/assets/geardn-logo.png";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import XIcon from "@mui/icons-material/X";
@@ -27,7 +26,12 @@ const Footer = () => {
                 },
               }}
             >
-              <SkeletonImage src={LOGO} alt="geardn" fill unoptimized={true} />
+              <SkeletonImage
+                src={"/geardn-logo.png"}
+                alt="Hình ảnh logo thương hiệu GearDN"
+                fill
+                unoptimized={true}
+              />
             </Box>
           </Grid2>
           <Grid2 size={{ xs: 4, md: 2 }}>
@@ -90,7 +94,10 @@ const Footer = () => {
                 },
               }}
             >
-              <Link href={"https://www.facebook.com/geardnha"}>
+              <Link
+                href={"https://www.facebook.com/geardnha"}
+                aria-label="Truy cập Fanpage Facebook của GearDN"
+              >
                 <ListItem>
                   <FacebookIcon />
                 </ListItem>

@@ -68,6 +68,7 @@ export default function SearchClient({ initial, params }: Props) {
       {q.hasNextPage && (
         <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
           <Button
+            aria-label="Tải thêm sản phẩm"
             onClick={() => q.fetchNextPage()}
             disabled={!q.hasNextPage || q.isFetchingNextPage}
             variant="outlined"

@@ -399,6 +399,7 @@ const CartClient = ({
       }}
     >
       <Button
+        aria-label="Giảm số lượng"
         sx={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
         onClick={() =>
           handleSubtractItem(row.skuId, row.productName, row?.cartItemId)
@@ -423,6 +424,7 @@ const CartClient = ({
         }}
       />
       <Button
+        aria-label="Thêm số lượng"
         sx={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}
         onClick={() => handleAddItem(row?.skuId, row?.cartItemId)}
         disabled={
@@ -798,6 +800,7 @@ const CartClient = ({
                     </Grid2>
                     <Button
                       sx={{ mb: { xs: 1, md: 1.5 }, fontWeight: 600 }}
+                      aria-label="Thanh toán"
                       variant="contained"
                       size="large"
                       fullWidth
@@ -807,6 +810,7 @@ const CartClient = ({
                     </Button>
                     <Button
                       sx={{ fontWeight: 600 }}
+                      aria-label="Tiếp tục mua hàng"
                       variant="outlined"
                       size="large"
                       fullWidth
@@ -854,6 +858,7 @@ const CartClient = ({
               </Typography>
               <Button
                 sx={{ width: 220, fontWeight: 600 }}
+                aria-label="Tiếp tục mua hàng"
                 component={Link}
                 href="/"
                 variant="contained"

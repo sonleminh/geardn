@@ -2,15 +2,22 @@ import SkeletonImage from "@/components/common/SkeletonImage";
 import { Box, Button, InputBase, Typography } from "@mui/material";
 import ProductCatalog from "./components/product-catalog";
 
-import BANNER_BG from "@/assets/geardn.jpg";
 import LayoutContainer from "@/components/layout-container";
-import Explore from "./components/explore";
 import { getCategories } from "@/data/category.server";
 import { getProducts } from "@/data/product.server";
 import {
   parseProductListParams,
   toURLSearchParams,
 } from "@/lib/search/productList.params";
+
+import dynamic from "next/dynamic";
+const Explore = dynamic(() => import("./components/explore"), {
+  loading: () => (
+    <Box sx={{ width: "100%", height: "400px" }} className="h-[400px]">
+      Đang tải danh sách...
+    </Box>
+  ),
+});
 
 export default async function Homepage({
   searchParams,
@@ -50,11 +57,13 @@ export default async function Homepage({
         }}
       >
         <SkeletonImage
-          src={BANNER_BG}
-          alt="geardn"
+          src={"/geardn.webp"}
+          alt="Không gian làm việc setup với GearDN"
           fill
-          quality={90}
           priority
+          fetchPriority="high"
+          sizes="100vw"
+          quality={90}
         />
       </Box>
 
@@ -103,6 +112,7 @@ export default async function Homepage({
             >
               <InputBase placeholder="Email .." />
               <Button
+                aria-label="Gửi"
                 variant="contained"
                 sx={{ width: "88px", borderRadius: 10 }}
               >

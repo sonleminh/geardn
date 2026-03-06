@@ -65,6 +65,7 @@ export function ProductFilters({ initial }: { initial: IQueryParams }) {
             page: "1",
           });
         }}
+        inputProps={{ "aria-label": "Sắp xếp sản phẩm" }}
         disableUnderline
         sx={{
           width: { xs: 120, md: 150 },
