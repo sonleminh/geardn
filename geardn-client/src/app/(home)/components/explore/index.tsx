@@ -11,6 +11,9 @@ import LayoutContainer from "@/components/layout-container";
 import ProductCard from "@/components/common/ProductCard";
 import { IProduct } from "@/interfaces/IProduct";
 
+import "swiper/css";
+import "swiper/css/navigation";
+
 const Explore = ({ exploreData }: { exploreData: IProduct[] | undefined }) => {
   return (
     <Box sx={{ mb: { xs: 5, md: 10 } }}>
