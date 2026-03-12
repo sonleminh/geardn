@@ -98,6 +98,8 @@ export class CartService {
     });
 
     if (!existingItem) throw new Error('Item not found in cart');
+    if (existingItem.cartId !== cart.id)
+      throw new Error('Can not update item in other cart user');
 
     const stock = await this.getStockForSkus([existingItem.skuId]);
 
