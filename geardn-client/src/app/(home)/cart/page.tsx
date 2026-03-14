@@ -1,7 +1,7 @@
-import CartClient from './CartClient';
-import { getCartOnServer } from '@/data/cart.server';
+import { getCartOnServer } from "@/data/cart.server";
+import CartContainer from "./components/CartContainer";
 
 export default async function Page() {
   const cart = await getCartOnServer();
-  return <CartClient initialCart={cart} />;
+  return <CartContainer initialCart={cart} />;
 }

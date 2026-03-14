@@ -40,4 +40,4 @@ const SkeletonImage: React.FC<ImageProps> = (props) => {
   );
 };
 
-export default SkeletonImage;
+export default React.memo(SkeletonImage);

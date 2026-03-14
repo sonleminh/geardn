@@ -25,7 +25,6 @@ import { formatPrice } from "@/utils/format-price";
 import { useSession } from "@/hooks/useSession";
 import { IProduct } from "@/interfaces/IProduct";
 import { AppError } from "@/lib/errors/app-error";
-import { useAddCartItem } from "@/queries/cart";
 import { useGetProduct } from "@/queries/product";
 import { useCartStore } from "@/stores/cart-store";
 import { useNotificationStore } from "@/stores/notification-store";
@@ -34,6 +33,7 @@ import { useRouter } from "next/navigation";
 import ProductImageGallery from "./components/ProductGallery";
 import { useProductSkuSelection } from "./hooks/useProductSkuSelection";
 import { truncateTextByLine } from "@/utils/css-helper.util";
+import { addCartItemDB } from "@/actions/cart.action";
 
 const ProductDetailClient = ({
   initialProduct,
@@ -47,7 +47,6 @@ const ProductDetailClient = ({
   const { showNotification } = useNotificationStore();
 
   const { data } = useGetProduct(initialProduct);
-  const { mutateAsync: onAddToCart } = useAddCartItem();
 
   const [isBuyingNow, setIsBuyingNow] = useState(false);
 
@@ -94,27 +93,20 @@ const ProductDetailClient = ({
     }
 
     try {
-      if (isBuyNow) setIsBuyingNow(true);
-
-      if (user) {
-        addToCart(cartItemPayload);
-        await onAddToCart({
-          productId: selectedSku.productId,
-          skuId: selectedSku.id,
-          quantity: count ?? 1,
-        });
-      }
-
+      addToCart(cartItemPayload);
       if (isBuyNow) {
-        if (!isCurrentQtyExceedStock) {
-          addToCart(cartItemPayload);
-        }
-
+        setIsBuyingNow(true);
         setLastBuyNowItemId(selectedSku.id);
+        if (user) {
+          await addCartItemDB({
+            productId: selectedSku.productId,
+            skuId: selectedSku.id,
+            quantity: count ?? 1,
+          });
+        }
         router.push("/cart");
       } else {
         showNotification("Thêm vào giỏ hàng thành công", "success");
-        if (isBuyNow) setIsBuyingNow(false);
       }
     } catch (error) {
       setIsBuyingNow(false);

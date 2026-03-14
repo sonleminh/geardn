@@ -1,24 +1,45 @@
-import { addCartItem, deleteCartItem, getCart, getCartStock, syncCart, updateQty } from '@/apis/cart';
-import { IAddCartItemPayload, ICartResponse, ICartStockItem, ISyncCartPayload, IUpdateQuantityPayload, IUpdateQuantityResponse } from '@/interfaces/ICart';
-import { BaseResponse } from '@/types/response.type';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import {
+  deleteCartItem,
+  getCart,
+  getCartStock,
+  syncCart,
+  updateQty,
+} from "@/apis/cart";
+import {
+  ICartResponse,
+  ICartStockItem,
+  ISyncCartPayload,
+  IUpdateQuantityPayload,
+  IUpdateQuantityResponse,
+} from "@/interfaces/ICart";
+import { BaseResponse } from "@/types/response.type";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
-export function useGetCart(enabled: boolean, initialData?: BaseResponse<ICartResponse> | null) {
+export function useGetCart(
+  enabled: boolean,
+  initialData?: BaseResponse<ICartResponse> | null
+) {
   return useQuery<BaseResponse<ICartResponse>, Error>({
-    queryKey: ['cart'],
+    queryKey: ["cart"],
     queryFn: getCart,
     enabled,
-    initialData: initialData ?? undefined, 
+    initialData: initialData ?? undefined,
     staleTime: 0,
     gcTime: 0,
   });
 }
 
 export function useGetCartStock(skuIds: number[]) {
-  const key = ['cart-stock', skuIds.slice().sort((a,b)=>a-b).join(',')];
+  const key = [
+    "cart-stock",
+    skuIds
+      .slice()
+      .sort((a, b) => a - b)
+      .join(","),
+  ];
   return useQuery<BaseResponse<ICartStockItem[]>, Error>({
     queryKey: [key],
-    queryFn: () => getCartStock(skuIds), 
+    queryFn: () => getCartStock(skuIds),
     enabled: skuIds.length > 0,
   });
 }
@@ -29,14 +50,22 @@ export function useSyncCart() {
   });
 }
 
-export function useAddCartItem() {
-  return useMutation<BaseResponse<object>, Error, IAddCartItemPayload>({
-    mutationFn: addCartItem,
-  });
-}
+// export function useAddCartItem() {
+//   return useMutation<
+//     BaseResponse<{ message: string }> | null,
+//     Error,
+//     IAddCartItemPayload
+//   >({
+//     mutationFn: addCartItem,
+//   });
+// }
 
 export function useUpdateQuantity() {
-  return useMutation<BaseResponse<IUpdateQuantityResponse>, Error, IUpdateQuantityPayload>({
+  return useMutation<
+    BaseResponse<IUpdateQuantityResponse>,
+    Error,
+    IUpdateQuantityPayload
+  >({
     mutationFn: updateQty,
   });
 }
