@@ -93,24 +93,18 @@ const ProductDetailClient = ({
     }
 
     try {
-      addToCart(cartItemPayload);
       if (isBuyNow) {
         setIsBuyingNow(true);
+
+        addToCart(cartItemPayload);
         setLastBuyNowItemId(selectedSku.id);
-        if (user) {
-          await addCartItemDB({
-            productId: selectedSku.productId,
-            skuId: selectedSku.id,
-            quantity: count ?? 1,
-          });
-        }
         router.push("/cart");
       } else {
+        addToCart(cartItemPayload);
         showNotification("Thêm vào giỏ hàng thành công", "success");
       }
     } catch (error) {
       setIsBuyingNow(false);
-      syncCart(oldCartItems);
       showNotification(AppError.fromUnknown(error).message, "error");
     }
   };
@@ -394,6 +388,7 @@ const ProductDetailClient = ({
                   loading={isBuyingNow}
                   disabled={!selectedSku || selectedSkuStock === 0}
                   onClick={() => handleAddToCartProcess(true)}
+                  onMouseEnter={() => router.prefetch("/cart")}
                 >
                   {(!!totalStock && !selectedSku) ||
                   (!!totalStock && selectedSku && selectedSkuStock)

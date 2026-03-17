@@ -141,7 +141,7 @@ const Footer = () => {
             }}
           >
             <Typography sx={{ mr: 4 }}>
-              Địa chỉ: 02 Tô Hiến Thành, An Hải, Đà Nẵng. Điện thoại:
+              Địa chỉ: 39 Cù Chính Lan, Thanh Khê, Đà Nẵng. Điện thoại:
               0789787200. Email: sonlele2000@gmail.com.
             </Typography>
           </Box>

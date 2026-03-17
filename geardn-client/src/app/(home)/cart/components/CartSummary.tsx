@@ -1,6 +1,12 @@
+import { ROUTES } from "@/constants/route";
+import { ICartStoreItem } from "@/interfaces/ICart";
+import { useAuthStore } from "@/stores/auth-store";
+import { useCartStore } from "@/stores/cart-store";
+import { useNotificationStore } from "@/stores/notification-store";
 import { formatPrice } from "@/utils/format-price";
 import { Button, Grid2, Paper, Typography } from "@mui/material";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 interface Props {
@@ -9,6 +15,20 @@ interface Props {
 }
 
 const CartSummary = ({ selected, totalAmount }: Props) => {
+  const router = useRouter();
+  const { showNotification } = useNotificationStore();
+  const { setCheckoutCart } = useAuthStore((state) => state);
+  const { cartItems } = useCartStore();
+  const handlePayBtn = () => {
+    if (selected.length === 0) {
+      return showNotification("Vui lòng chọn sản phẩm", "warning");
+    }
+    const selectedItems = selected
+      .map((skuId) => cartItems?.find((item) => item.skuId === skuId))
+      ?.filter((item): item is ICartStoreItem => item !== undefined);
+    setCheckoutCart(selectedItems);
+    router.push(ROUTES.CHECKOUT);
+  };
   return (
     <Paper
       sx={{
@@ -64,7 +84,7 @@ const CartSummary = ({ selected, totalAmount }: Props) => {
           variant="contained"
           size="large"
           fullWidth
-          //   onClick={handlePayBtn}
+          onClick={handlePayBtn}
         >
           Thanh toán
         </Button>

@@ -130,11 +130,10 @@ export default function CartContainer({
         if (userSession?.data && cartItemId) {
           const response = await updateCartItemDB({
             id: cartItemId,
-            quantity: newQty, // This is the *final* number they settled on
+            quantity: newQty,
           });
 
           if (!response.success) {
-            // Rollback if the DB fails
             const fallbackQty = originalQtyRef.current[skuId];
             updateQuantity(skuId, fallbackQty);
             showNotification(
@@ -145,7 +144,7 @@ export default function CartContainer({
           delete originalQtyRef.current[skuId];
           delete debounceTimersRef.current[skuId];
         }
-      }, 500); // 500 milliseconds (adjust this if you want it faster or slower)
+      }, 500);
     },
     [updateQuantity, userSession?.data, showNotification, handleTriggerRemove]
   );
@@ -171,28 +170,22 @@ export default function CartContainer({
     },
     []
   );
-  console.log("selected", selected);
 
   const handleSelectClick = useCallback(
     (event: React.MouseEvent<unknown>, id: number) => {
       event.stopPropagation();
       console.log("Clicked ID:", id);
-
-      // Using the functional updater gives us the TRUE current state (prevSelected),
-      // completely bypassing the stale closure bug caused by React.memo!
       setSelected((prevSelected) => {
         const isSelected = prevSelected.includes(id);
 
         if (isSelected) {
-          // If it's already selected, filter it out
           return prevSelected.filter((selectedId) => selectedId !== id);
         } else {
-          // If it's not selected, add it to the array
           return [...prevSelected, id];
         }
       });
     },
-    [] // Look ma, no dependencies! We don't need `selected` in here anymore.
+    []
   );
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -254,75 +247,93 @@ export default function CartContainer({
   }, [selected, cartItems]);
 
   return (
-    <Box
-      pt={2}
-      pb={{ xs: 22, md: 4 }}
-      bgcolor={"#F3F4F6"}
-      minHeight={{ xs: "100vh", md: "" }}
-    >
+    <Box pt={2} pb={{ xs: 22, md: 4 }} minHeight={{ xs: "100vh", md: "" }}>
       <LayoutContainer>
         <Box sx={{ mb: 2 }}>
           <Breadcrumbs options={breadcrumbsOptions} />
         </Box>
         <Grid2 container spacing={3}>
-          {/* Main Cart Area */}
           <Grid2 size={{ xs: 12, md: 8.5 }}>
-            <Paper elevation={1} sx={{ borderRadius: 2, overflow: "hidden" }}>
-              {/* Header */}
+            <Paper
+              elevation={1}
+              sx={{
+                borderRadius: 2,
+                overflow: "hidden",
+                bgcolor: "transparent",
+              }}
+            >
               <Grid2
                 container
-                spacing={2}
                 alignItems="center"
                 sx={{
-                  p: 2,
+                  py: { xs: 0, sm: 2 },
                   borderBottom: 1,
                   borderColor: "divider",
+                  bgcolor: { xs: "transparent", md: "#fff" },
                 }}
               >
-                <Grid2 size={1} textAlign="center">
-                  {/* You'll likely want to wire up a 'select all' handler here later */}
+                <Grid2 size={{ xs: 1.2, md: 1 }} textAlign={"center"}>
                   <Checkbox
-                    size="small"
                     checked={isAllSelected}
                     onChange={handleSelectAllClick}
+                    size="small"
                     sx={{
                       color: "text.primary",
                       "&.Mui-checked": { color: "text.primary" },
                     }}
                   />
                 </Grid2>
-                <Grid2 size={5}>
+                <Grid2 size={2} sx={{ display: { xs: "grid", md: "none" } }}>
+                  <Typography variant="body2" fontWeight="medium">
+                    Tất cả
+                  </Typography>
+                </Grid2>
+                <Grid2
+                  size={{ xs: 7, md: 5 }}
+                  sx={{ display: { xs: "none", md: "grid" } }}
+                >
                   <Typography variant="body2" fontWeight="medium">
                     Sản phẩm
                   </Typography>
                 </Grid2>
-                <Grid2 size={2} textAlign="center">
+                <Grid2
+                  size={2}
+                  textAlign="center"
+                  sx={{ display: { xs: "none", md: "grid" } }}
+                >
                   <Typography variant="body2" fontWeight="medium">
                     Giá
                   </Typography>
                 </Grid2>
-                <Grid2 size={2} textAlign="center">
+                <Grid2
+                  size={2}
+                  textAlign="center"
+                  sx={{ display: { xs: "none", md: "grid" } }}
+                >
                   <Typography variant="body2" fontWeight="medium">
                     Số lượng
                   </Typography>
                 </Grid2>
-                <Grid2 size={2} textAlign="center">
+                <Grid2
+                  size={2}
+                  textAlign="center"
+                  sx={{ display: { xs: "none", md: "grid" } }}
+                >
                   <Typography variant="body2" fontWeight="medium">
                     Tuỳ chọn
                   </Typography>
                 </Grid2>
               </Grid2>
 
-              {/* Item List */}
               <Box
                 sx={{
                   display: "flex",
                   flexDirection: "column",
-                  // This replicates Tailwind's 'divide-y' utility exactly
                   "& > *:not(:last-child)": {
                     borderBottom: 1,
                     borderColor: "divider",
                   },
+                  bgcolor: "#fff",
                 }}
               >
                 {cartItems.length > 0 ? (
@@ -332,7 +343,6 @@ export default function CartContainer({
                       (stockItem) => stockItem.id === item.skuId
                     );
 
-                    // Default to a safe number (or 0) if the API is still loading
                     const currentStock = itemStockData?.quantity ?? 0;
                     return (
                       <CartItem
@@ -355,7 +365,6 @@ export default function CartContainer({
             </Paper>
           </Grid2>
 
-          {/* Cart Summary Sidebar */}
           <Grid2
             size={{ xs: 12, md: 3.5 }}
             sx={{

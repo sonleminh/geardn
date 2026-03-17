@@ -24,8 +24,7 @@ export function useGetCart(
     queryFn: getCart,
     enabled,
     initialData: initialData ?? undefined,
-    staleTime: 0,
-    gcTime: 0,
+    staleTime: 1000 * 5,
   });
 }
 
