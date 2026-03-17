@@ -1,7 +1,7 @@
-import { getOrderConfirm } from '@/data/order.server';
-import { Box } from '@mui/material';
-import OrderConfirmationClient from './OrderComfirmationClient';
-import { notFound } from 'next/navigation';
+import { getOrderConfirm } from "@/data/order.server";
+import { Box } from "@mui/material";
+import OrderConfirmationClient from "./OrderComfirmationClient";
+import { notFound } from "next/navigation";
 
 export default async function OrderConfirmation({
   params,
