@@ -33,7 +33,6 @@ import { useRouter } from "next/navigation";
 import ProductImageGallery from "./components/ProductGallery";
 import { useProductSkuSelection } from "./hooks/useProductSkuSelection";
 import { truncateTextByLine } from "@/utils/css-helper.util";
-import { addCartItemDB } from "@/actions/cart.action";
 
 const ProductDetailClient = ({
   initialProduct,
@@ -42,8 +41,7 @@ const ProductDetailClient = ({
 }) => {
   const router = useRouter();
   const { data: user } = useSession();
-  const { cartItems, addToCart, syncCart, setLastBuyNowItemId } =
-    useCartStore();
+  const { cartItems, addToCart, setLastBuyNowItemId } = useCartStore();
   const { showNotification } = useNotificationStore();
 
   const { data } = useGetProduct(initialProduct);
@@ -70,7 +68,6 @@ const ProductDetailClient = ({
   const handleAddToCartProcess = async (isBuyNow: boolean = false) => {
     if (!selectedSku)
       return showNotification("Vui lòng chọn phân loại hàng", "error");
-    const oldCartItems = [...cartItems];
     const cartItemPayload = {
       productId: selectedSku?.productId,
       skuId: selectedSku.id,

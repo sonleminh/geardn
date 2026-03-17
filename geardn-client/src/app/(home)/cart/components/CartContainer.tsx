@@ -88,10 +88,9 @@ export default function CartContainer({
   }, [lastBuyNowItemId, setLastBuyNowItemId]);
 
   useEffect(() => {
+    const currentTimers = debounceTimersRef.current;
     return () => {
-      Object.values(debounceTimersRef.current).forEach((timer) =>
-        clearTimeout(timer)
-      );
+      Object.values(currentTimers).forEach((timer) => clearTimeout(timer));
     };
   }, []);
 
@@ -168,7 +167,7 @@ export default function CartContainer({
         }
       }
     },
-    []
+    [removeItem, userSession?.data, cartItems, syncCart, showNotification]
   );
 
   const handleSelectClick = useCallback(
