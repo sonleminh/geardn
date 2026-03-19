@@ -2,25 +2,23 @@
 
 import Breadcrumbs from "@/components/common/Breadcrumbs";
 import ProductCard from "@/components/common/ProductCard";
-import { ProductFilters } from "@/components/common/ProductFilters";
+import { ProductSort } from "@/components/common/ProductSort";
 import LayoutContainer from "@/components/layout-container";
 import { IProduct } from "@/interfaces/IProduct";
-import { IQueryParams } from "@/interfaces/IQuery";
+import { ProductListParams } from "@/lib/search/productList.params";
 import { useSearchProductsInfinite } from "@/queries/product";
 import { SearchProductsResponse } from "@/types/response.type";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { Box, Button, Grid2, Typography } from "@mui/material";
-import { useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 
 type Props = {
-  initial: SearchProductsResponse<IProduct> | null;
-  params: IQueryParams;
+  data: SearchProductsResponse<IProduct> | null;
+  query: ProductListParams;
 };
 
-export default function SearchClient({ initial, params }: Props) {
-  const sp = useSearchParams();
-  const q = useSearchProductsInfinite(initial, sp);
+export default function SearchClient({ data, query }: Props) {
+  const q = useSearchProductsInfinite(data, query);
   const total = q?.data?.meta?.total ?? 0;
   const products = useMemo(() => {
     const seen = new Set<number>();
@@ -55,7 +53,7 @@ export default function SearchClient({ initial, params }: Props) {
           Tìm thấy {total} sản phẩm
         </Typography>
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <ProductFilters initial={params} />
+          <ProductSort />
         </Box>
       </Box>
       <Grid2 container spacing={2}>

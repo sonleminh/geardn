@@ -4,10 +4,10 @@ export const HeaderStyle: (
   isExpanded: boolean,
   pathname: string
 ) => SxProps<Theme> = (isExpanded: boolean, pathname: string) => ({
-  position: { xs: "unset", md: "fixed" },
+  position: { xs: "sticky", md: "fixed" },
   left: { xs: "0", md: "50%" },
   transform: { xs: "translateX(0)", md: "translateX(-50%)" },
-  zIndex: 69,
+  zIndex: 9999,
   width: isExpanded || pathname !== "/" ? "100%" : { xs: "100%", md: "1070px" },
   height: { xs: 68, md: 80 },
   bgcolor: isExpanded || pathname !== "/" ? "#fff" : { xs: "#fff", md: "none" },

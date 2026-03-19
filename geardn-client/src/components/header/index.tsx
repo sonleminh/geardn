@@ -40,6 +40,9 @@ import { useNotificationStore } from "@/stores/notification-store";
 import AppLink from "../common/AppLink";
 import SearchIconExpand from "../common/SearchIconExpand";
 import { HeaderStyle } from "./style";
+import { searchProducts } from "@/services/products";
+import { IProduct } from "@/interfaces/IProduct";
+import { formatPrice } from "@/utils/format-price";
 
 const Header = ({ initialUser }: { initialUser?: IUser | null }) => {
   const router = useRouter();
@@ -57,6 +60,50 @@ const Header = ({ initialUser }: { initialUser?: IUser | null }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [openMenuDrawer, setOpenMenuDrawer] = useState(false);
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [liveResults, setLiveResults] = useState<IProduct[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+
+  const handleLiveSearch = async (keyword: string) => {
+    if (!keyword.trim()) return;
+
+    try {
+      const results = await searchProducts({
+        keyword: keyword,
+        page: 1,
+        limit: 5,
+        sortBy: "createdAt",
+        order: "desc",
+      });
+
+      if (results && results.data) {
+        setLiveResults(results.data);
+      } else {
+        setLiveResults([]);
+      }
+    } catch (error) {
+      console.error(error);
+      setLiveResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleFullSearch = (keyword: string) => {
+    router.push(`/search?keyword=${keyword}`);
+  };
+
+  const handleStartTyping = (keyword: string) => {
+    setSearchTerm(keyword);
+
+    if (keyword.trim()) {
+      setIsSearching(true);
+    } else {
+      setIsSearching(false);
+      setLiveResults([]);
+    }
+  };
 
   const toggleMenuDrawer = (newOpen: boolean) => () => {
     setOpenMenuDrawer(newOpen);
@@ -196,11 +243,148 @@ const Header = ({ initialUser }: { initialUser?: IUser | null }) => {
               }}
             >
               <SearchIconExpand
-                onSearch={(q) =>
-                  router.replace(`/search?keyword=${q.toString()}`)
-                }
+                onType={handleLiveSearch}
+                onStartTyping={handleStartTyping}
+                onSubmit={handleFullSearch}
                 placeholder="Tìm sản phẩm…"
-                debounceMs={1000}
+                debounceMs={500}
+                dropdownContent={
+                  <Box>
+                    {searchTerm && (
+                      <Box
+                        onClick={(e) => e.stopPropagation()}
+                        sx={{ bgcolor: "#f5f5f5", px: 2, py: 1.5 }}
+                      >
+                        <Typography sx={{ fontWeight: 600, fontSize: 14 }}>
+                          Kết quả tìm kiếm:
+                        </Typography>
+                      </Box>
+                    )}
+
+                    <Box
+                      sx={{ maxHeight: 500, overflowY: "auto", minHeight: 100 }}
+                    >
+                      {isSearching ? (
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            height: 100,
+                          }}
+                        >
+                          <Typography
+                            sx={{ fontSize: 13, color: "text.secondary" }}
+                          >
+                            Đang tìm kiếm...
+                          </Typography>
+                        </Box>
+                      ) : liveResults.length === 0 && searchTerm ? (
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            height: 100,
+                          }}
+                        >
+                          <Typography
+                            sx={{ fontSize: 13, color: "text.secondary" }}
+                          >
+                            Không tìm thấy sản phẩm.
+                          </Typography>
+                        </Box>
+                      ) : (
+                        liveResults.map((item) => (
+                          <MenuItem
+                            key={item.id}
+                            onClick={() =>
+                              router.push(`/product/${item.slug || item.id}`)
+                            }
+                            sx={{
+                              display: "flex",
+                              alignItems: "flex-start",
+                              gap: 1.5,
+                              px: 2,
+                              py: 1,
+                              whiteSpace: "normal",
+                              borderBottom: "1px solid #f0f0f0",
+                              "&:last-child": {
+                                borderBottom: "none",
+                              },
+                              "&:hover": {
+                                bgcolor: "#f9f9f9",
+                              },
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                width: 48,
+                                height: 48,
+                                flexShrink: 0,
+                                position: "relative",
+                                bgcolor: "#fff",
+                                borderRadius: 1,
+                                overflow: "hidden",
+                              }}
+                            >
+                              <SkeletonImage
+                                src={item.images[0]}
+                                alt={item.name}
+                                style={{
+                                  width: "100%",
+                                  height: "100%",
+                                  objectFit: "contain",
+                                }}
+                              />
+                            </Box>
+
+                            <Box
+                              sx={{
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: 0.5,
+                              }}
+                            >
+                              <Typography
+                                sx={{
+                                  fontSize: 12,
+                                  fontWeight: 600,
+                                  lineHeight: 1.4,
+                                  color: "#333",
+                                  display: "-webkit-box",
+                                  WebkitLineClamp: 2,
+                                  WebkitBoxOrient: "vertical",
+                                  overflow: "hidden",
+                                }}
+                              >
+                                {item.name}
+                              </Typography>
+
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 1,
+                                }}
+                              >
+                                <Typography
+                                  sx={{
+                                    fontSize: 13,
+                                    fontWeight: 700,
+                                    color: "#d32f2f",
+                                  }}
+                                >
+                                  {formatPrice(item.priceMin)}
+                                </Typography>
+                              </Box>
+                            </Box>
+                          </MenuItem>
+                        ))
+                      )}
+                    </Box>
+                  </Box>
+                }
               />
               <Button
                 aria-label="Xem giỏ hàng"
