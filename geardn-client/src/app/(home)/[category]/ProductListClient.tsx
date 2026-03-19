@@ -1,40 +1,29 @@
 "use client";
 
-import { useProductsByCategoryInfinite } from "@/queries/product";
 import ProductCard from "@/components/common/ProductCard";
-import { Grid2, Box, Button } from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { useMemo } from "react";
-import { ProductsByCategoryResponse } from "@/types/response.type";
 import { IProduct } from "@/interfaces/IProduct";
-import { useSearchParams } from "next/navigation";
+import { ProductListParams } from "@/lib/search/productList.params";
+import { useProductsByCategoryInfinite } from "@/queries/product";
+import { ProductsByCategoryResponse } from "@/types/response.type";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { Box, Button, Grid2 } from "@mui/material";
 
 type Props = {
+  data: ProductsByCategoryResponse<IProduct>;
   slug: string;
-  initial: ProductsByCategoryResponse<IProduct> | null;
+  query: ProductListParams;
 };
 
-export default function ProductListClient({ slug, initial }: Props) {
-  const sp = useSearchParams();
-  const q = useProductsByCategoryInfinite(slug, initial, sp);
+export default function ProductListClient({ data, slug, query }: Props) {
+  const q = useProductsByCategoryInfinite(slug, data, query);
+  const products = q?.data?.items;
   const total = q?.data?.meta?.total ?? 0;
-
-  const products = useMemo(() => {
-    const seen = new Set<number>();
-    const out = [];
-    for (const it of q.data.items)
-      if (!seen.has(it.id)) {
-        seen.add(it.id);
-        out.push(it);
-      }
-    return out;
-  }, [q.data]);
 
   return (
     <>
       <Grid2 container spacing={2}>
         {products?.map((item) => (
-          <Grid2 size={{ xs: 6, md: 3 }} key={item.id}>
+          <Grid2 size={{ xs: 6, md: 3 }} key={item?.id}>
             <ProductCard data={item} />
           </Grid2>
         ))}

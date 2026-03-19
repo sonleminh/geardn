@@ -1,16 +1,17 @@
+import { notFound } from "next/navigation";
+import { Suspense } from "react";
+
 import Breadcrumbs from "@/components/common/Breadcrumbs";
 import { LoadingCircle } from "@/components/common/LoadingCircle";
-import { ProductFilters } from "@/components/common/ProductFilters";
 import LayoutContainer from "@/components/layout-container";
-import { getCategoryBySlug } from "@/data/category.server";
-import {
-  parseProductListParams,
-  toURLSearchParams,
-} from "@/lib/search/productList.params";
+import { ProductSort } from "@/components/common/ProductSort";
+
+import { parseProductListParams } from "@/lib/search/productList.params";
+import { getProductsByCategory } from "@/services/products";
 import { Box } from "@mui/material";
-import { Suspense } from "react";
+
 import ProductCount from "./ProductCount";
-import ProductListContainer from "./ProductListContainer";
+import ProductListClient from "./ProductListClient";
 
 export default async function ProductByCategoryPage({
   params,
@@ -21,10 +22,11 @@ export default async function ProductByCategoryPage({
 }) {
   const { category } = await params;
   const resolvedParams = await searchParams;
-  const parsed = parseProductListParams(resolvedParams);
-  const qs = toURLSearchParams(parsed);
-  const categoryRes = await getCategoryBySlug(category).catch(() => null);
-  const categoryName = categoryRes?.data?.name || "Sản phẩm";
+  const query = parseProductListParams(resolvedParams);
+  const res = await getProductsByCategory(category, query);
+  if (!res) notFound();
+
+  const categoryName = res?.category?.name || "Sản phẩm";
 
   const breadcrumbsOptions = [
     { href: "/", label: "Trang chủ" },
@@ -44,11 +46,11 @@ export default async function ProductByCategoryPage({
             alignItems: "center",
           }}
         >
-          <ProductCount category={category} qs={qs} />
-          <ProductFilters initial={parsed} />
+          <ProductCount total={res?.meta?.total ?? 0} />
+          <ProductSort />
         </Box>
         <Suspense fallback={<LoadingCircle />}>
-          <ProductListContainer category={category} qs={qs} />
+          <ProductListClient data={res} slug={category} query={query} />
         </Suspense>
       </LayoutContainer>
     </Box>

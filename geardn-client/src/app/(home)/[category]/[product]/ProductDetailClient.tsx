@@ -25,30 +25,22 @@ import { formatPrice } from "@/utils/format-price";
 import { useSession } from "@/hooks/useSession";
 import { IProduct } from "@/interfaces/IProduct";
 import { AppError } from "@/lib/errors/app-error";
-import { useGetProduct } from "@/queries/product";
 import { useCartStore } from "@/stores/cart-store";
 import { useNotificationStore } from "@/stores/notification-store";
-import { BaseResponse } from "@/types/response.type";
 import { useRouter } from "next/navigation";
 import ProductImageGallery from "./components/ProductGallery";
 import { useProductSkuSelection } from "./hooks/useProductSkuSelection";
 import { truncateTextByLine } from "@/utils/css-helper.util";
 
-const ProductDetailClient = ({
-  initialProduct,
-}: {
-  initialProduct: BaseResponse<IProduct>;
-}) => {
+const ProductDetailClient = ({ data }: { data: IProduct }) => {
   const router = useRouter();
   const { data: user } = useSession();
   const { cartItems, addToCart, setLastBuyNowItemId } = useCartStore();
   const { showNotification } = useNotificationStore();
 
-  const { data } = useGetProduct(initialProduct);
-
   const [isBuyingNow, setIsBuyingNow] = useState(false);
 
-  const product = data?.data;
+  const product = data;
 
   const {
     selectedAttributes,

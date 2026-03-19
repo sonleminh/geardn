@@ -1,7 +1,7 @@
 import React from "react";
 import { Metadata } from "next";
 import LayoutContainer from "@/components/layout-container";
-import { getProductBySlug } from "@/data/product.server";
+import { getProductBySlug } from "@/services/products";
 
 export async function generateMetadata({
   params,

@@ -1,6 +1,6 @@
 import React from "react";
 import { Metadata } from "next";
-import { getCategoryBySlug } from "@/data/category.server";
+import { getCategoryBySlug } from "@/services/category";
 
 export async function generateMetadata({
   params,
@@ -8,9 +8,15 @@ export async function generateMetadata({
   params: Promise<{ category: string }>;
 }): Promise<Metadata> {
   const { category } = await params;
-  const res = await getCategoryBySlug(category).catch(() => null);
-  const categoryData = res?.data;
+  const res = await getCategoryBySlug(category);
 
+  if (!res) {
+    return {
+      title: "Không tìm thấy danh mục",
+      description: "Danh mục bạn tìm kiếm không tồn tại.",
+    };
+  }
+  const categoryData = res?.data;
   const fallbackTitle = "Sản phẩm";
   const title = categoryData?.name
     ? `${categoryData.name} | GearDN`

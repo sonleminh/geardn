@@ -6,16 +6,18 @@ import {
   ProductsByCategoryResponse,
   SearchProductsResponse,
 } from "@/types/response.type";
+import {
+  ProductListParams,
+  toURLSearchParams,
+} from "@/lib/search/productList.params";
 export type PageMeta = { total: number; page: number; pageSize: number };
 
 const BE = getBackendBaseUrl();
 
-export async function getProducts(qs: URLSearchParams) {
-  const res = await fetch(`${BE}/products/homepage?${qs.toString()}`, {
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
+export async function getProducts(query: ProductListParams) {
+  const queryString = toURLSearchParams(query);
+
+  const res = await fetch(`${BE}/products/homepage?${queryString}`, {
     next: { revalidate: 60 },
   });
   if (res.status === 404) return null;
@@ -27,12 +29,9 @@ export async function getProducts(qs: URLSearchParams) {
   return res.json() as Promise<SearchProductsResponse<IProduct>>;
 }
 
-export async function searchProducts(qs: URLSearchParams) {
-  const res = await fetch(`${BE}/products/search?${qs.toString()}`, {
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
+export async function searchProducts(query: ProductListParams) {
+  const queryString = toURLSearchParams(query);
+  const res = await fetch(`${BE}/products/search?${queryString}`, {
     next: { revalidate: 60 },
   });
   if (res.status === 404) return null;
@@ -49,17 +48,13 @@ export async function searchProducts(qs: URLSearchParams) {
 }
 
 export const getProductsByCategory = cache(
-  async (slug: string, qs?: URLSearchParams) => {
+  async (slug: string, query: ProductListParams) => {
+    const queryString = toURLSearchParams(query);
+
     const res = await fetch(
-      `${BE}/products/category/slug/${encodeURIComponent(slug)}${
-        qs?.size ? `?${qs}` : ""
-      }`,
+      `${BE}/products/category/slug/${encodeURIComponent(slug)}?${queryString}`,
       {
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        next: { revalidate: 60 },
+        next: { revalidate: 1800 },
       }
     );
 
@@ -79,10 +74,6 @@ export const getProductsByCategory = cache(
 
 export const getProductBySlug = cache(async (slug: string) => {
   const res = await fetch(`${BE}/products/slug/${encodeURIComponent(slug)}`, {
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
     next: { revalidate: 60 },
   });
 

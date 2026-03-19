@@ -6,11 +6,7 @@ const BE = getBackendBaseUrl();
 
 export async function getCategoryBySlug(slug: string) {
   const res = await fetch(`${BE}/categories/slug/${encodeURIComponent(slug)}`, {
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-    next: { revalidate: 60 },
+    next: { revalidate: 1800 },
   });
   if (res.status === 404) return null;
 
@@ -23,11 +19,7 @@ export async function getCategoryBySlug(slug: string) {
 
 export async function getCategories() {
   const res = await fetch(`${BE}/categories`, {
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-    next: { revalidate: 60 },
+    next: { revalidate: 1800 },
   });
   if (res.status === 404) return null;
 

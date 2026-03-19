@@ -3,12 +3,9 @@ import { Box, Button, InputBase, Typography } from "@mui/material";
 import ProductCatalog from "./components/product-catalog";
 
 import LayoutContainer from "@/components/layout-container";
-import { getCategories } from "@/data/category.server";
-import { getProducts } from "@/data/product.server";
-import {
-  parseProductListParams,
-  toURLSearchParams,
-} from "@/lib/search/productList.params";
+import { getCategories } from "@/services/category";
+import { getProducts } from "@/services/products";
+import { parseProductListParams } from "@/lib/search/productList.params";
 
 import dynamic from "next/dynamic";
 const Explore = dynamic(() => import("./components/explore"), {
@@ -25,12 +22,13 @@ export default async function Homepage({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const resolvedParams = await searchParams;
-  const parsed = parseProductListParams(resolvedParams);
-  const qs = toURLSearchParams(parsed);
+  const query = parseProductListParams(resolvedParams);
 
-  const productPage = await getProducts(qs);
-  const categoryPage = await getCategories();
-  if (!productPage?.success && !categoryPage?.success) {
+  const [products, categories] = await Promise.all([
+    getProducts(query),
+    getCategories(),
+  ]);
+  if (!products?.success && !categories?.success) {
     throw new Error("Không tải được dữ liệu trang chủ");
   }
 
@@ -69,14 +67,14 @@ export default async function Homepage({
 
       <section id="shop">
         <ProductCatalog
-          products={productPage?.data}
-          categories={categoryPage?.data}
-          pagination={productPage?.meta}
-          params={parsed}
+          products={products?.data}
+          categories={categories?.data}
+          pagination={products?.meta}
+          query={query}
         />
       </section>
 
-      <Explore exploreData={productPage?.data} />
+      <Explore exploreData={products?.data} />
 
       <LayoutContainer>
         <Box

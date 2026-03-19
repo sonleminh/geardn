@@ -1,6 +1,7 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 import {
   Box,
@@ -11,6 +12,7 @@ import {
   List,
   ListItem,
   Pagination as MuiPagination,
+  PaginationItem,
   Skeleton,
   Typography,
 } from "@mui/material";
@@ -19,11 +21,10 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ProductCard from "@/components/common/ProductCard";
 import LayoutContainer from "@/components/layout-container";
 
-import { ProductFilters } from "@/components/common/ProductFilters";
+import { ProductSort } from "@/components/common/ProductSort";
 import { IProduct } from "@/interfaces/IProduct";
 import { CursorMeta } from "@/types/response.type";
 import { ProductListStyle } from "./style";
-import { IQueryParams } from "@/interfaces/IQuery";
 import { ICategory } from "@/interfaces/ICategory";
 import AppLink from "@/components/common/AppLink";
 import SkeletonImage from "@/components/common/SkeletonImage";
@@ -33,28 +34,23 @@ import { Pagination, Grid } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/grid";
+import { ProductListParams } from "@/lib/search/productList.params";
 
 const ProductCatalog = ({
   products,
   categories,
   pagination,
-  params,
+  query,
 }: {
   products: IProduct[] | undefined;
   categories: ICategory[] | undefined;
   pagination: CursorMeta | undefined;
-  params: IQueryParams;
+  query: ProductListParams;
 }) => {
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const page = Number(searchParams.get("page") ?? 1);
+  const page = Number(query.page);
   const total = pagination?.total ?? 0;
 
-  const handlePageChange = (_: unknown, value: number) => {
-    const next = new URLSearchParams(searchParams.toString());
-    next.set("page", String(value));
-    router.replace(`/?${next.toString()}`, { scroll: false });
-  };
   return (
     <Box>
       <LayoutContainer>
@@ -260,7 +256,7 @@ const ProductCatalog = ({
                   <Typography sx={{ fontSize: { xs: 12, md: 15 } }}>
                     Tìm thấy <b>{total} </b>kết quả
                   </Typography>
-                  <ProductFilters initial={params} />
+                  <ProductSort />
                 </Box>
                 <Grid2 container spacing={{ xs: 1, md: 2 }} sx={{ mb: 3 }}>
                   {products?.length === 0
@@ -323,9 +319,25 @@ const ProductCatalog = ({
                   sx={{ display: "flex", justifyContent: "center" }}
                   count={Math.ceil(total / 12)}
                   page={page ?? 1}
-                  onChange={handlePageChange}
                   showFirstButton
                   showLastButton
+                  renderItem={(item) => {
+                    const nextParams = new URLSearchParams(
+                      searchParams.toString()
+                    );
+                    if (item.page !== null) {
+                      nextParams.set("page", item.page.toString());
+                    }
+
+                    return (
+                      <PaginationItem
+                        {...item}
+                        component={Link}
+                        href={`/?${nextParams.toString()}`}
+                        scroll={false}
+                      />
+                    );
+                  }}
                 />
               </Box>
             </Grid2>
