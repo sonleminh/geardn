@@ -8,8 +8,8 @@ const productParamsSchema = z.object({
   keyword: z.string().trim().optional(),
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().default(12),
-  sortBy: z.enum(["price", "createdAt", "name"]).default("createdAt"),
-  order: z.enum(["asc", "desc"]).default("desc"),
+  sortBy: z.enum(["createdAt", "price", "sold"]).optional(),
+  order: z.enum(["asc", "desc"]).optional(),
   category: z.string().trim().optional(),
   cursor: z.string().trim().optional(),
 });

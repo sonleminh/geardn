@@ -65,7 +65,7 @@ export class ProductService {
 
     let orderBy: Prisma.ProductOrderByWithRelationInput[];
 
-    if (!sortBy || sortBy === 'createdAt') {
+    if (!sortBy) {
       orderBy = [{ priority: 'desc' }, { createdAt: 'desc' }, { id: 'desc' }];
     } else {
       const sortFieldMap: Record<
