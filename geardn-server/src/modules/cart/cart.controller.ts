@@ -38,10 +38,10 @@ export class CartController {
   async updateQty(
     @Req() req: Request,
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateQuantityDto: UpdateQuantityDto,
+    @Body() dto: UpdateQuantityDto,
   ) {
     const userId = req.user?.id;
-    return this.cartService.updateQuantity(userId, id, updateQuantityDto);
+    return this.cartService.updateQuantity(userId, id, dto);
   }
 
   @UseGuards(JwtAuthGuard)
