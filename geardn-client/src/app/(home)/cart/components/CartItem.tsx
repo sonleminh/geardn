@@ -23,7 +23,7 @@ interface Props {
     name: string,
     newQty: number,
     oldQty: number,
-    cartItemId?: number
+    cartItemId?: number,
   ) => void;
   onRemove: (skuId: number, cartItemId?: number) => void;
   onSelect: (event: React.MouseEvent<unknown>, id: number) => void;
@@ -38,7 +38,7 @@ function CartItem({
   onSelect,
 }: Props) {
   const [localQty, setLocalQty] = useState(
-    item?.quantity ? item.quantity.toString() : "1"
+    item?.quantity ? item.quantity.toString() : "1",
   );
 
   useEffect(() => {
@@ -68,7 +68,7 @@ function CartItem({
         item.productName,
         newQty,
         item.quantity,
-        item.cartItemId
+        item.cartItemId,
       );
     }
   };
@@ -116,7 +116,7 @@ function CartItem({
               fill
               className="product-image"
             />
-            {stock < 10 && (
+            {stock && stock < 10 && (
               <Typography
                 sx={{
                   position: "absolute",
@@ -209,7 +209,7 @@ function CartItem({
                         item.productName,
                         item.quantity - 1,
                         item.quantity,
-                        item.cartItemId
+                        item.cartItemId,
                       )
                     }
                     sx={{
@@ -246,7 +246,7 @@ function CartItem({
                         item.productName,
                         item.quantity + 1,
                         item.quantity,
-                        item.cartItemId
+                        item.cartItemId,
                       )
                     }
                     sx={{
@@ -330,7 +330,7 @@ function CartItem({
                   item.productName,
                   item.quantity - 1,
                   item.quantity,
-                  item.cartItemId
+                  item.cartItemId,
                 )
               }
               sx={{ px: 1.5, py: 0.5, "&:hover": { bgcolor: "grey.50" } }}
@@ -366,7 +366,7 @@ function CartItem({
                   item.productName,
                   item.quantity + 1,
                   item.quantity,
-                  item.cartItemId
+                  item.cartItemId,
                 )
               }
               sx={{ px: 1.5, py: 0.5, "&:hover": { bgcolor: "grey.50" } }}

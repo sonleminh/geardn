@@ -62,7 +62,7 @@ interface CheckoutShippingProps {
   };
   errors: { note?: string };
   handleChange: (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => void;
   setFieldValue: (field: string, value: string | number | Date | null) => void;
 
@@ -84,7 +84,7 @@ interface CheckoutShippingProps {
   shipmentError: boolean;
 
   provinceOptions: ILocationOption[];
-  provinceData: BaseResponse<ILocation> | undefined;
+  provinceData: BaseResponse<ILocation> | undefined | null;
 }
 
 const CheckoutShipping = ({

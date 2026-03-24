@@ -1,7 +1,7 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
-import Link from "next/link";
+import { useRef, useTransition } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import {
   Box,
@@ -12,7 +12,6 @@ import {
   List,
   ListItem,
   Pagination as MuiPagination,
-  PaginationItem,
   Skeleton,
   Typography,
 } from "@mui/material";
@@ -51,10 +50,43 @@ const ProductCatalog = ({
   const page = Number(query.page);
   const total = pagination?.total ?? 0;
 
+  const router = useRouter();
+  const pathname = usePathname();
+  const [isPending, startTransition] = useTransition();
+
+  const listTopRef = useRef<HTMLDivElement>(null);
+
+  const handlePageChange = (
+    event: React.ChangeEvent<unknown>,
+    value: number,
+  ) => {
+    const nextParams = new URLSearchParams(searchParams.toString());
+    nextParams.set("page", value.toString());
+
+    startTransition(() => {
+      router.push(`${pathname}?${nextParams.toString()}`, { scroll: false });
+    });
+
+    setTimeout(() => {
+      if (listTopRef.current) {
+        const headerHeight = 90;
+
+        const elementPosition = listTopRef.current.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.scrollY - headerHeight;
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: "smooth",
+        });
+      }
+    }, 50);
+  };
+
+  const showSkeletons = products?.length === 0 || isPending;
   return (
     <Box>
       <LayoutContainer>
-        <Box sx={ProductListStyle}>
+        <Box sx={ProductListStyle} ref={listTopRef}>
           <Grid2 container spacing={{ xs: 0, md: 3 }} sx={{}}>
             <Grid2
               size={{ xs: 12, md: 3 }}
@@ -259,7 +291,7 @@ const ProductCatalog = ({
                   <ProductSort />
                 </Box>
                 <Grid2 container spacing={{ xs: 1, md: 2 }} sx={{ mb: 3 }}>
-                  {products?.length === 0
+                  {showSkeletons
                     ? [1, 2, 3, 4, 5, 6, 7, 8, 9].map((item, index) => (
                         <Grid2 key={index} size={{ xs: 6, md: 4 }}>
                           <Card>
@@ -321,23 +353,8 @@ const ProductCatalog = ({
                   page={page ?? 1}
                   showFirstButton
                   showLastButton
-                  renderItem={(item) => {
-                    const nextParams = new URLSearchParams(
-                      searchParams.toString()
-                    );
-                    if (item.page !== null) {
-                      nextParams.set("page", item.page.toString());
-                    }
-
-                    return (
-                      <PaginationItem
-                        {...item}
-                        component={Link}
-                        href={`/?${nextParams.toString()}`}
-                        scroll={false}
-                      />
-                    );
-                  }}
+                  onChange={handlePageChange}
+                  disabled={isPending}
                 />
               </Box>
             </Grid2>
