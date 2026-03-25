@@ -35,6 +35,8 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { TelegrafModule } from 'nestjs-telegraf';
 import { TelegramNotificationService } from './modules/notification/telegram-notification.service';
 import { AnalyticsModule } from './modules/google-analytics/analytics.module';
+import { CacheModule } from '@nestjs/cache-manager/dist/cache.module';
+import { redisCacheConfig } from './config/redis-cache.config';
 
 @Module({
   imports: [
@@ -55,13 +57,17 @@ import { AnalyticsModule } from './modules/google-analytics/analytics.module';
       useFactory: (cfg: ConfigService) => {
         return {
           connection: {
-            host: cfg.get<string>('REDIS_HOST', '127.0.0.1'),
+            host: cfg.get<string>('REDIS_HOST', 'redis_local'),
             port: parseInt(cfg.get<string>('REDIS_PORT', '6379'), 10),
             password: cfg.get<string>('REDIS_PASSWORD') || undefined,
             ...(cfg.get('REDIS_TLS') === 'true' ? { tls: {} } : {}),
           },
         };
       },
+    }),
+    CacheModule.registerAsync({
+      isGlobal: true,
+      useFactory: redisCacheConfig,
     }),
     ScheduleModule.forRoot(),
     AuthModule,

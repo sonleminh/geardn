@@ -1,4 +1,12 @@
-import { Controller, Req, Sse, UseGuards, MessageEvent, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import {
+  Controller,
+  Req,
+  Sse,
+  UseGuards,
+  MessageEvent,
+  OnModuleInit,
+  OnModuleDestroy,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import IORedis from 'ioredis';
 import { Observable, Subject } from 'rxjs';
@@ -14,9 +22,9 @@ export class RealtimeController implements OnModuleInit, OnModuleDestroy {
 
   onModuleInit() {
     this.sub = new IORedis({
-      host: this.config.get<string>('REDIS_HOST', '127.0.0.1'),
+      host: this.config.get<string>('REDIS_HOST', 'localhost'),
       port: parseInt(this.config.get<string>('REDIS_PORT', '6379'), 10),
-      password: this.config.get<string>('REDIS_PASSWORD', ''),
+      password: this.config.get<string>('REDIS_PASSWORD') || undefined,
     });
   }
 

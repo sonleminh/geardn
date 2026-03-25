@@ -11,6 +11,8 @@ import { ProductListQueryDto } from './dto/product-list.dto';
 import { AdminFindProductsDto } from './dto/admin-find-products.dto';
 import { ProductListByCateQueryDto } from './dto/product-list-by-cate.dto';
 import { SearchProductsDto } from './dto/search-product.dto';
+import { CacheService } from '../cache/cache.service';
+import { CacheTTL } from '../cache/cache-ttl';
 
 type CursorV1 =
   | { v: 1; k: 'createdAt'; c: string; id: number }
@@ -21,7 +23,7 @@ export class ProductService {
   constructor(
     private prisma: PrismaService,
     private readonly categoryService: CategoryService,
-    private readonly productSkuService: ProductSkuService,
+    private readonly cacheService: CacheService,
   ) {}
 
   encodeCursor(c: CursorV1): string {
@@ -52,6 +54,8 @@ export class ProductService {
     const res = await this.prisma.product.create({
       data,
     });
+    await this.cacheService.delByPattern('cache:products:homepage:*');
+
     return {
       data: res,
     };
@@ -61,6 +65,12 @@ export class ProductService {
     const { page = 1, limit: rawLimit = 12, sortBy, order = 'desc' } = dto;
 
     const limit = Math.min(Math.max(rawLimit, 1), 100);
+
+    const cacheKey = `cache:products:homepage:${page}:${limit}:${sortBy ?? 'default'}:${order}`;
+    const cached =
+      await this.cacheService.get<HomepageProductsResult>(cacheKey);
+    if (cached) return cached;
+
     const skip = (page - 1) * limit;
 
     let orderBy: Prisma.ProductOrderByWithRelationInput[];
@@ -99,7 +109,7 @@ export class ProductService {
       this.prisma.product.count({ where }),
     ]);
 
-    return {
+    const result: HomepageProductsResult = {
       data: products,
       meta: {
         total,
@@ -113,6 +123,10 @@ export class ProductService {
       },
       message: 'Product list retrieved successfully',
     };
+
+    await this.cacheService.set(cacheKey, result, 5 * 60 * 1000);
+
+    return result;
   }
 
   async search(dto: SearchProductsDto) {
@@ -265,6 +279,13 @@ export class ProductService {
   }
 
   async getProductBySlug(slug: string) {
+    const cacheKey = `cache:products:detail:${slug}`;
+
+    const cached = await this.cacheService.get<{ data: ProductWithDetails }>(
+      cacheKey,
+    );
+    if (cached) return cached;
+
     const product = await this.prisma.product.findUnique({
       where: { slug },
       include: {
@@ -317,9 +338,11 @@ export class ProductService {
       throw new NotFoundException(`Product with slug "${slug}" not found`);
     }
 
-    return {
-      data: product,
-    };
+    const result = { data: product };
+
+    await this.cacheService.set(cacheKey, result, CacheTTL.PRODUCT_DETAIL);
+
+    return result;
   }
 
   async getProductsByCategory(id: number) {
@@ -591,6 +614,10 @@ export class ProductService {
       where: { id },
       data,
     });
+    await this.cacheService.del(`cache:products:detail:${data.slug}`);
+
+    await this.cacheService.delByPattern('cache:products:homepage:*');
+
     return { data: res };
   }
 
