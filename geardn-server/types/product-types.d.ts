@@ -22,3 +22,24 @@ type ProductWithDetails = Prisma.ProductGetPayload<{
     skus: true;
   };
 }>;
+
+type CategoryProductsResult = {
+  data: {
+    id: number;
+    name: string;
+    slug: string;
+    images: string[];
+    priceMin: Decimal;
+    priceMax: Decimal;
+    createdAt: Date;
+    category: { id: number; slug: string; name: string };
+  }[];
+  meta: {
+    nextCursor: string | null;
+    hasMore: boolean;
+    total: number;
+    limit: number;
+  };
+  category: { id: number | undefined; slug: string; name: string | undefined };
+  message: string;
+};

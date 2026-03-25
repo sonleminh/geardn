@@ -394,6 +394,13 @@ export class ProductService {
     const sortDir: 'asc' | 'desc' = dto.order ?? 'desc';
     const sortByPrice = !!dto.order;
 
+    const cacheKey = `cache:products:category:${slug}:${limit}:${sortDir}:${sortByPrice}:${dto.cursor ?? 'first'}`;
+
+    // 1. Check cache first
+    const cached =
+      await this.cacheService.get<CategoryProductsResult>(cacheKey);
+    if (cached) return cached;
+
     // decode cursor đầu vào (nếu có). Nên để decode trả về null nếu hỏng.
     const cur = this.decodeCursor(dto.cursor); // { v:1, k:'priceMin'|'createdAt', p?:number, c?:string, id:number }
 
@@ -499,12 +506,16 @@ export class ProductService {
             })
         : null;
 
-    return {
+    const result: CategoryProductsResult = {
       data: sliced,
       meta: { nextCursor, hasMore, total, limit },
       category: { id: categoryId, slug: cat.data.slug, name: cat.data.name },
       message: 'Product list retrieved successfully',
     };
+
+    await this.cacheService.set(cacheKey, result, CacheTTL.HOMEPAGE_PRODUCTS);
+
+    return result;
   }
 
   async adminFindAll(query: AdminFindProductsDto) {
