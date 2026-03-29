@@ -11,12 +11,18 @@ import { formatPrice } from '../../utils/format-price';
 export class TelegramNotificationService {
   private readonly logger = new Logger(TelegramNotificationService.name);
   private readonly adminId: string;
+  private readonly botToken: string;
 
-  constructor(
-    @InjectBot() private readonly bot: Telegraf<Context>,
-    private readonly configService: ConfigService,
-  ) {
+  // constructor(
+  //   @InjectBot() private readonly bot: Telegraf<Context>,
+  //   private readonly configService: ConfigService,
+  // ) {
+  //   this.adminId = this.configService.get<string>('TELEGRAM_ADMIN_ID');
+  // }
+
+  constructor(private readonly configService: ConfigService) {
     this.adminId = this.configService.get<string>('TELEGRAM_ADMIN_ID');
+    this.botToken = this.configService.get<string>('TELEGRAM_BOT_TOKEN');
   }
 
   @OnEvent('order.created')
@@ -38,12 +44,27 @@ ${order?.orderItems?.map((item) => `  • ${item?.productName} (x${item?.quantit
 
     `;
     try {
-      await this.bot.telegram.sendMessage(this.adminId, message, {
-        parse_mode: 'HTML',
+      const url = `https://api.telegram.org/bot${this.botToken}/sendMessage`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: this.adminId,
+          text: message,
+          parse_mode: 'HTML',
+        }),
       });
+
+      if (!response.ok) {
+        throw new Error(
+          `Telegram API responded with status ${response.status}`,
+        );
+      }
+
       this.logger.log(`Notification sent for Order #${order?.orderCode}`);
     } catch (error) {
-      this.logger.error('Failed to send Telegram notification', error);
+      // This will now safely catch the ETIMEDOUT without crashing the server
+      this.logger.error('Failed to send Telegram notification', error.message);
     }
   }
 }

@@ -45,13 +45,13 @@ import { redisCacheConfig } from './config/redis-cache.config';
       envFilePath: ['.env.local', '.env.production'],
     }),
     EventEmitterModule.forRoot(),
-    TelegrafModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        token: configService.get<string>('TELEGRAM_BOT_TOKEN'),
-      }),
-      inject: [ConfigService],
-    }),
+    // TelegrafModule.forRootAsync({
+    //   imports: [ConfigModule],
+    //   useFactory: (configService: ConfigService) => ({
+    //     token: configService.get<string>('TELEGRAM_BOT_TOKEN'),
+    //   }),
+    //   inject: [ConfigService],
+    // }),
     BullModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (cfg: ConfigService) => {
