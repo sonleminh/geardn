@@ -1,8 +1,4 @@
-import {
-  getRefreshToken,
-  getSession,
-  removeSession,
-} from "@/authentication/cookie-session";
+import { getSession, removeSession } from "@/authentication/cookie-session";
 import axios, {
   AxiosError,
   AxiosInstance,
@@ -17,43 +13,35 @@ const baseURL = import.meta.env.VITE_APP_HOST;
 
 let isRefreshing = false;
 let failedQueue: Array<{
-  resolve: (token: string | null) => void;
+  resolve: () => void;
   reject: (error: AxiosError) => void;
 }> = [];
 
 const axiosInstance: AxiosInstance = axios.create({
   baseURL,
   timeout: 60000,
-  withCredentials: true, // sends refresh token cookie
+  withCredentials: true,
 });
 
-// axiosExtend: no auth header, used for refresh calls
 const axiosExtend: AxiosInstance = axios.create({
   baseURL,
   timeout: 60000,
-  withCredentials: true, // still needs cookies for refresh token
+  withCredentials: true,
 });
 
-const processQueue = (
-  error: AxiosError | null,
-  token: string | null = null,
-) => {
+const processQueue = (error: AxiosError | null) => {
   failedQueue.forEach((prom) => {
     if (error) prom.reject(error);
-    else prom.resolve(token);
+    else prom.resolve();
   });
   failedQueue = [];
 };
 
-const redirectToLogin = () => {
-  // Centralized navigation — use your router's navigate if available
-  // This avoids the auth guard racing with the interceptor
-  if (window.location.pathname !== "/login") {
+export const redirectToLogin = () => {
+  if (!window.location.pathname.includes("/login")) {
     window.location.href = "/login";
   }
 };
-
-// ─── axiosExtend: no-auth instance (for refresh + public endpoints) ──────────
 
 axiosExtend.interceptors.response.use(
   (response) => response,
@@ -65,8 +53,6 @@ axiosExtend.interceptors.response.use(
     return Promise.reject(error);
   },
 );
-
-// ─── axiosInstance: authenticated instance ───────────────────────────────────
 
 axiosInstance.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
@@ -85,46 +71,33 @@ axiosInstance.interceptors.response.use(
     const originalRequest = error.config as CustomAxiosRequestConfig;
 
     if (!originalRequest) return Promise.reject(error);
-
-    const is401 = error?.response?.status === 401;
-    const alreadyRetried = originalRequest._retry;
-
-    if (!is401 || alreadyRetried) {
+    if (error?.response?.status !== 401 || originalRequest._retry) {
       return Promise.reject(error);
     }
 
-    // If a refresh is already in progress, queue this request
     if (isRefreshing) {
-      return new Promise<string | null>((resolve, reject) => {
+      return new Promise<void>((resolve, reject) => {
         failedQueue.push({ resolve, reject });
       })
-        .then(() => axiosInstance(originalRequest)) // retry with new token (picked up via getSession in request interceptor)
+        .then(() => axiosInstance(originalRequest))
         .catch((err) => Promise.reject(err));
     }
 
     originalRequest._retry = true;
     isRefreshing = true;
 
-    const refreshToken = await getRefreshToken();
-    if (!refreshToken) {
-      isRefreshing = false;
-      removeSession();
-      redirectToLogin();
-      return Promise.reject(error);
-    }
-
     try {
-      // KEY FIX: use axiosExtend here — no expired Authorization header
-      await axiosExtend.get(`/admin/auth/refresh-token`);
+      // No getRefreshToken() guard — withCredentials sends the
+      // HttpOnly refresh_token cookie from api.geardn.id automatically.
+      // If it's expired, the backend 401s and we catch below.
+      await axiosExtend.get("/admin/auth/refresh-token");
 
-      // New token is now set in cookie by the server
-      // getSession() in the request interceptor will pick it up on retry
-      processQueue(null, null);
+      processQueue(null);
       return axiosInstance(originalRequest);
     } catch (refreshError) {
-      processQueue(refreshError as AxiosError, null);
+      processQueue(refreshError as AxiosError);
       removeSession();
-      redirectToLogin(); // Only navigate here — after refresh definitively fails
+      redirectToLogin();
       return Promise.reject(refreshError);
     } finally {
       isRefreshing = false;

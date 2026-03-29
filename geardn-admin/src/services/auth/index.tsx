@@ -1,20 +1,20 @@
-import { useNavigate } from 'react-router-dom';
-import { useAlertContext } from '@/contexts/AlertContext';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { useAuthContext } from '@/contexts/AuthContext';
-import { AxiosError } from 'axios';
+import { useNavigate } from "react-router-dom";
+import { useAlertContext } from "@/contexts/AlertContext";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useAuthContext } from "@/contexts/AuthContext";
+import { AxiosError } from "axios";
 
-import { axiosInstance } from '../axiosInstance';
+import { axiosInstance } from "../axiosInstance";
 
-import { ErrorResponse } from '@/interfaces/IError';
+import { ErrorResponse } from "@/interfaces/IError";
 import {
   ILoginPayload,
   ILoginResponse,
   IRefreshTokenResponse,
-} from '@/interfaces/IAuth';
-import { ROUTES } from '@/constants/route';
+} from "@/interfaces/IAuth";
+import { ROUTES } from "@/constants/route";
 
-const authUrl = 'admin/auth';
+const authUrl = "admin/auth";
 
 const loginApi = async (payload: ILoginPayload) => {
   const result = await axiosInstance.post(`${authUrl}/login`, payload);
@@ -27,15 +27,15 @@ export const useLoginMutate = () => {
   const { showAlert } = useAlertContext();
 
   return useMutation({
-    mutationKey: ['user'],
+    mutationKey: ["user"],
     mutationFn: loginApi,
     onSuccess: (data) => {
       auth?.login(data?.data);
-      showAlert('Đăng nhập thành công', 'success');
-      navigate('/dashboard');
+      showAlert("Đăng nhập thành công", "success");
+      navigate("/dashboard");
     },
     onError(error: AxiosError<ErrorResponse>) {
-      showAlert(error?.response?.data?.message, 'error');
+      showAlert(error?.response?.data?.message, "error");
     },
   });
 };
@@ -51,11 +51,11 @@ export const useLogoutMutate = () => {
   const { showAlert } = useAlertContext();
 
   return useMutation({
-    mutationKey: ['user'],
+    mutationKey: ["user"],
     mutationFn: logoutApi,
     onSuccess: () => {
       auth?.logout();
-      showAlert('Đăng xuất thành công', 'success');
+      showAlert("Đăng xuất thành công", "success");
       navigate(ROUTES.LOGIN);
     },
   });
@@ -68,10 +68,10 @@ const whoAmI = async () => {
 
 export const useWhoAmI = () => {
   return useQuery({
-    queryKey: ['user'],
+    queryKey: ["user"],
     queryFn: whoAmI,
     refetchOnWindowFocus: false,
-    retry: 0,
+    retry: false,
     gcTime: 0,
   });
 };
@@ -83,7 +83,7 @@ export const refreshToken = async () => {
 
 export const useRefreshToken = () => {
   return useQuery({
-    queryKey: ['refreshToken'],
+    queryKey: ["refreshToken"],
     queryFn: refreshToken,
     enabled: false,
     refetchOnWindowFocus: false,
