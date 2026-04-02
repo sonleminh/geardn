@@ -5,9 +5,8 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UploadService } from './upload.service';
-import {  FilesInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { JwtAdminAuthGuard } from '../admin-auth/guards/jwt-admin-auth.guard';
 
 @Controller('upload')
@@ -19,4 +18,5 @@ export class UploadController {
   @Post('/')
   async uploadImage(@UploadedFiles() files: Array<Express.Multer.File>) {
     return this.uploadService.uploadImage(files);
-  }}
+  }
+}

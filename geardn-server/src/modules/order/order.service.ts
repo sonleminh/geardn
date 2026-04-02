@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { JsonObject } from '@prisma/client/runtime/library';
 import { OrderReasonCode } from 'src/common/enums/order-reason-code';
 import { PrismaService } from '../prisma/prisma.service';
@@ -20,6 +20,8 @@ import { FindOrderStatusHistoryDto } from './dto/find-order-status-history.dto';
 import { FindOrdersDto } from './dto/find-orders.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { EmailService } from '../email/email.service';
+import { LoggerFactory } from 'src/logger/custom.logger';
 
 const ALLOWED_STATUS_TRANSITIONS: Readonly<
   Record<OrderStatus, readonly OrderStatus[]>
@@ -50,6 +52,8 @@ export class OrderService {
     private prisma: PrismaService,
     private readonly cartService: CartService,
     private eventEmitter: EventEmitter2,
+    private readonly emailService: EmailService,
+    private logger: LoggerFactory,
   ) {}
 
   async create(createOrderDto: CreateOrderDto) {
@@ -162,7 +166,11 @@ export class OrderService {
         },
       });
 
-      await this.eventEmitter.emit('order.created', updatedOrder);
+      void this.emailService
+        .sendNewOrderNotification(updatedOrder)
+        .catch((err) => {
+          this.logger.error(`Unhandled email error: ${err.message}`);
+        });
       return updatedOrder;
     });
 

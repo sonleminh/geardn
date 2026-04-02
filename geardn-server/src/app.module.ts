@@ -6,7 +6,6 @@ import { PrismaModule } from './modules/prisma/prisma.module';
 import { ProductModule } from './modules/product/product.module';
 import { CategoryModule } from './modules/category/category.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import configuration from './config/configuration';
 import { AuthModule } from './modules/auth/auth.module';
 import { AdminAuthModule } from './modules/admin-auth/admin-auth.module';
 import { LoggerModule } from './logger/logger.module';
@@ -32,8 +31,6 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { OutboxModule } from './modules/outbox/outbox.module';
 import { NotificationsModule } from './modules/notification/notification.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
-import { TelegrafModule } from 'nestjs-telegraf';
-import { TelegramNotificationService } from './modules/notification/telegram-notification.service';
 import { AnalyticsModule } from './modules/google-analytics/analytics.module';
 import { CacheModule } from '@nestjs/cache-manager/dist/cache.module';
 import { redisCacheConfig } from './config/redis-cache.config';
@@ -45,13 +42,6 @@ import { redisCacheConfig } from './config/redis-cache.config';
       envFilePath: ['.env.local', '.env.production'],
     }),
     EventEmitterModule.forRoot(),
-    // TelegrafModule.forRootAsync({
-    //   imports: [ConfigModule],
-    //   useFactory: (configService: ConfigService) => ({
-    //     token: configService.get<string>('TELEGRAM_BOT_TOKEN'),
-    //   }),
-    //   inject: [ConfigService],
-    // }),
     BullModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (cfg: ConfigService) => {
@@ -100,6 +90,5 @@ import { redisCacheConfig } from './config/redis-cache.config';
   ],
   controllers: [AppController],
   // providers: [{ provide: APP_FILTER, useClass: AllExceptionFilter }] c
-  providers: [TelegramNotificationService],
 })
 export class AppModule {}
