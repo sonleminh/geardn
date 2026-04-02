@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Resend } from 'resend';
 import { Order, OrderItem } from '@prisma/client';
+import { formatPrice } from 'src/utils/format-price';
 
 @Injectable()
 export class EmailService {
@@ -16,9 +17,9 @@ export class EmailService {
   ): Promise<void> {
     try {
       const { data, error } = await this.resend.emails.send({
-        from: 'GearDN Orders <orders@geardn.id.vn>',
+        from: 'GearDN <orders@geardn.id.vn>',
         to: process.env.STORE_OWNER_EMAIL,
-        subject: `🛒 New Order #${order.id} — $${order.totalPrice.toFixed(2)}`,
+        subject: `💸 New Order #${order.id} — ${formatPrice(Number(order?.totalPrice))} 💸`,
         html: buildOrderEmailHtml(order),
       });
 
@@ -48,13 +49,6 @@ function buildOrderEmailHtml(
     [shipment?.address, shipment?.ward, shipment?.district, shipment?.city]
       .filter(Boolean)
       .join(', ') || 'N/A';
-
-  const initials = (order.fullName ?? 'NA')
-    .split(' ')
-    .slice(-2)
-    .map((w) => w[0])
-    .join('')
-    .toUpperCase();
 
   const itemRows = order.orderItems
     .map(
@@ -158,7 +152,7 @@ function buildOrderEmailHtml(
 
   <!-- CTA -->
   <div style="background:#ffffff;padding:0 24px 24px;text-align:center;border-top:1px solid #f4f4f5;">
-    <a href="https://admin.geardn.id.vn/orders/${order.id}"
+    <a href="https://admin.geardn.id.vn/order/confirm/${order.id}"
       style="display:inline-block;background:#09090b;color:#ffffff;padding:11px 28px;border-radius:8px;font-size:13px;font-weight:500;text-decoration:none;letter-spacing:0.01em;">
       View in dashboard &rarr;
     </a>
