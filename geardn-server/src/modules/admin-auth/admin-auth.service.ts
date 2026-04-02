@@ -53,7 +53,7 @@ export class AdminAuthService {
       });
 
       this.storeToken(res, 'access_token', access_token, 2);
-      this.storeToken(res, 'refresh_token', refresh_token, 48);
+      this.storeToken(res, 'refresh_token', refresh_token, 168);
       return { data: user };
     } catch (error) {
       throw error;
@@ -76,7 +76,7 @@ export class AdminAuthService {
         }),
         this.jwtService.signAsync(data, {
           secret: this.configService.get<string>('JWT_SECRET_KEY'),
-          expiresIn: '2d',
+          expiresIn: '7d',
         }),
       ]);
       return {
@@ -137,7 +137,6 @@ export class AdminAuthService {
         access_token: newAccessToken,
         expires: 2,
       };
-      // return 2;
     } catch {
       throw new HttpException('Invalid refresh token', HttpStatus.UNAUTHORIZED);
     }
