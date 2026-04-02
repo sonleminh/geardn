@@ -42,7 +42,7 @@ jobs:
           username: ${{ secrets.HOST_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "./geardn-server/docker-compose.yml"
-          target: "/var/www/geardn-server/"
+          target: "/root/geardn-server/"
           strip_components: 1
 
       - name: SSH into VPS and Deploy
@@ -53,10 +53,7 @@ jobs:
           username: ${{ secrets.HOST_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # Tạo thư mục trước để tránh lỗi nếu chưa có
-            mkdir -p /var/www/geardn-server
-
-            cd /var/www/geardn-server
+            cd ~/geardn-server 
 
             # Pull image mới nhất về
             docker pull ${{ secrets.DOCKER_USERNAME }}/geardn-server:latest
