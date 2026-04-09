@@ -8,6 +8,7 @@ import { getTagStyle } from "@/utils/getTagStyle";
 
 import AppLink from "../AppLink";
 import SkeletonImage from "../SkeletonImage";
+import React from "react";
 
 const ProductCard = ({ data }: { data: IProduct }) => {
   const fallbackImage = "/icon.png";
@@ -157,4 +158,4 @@ const ProductCard = ({ data }: { data: IProduct }) => {
   );
 };
 
-export default ProductCard;
+export default React.memo(ProductCard);

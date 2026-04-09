@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { useQueryClient } from "@tanstack/react-query";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -50,7 +50,7 @@ const Header = ({ initialUser }: { initialUser?: IUser | null }) => {
   const queryClient = useQueryClient();
   const { showNotification } = useNotificationStore();
 
-  const { cartItems } = useCartStore((state) => state);
+  const cartLength = useCartStore((state) => state.cartItems.length);
 
   const { data } = useSession();
   const { mutateAsync: onLogout } = useLogout();
@@ -415,7 +415,7 @@ const Header = ({ initialUser }: { initialUser?: IUser | null }) => {
                     color: "#fff",
                   }}
                 >
-                  {cartItems ? cartItems?.length : 0}
+                  {cartLength ?? 0}
                 </Typography>
               </Button>
 
@@ -526,7 +526,7 @@ const Header = ({ initialUser }: { initialUser?: IUser | null }) => {
                       disablePadding
                       onClick={() =>
                         router.push(
-                          userData?.name ? ROUTES.ACCOUNT : ROUTES.LOGIN
+                          userData?.name ? ROUTES.ACCOUNT : ROUTES.LOGIN,
                         )
                       }
                     >
@@ -582,4 +582,4 @@ const Header = ({ initialUser }: { initialUser?: IUser | null }) => {
   );
 };
 
-export default Header;
+export default React.memo(Header);
