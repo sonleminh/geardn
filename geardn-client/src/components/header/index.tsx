@@ -1,7 +1,7 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 
 import { useQueryClient } from "@tanstack/react-query";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -157,6 +157,12 @@ const Header = ({ initialUser }: { initialUser?: IUser | null }) => {
       router.push(ROUTES.LOGIN);
     } else {
       setAnchorEl(event.currentTarget);
+    }
+  };
+
+  const handleUserMouseEnter = () => {
+    if (!userData) {
+      router.prefetch(ROUTES.LOGIN);
     }
   };
 
@@ -479,6 +485,7 @@ const Header = ({ initialUser }: { initialUser?: IUser | null }) => {
                     sx={{ width: 40, minWidth: 40, height: 40, ml: 1 }}
                     className="user-icon"
                     onClick={handleUserClick}
+                    onMouseEnter={handleUserMouseEnter}
                   >
                     <AccountCircleIcon sx={{ fontSize: 30 }} />
                   </Button>

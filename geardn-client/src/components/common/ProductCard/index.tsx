@@ -1,3 +1,4 @@
+import React from "react";
 import StarRateIcon from "@mui/icons-material/StarRate";
 import { Box, Typography } from "@mui/material";
 
@@ -8,7 +9,6 @@ import { getTagStyle } from "@/utils/getTagStyle";
 
 import AppLink from "../AppLink";
 import SkeletonImage from "../SkeletonImage";
-import React from "react";
 
 const ProductCard = ({ data }: { data: IProduct }) => {
   const fallbackImage = "/icon.png";
